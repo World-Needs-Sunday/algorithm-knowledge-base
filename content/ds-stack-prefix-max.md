@@ -3,6 +3,7 @@ id: ds-stack-prefix-max
 title: '前缀最值栈（栈内最大值查询）'
 category: 数据结构
 subcategory: 栈
+subSubcategory: 前缀最值
 tags: ["数据结构", "栈", "前缀最值", "辅助数组", "最大值查询"]
 timeComplexity: '入栈O(1)，出栈O(1)，查询最值O(1)'
 spaceComplexity: 'O(n)'

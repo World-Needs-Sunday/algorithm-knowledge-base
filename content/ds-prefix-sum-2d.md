@@ -3,6 +3,7 @@ id: ds-prefix-sum-2d
 title: '二维前缀和（子矩阵和查询）'
 category: 数据结构
 subcategory: 前缀和与差分
+subSubcategory: 二维
 tags: ["数据结构", "前缀和", "二维", "子矩阵", "区间查询", "容斥原理", "数学"]
 timeComplexity: '预处理O(nm)，查询O(1)'
 spaceComplexity: 'O(nm)'

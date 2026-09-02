@@ -3,6 +3,7 @@ id: ds-uf-weighted-old
 title: '带权并查集（以前没有学的时候写的 - 蓝桥1156）'
 category: 数据结构
 subcategory: 并查集
+subSubcategory: 带权
 tags: ["数据结构", "并查集", "带权并查集", "距离查询"]
 timeComplexity: 'O(α(n))'
 spaceComplexity: 'O(n)'

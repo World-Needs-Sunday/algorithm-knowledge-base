@@ -3,6 +3,7 @@ id: graph-floyd
 title: 'Floyd-Warshall 全源最短路（传递闭包法）'
 category: 图论
 subcategory: 最短路
+subSubcategory: 全源最短路
 tags: ["图论", "最短路", "Floyd", "Floyd-Warshall", "全源最短路", "动态规划", "邻接矩阵", "负权边"]
 timeComplexity: 'O(n^3)'
 spaceComplexity: 'O(n^2)'

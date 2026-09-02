@@ -3,6 +3,7 @@ id: dp-01bag-2d
 title: '二维费用01背包'
 category: 动态规划
 subcategory: 背包问题
+subSubcategory: 01背包
 tags: ["动态规划", "背包问题", "二维费用", "01背包", "DP"]
 timeComplexity: 'O(N×V×M)'
 spaceComplexity: 'O(V×M)'

@@ -3,6 +3,7 @@ id: dp-01bag-standard
 title: '01背包（标准）'
 category: 动态规划
 subcategory: 背包问题
+subSubcategory: 01背包
 tags: ["动态规划", "背包问题", "01背包", "DP"]
 timeComplexity: 'O(n×m)'
 spaceComplexity: 'O(n×m)'

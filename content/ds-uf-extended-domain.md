@@ -3,6 +3,7 @@ id: ds-uf-extended-domain
 title: '扩展域并查集（P1892）'
 category: 数据结构
 subcategory: 并查集
+subSubcategory: 扩展域
 tags: ["数据结构", "并查集", "扩展域并查集", "敌对关系", "团伙问题"]
 timeComplexity: 'O(α(n))'
 spaceComplexity: 'O(2n)'

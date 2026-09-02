@@ -3,6 +3,7 @@ id: dp-linear-edit-distance
 title: '字符串编辑距离'
 category: 动态规划
 subcategory: 线性DP
+subSubcategory: 经典模型
 tags: ["动态规划", "线性DP", "编辑距离", "Levenshtein", "DP"]
 timeComplexity: 'O(|a|×|b|)'
 spaceComplexity: 'O(|a|×|b|)'

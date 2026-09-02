@@ -3,6 +3,7 @@ id: dp-complete-bag
 title: '完全背包'
 category: 动态规划
 subcategory: 背包问题
+subSubcategory: 完全背包
 tags: ["动态规划", "背包问题", "完全背包", "DP"]
 timeComplexity: 'O(n×m)'
 spaceComplexity: 'O(n×m)（可优化为O(m)）'

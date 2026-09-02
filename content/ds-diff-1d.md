@@ -3,6 +3,7 @@ id: ds-diff-1d
 title: '一维差分（区间加·批量更新）'
 category: 数据结构
 subcategory: 前缀和与差分
+subSubcategory: 一维
 tags: ["数据结构", "差分", "一维", "区间修改", "前缀和逆操作", "数学"]
 timeComplexity: '修改O(1)，还原O(n)'
 spaceComplexity: 'O(n)'

@@ -180,6 +180,7 @@ function build() {
             id: kpId,
             category: meta.category || '未分类',
             subcategory: meta.subcategory || '未分类',
+            subSubcategory: meta.subSubcategory || '',
             title: meta.title || meta.id || filename,
             content: body.trim(),
             timeComplexity: meta.timeComplexity || '未知',
@@ -277,6 +278,8 @@ const KNOWLEDGE_DATA = ${JSON.stringify(knowledgeData, null, 4)};
 const CATEGORY_META = ${JSON.stringify(graph.categories || {}, null, 4)};
 
 const SUBCATEGORY_META = ${JSON.stringify(graph.subcategories || {}, null, 4)};
+
+const SUBSUBCATEGORY_META = ${JSON.stringify(graph.subSubcategories || {}, null, 4)};
 `;
     fs.writeFileSync(OUTPUT_DATA, dataJs, 'utf8');
     console.log(`\n✅ 生成 data.js (${knowledgeData.length} 个知识点, ${(dataJs.length / 1024).toFixed(1)} KB)`);

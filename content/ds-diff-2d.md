@@ -3,6 +3,7 @@ id: ds-diff-2d
 title: '二维差分（子矩阵加·批量更新）'
 category: 数据结构
 subcategory: 前缀和与差分
+subSubcategory: 二维
 tags: ["数据结构", "差分", "二维", "子矩阵", "区间修改", "容斥原理", "前缀和"]
 timeComplexity: '构造O(nm)，单次子矩阵修改O(1)，还原O(nm)'
 spaceComplexity: 'O(nm)'

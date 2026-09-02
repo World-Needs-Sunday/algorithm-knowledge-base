@@ -214,13 +214,42 @@
             border-radius: 0.25rem;
         }
 
-        .subcategory {
-            padding: 0.35rem 1rem 0.15rem 2rem;
+        .subcategory-header {
+            display: flex;
+            align-items: center;
+            padding: 0.35rem 0.5rem 0.15rem 1.5rem;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.12s;
+        }
+        .subcategory-header:hover { background: var(--sidebar-hover); }
+        .chevron-sub {
+            font-size: 0.55rem;
+            margin-right: 0.3rem;
+            transition: transform 0.2s;
+            color: var(--text-sidebar-muted);
+        }
+        .subcategory:not(.expanded) .chevron-sub { transform: rotate(-90deg); }
+        .subcategory:not(.expanded) .subcategory-body { display: none; }
+        .subcategory-name {
+            flex: 1;
             color: var(--text-sidebar-muted);
             font-size: 0.72rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.06em;
+        }
+
+        .subsubcategory {
+            padding: 0.25rem 1rem 0.1rem 2.5rem;
+            color: var(--text-sidebar-muted);
+            font-size: 0.68rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .kp-item-sub {
+            padding-left: 3rem !important;
         }
 
         .kp-item {
@@ -688,6 +717,15 @@
             font-weight: 700;
             margin-right: 0.3rem;
         }
+        .catalog-subsub-title {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            padding: 0.35rem 0 0.1rem 0.3rem;
+            list-style: none;
+            margin-top: 0.3rem;
+            border-top: 1px dashed var(--border);
+        }
 
         /* ===== Theme Toggle ===== */
         #theme-toggle {
@@ -977,13 +1015,16 @@
                     var matches = kp.title.toLowerCase().indexOf(q) >= 0 ||
                         kp.category.toLowerCase().indexOf(q) >= 0 ||
                         kp.subcategory.toLowerCase().indexOf(q) >= 0 ||
+                        (kp.subSubcategory && kp.subSubcategory.toLowerCase().indexOf(q) >= 0) ||
                         (kp.tags && kp.tags.some(function(t) { return t.toLowerCase().indexOf(q) >= 0; })) ||
                         (kp.content && kp.content.toLowerCase().indexOf(q) >= 0);
                     if (!matches) return;
                 }
                 if (!tree[kp.category]) tree[kp.category] = {};
-                if (!tree[kp.category][kp.subcategory]) tree[kp.category][kp.subcategory] = [];
-                tree[kp.category][kp.subcategory].push(kp);
+                if (!tree[kp.category][kp.subcategory]) tree[kp.category][kp.subcategory] = {};
+                var ssub = kp.subSubcategory || '';
+                if (!tree[kp.category][kp.subcategory][ssub]) tree[kp.category][kp.subcategory][ssub] = [];
+                tree[kp.category][kp.subcategory][ssub].push(kp);
             });
 
             var html = '';
@@ -997,7 +1038,9 @@
 
             cats.forEach(function(cat) {
                 var subs = tree[cat];
-                var totalCount = Object.values(subs).reduce(function(s, arr) { return s + arr.length; }, 0);
+                var totalCount = Object.values(subs).reduce(function(s, ssubs) {
+                    return s + Object.values(ssubs).reduce(function(s2, arr) { return s2 + arr.length; }, 0);
+                }, 0);
                 var expanded = !filter ? ' expanded' : ' expanded';
 
                 html += '<div class="category' + expanded + '">';
@@ -1009,17 +1052,60 @@
                 html += '<div class="category-body">';
 
                 Object.keys(subs).sort().forEach(function(sub) {
-                    html += '<div class="subcategory subcategory-link" onclick="showCategoryOverview(\'' + escAttr(cat) + '\')" title="点击查看分类详情">' + escHtml(sub) + '</div>';
-                    subs[sub].forEach(function(kp) {
-                        var active = currentId === kp.id ? ' active' : '';
-                        html += '<div class="kp-item' + active + '" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' + escHtml(kp.title) + '</div>';
+                    var subCount = Object.values(subs[sub]).reduce(function(s, arr) { return s + arr.length; }, 0);
+                    html += '<div class="subcategory' + (filter ? ' expanded' : '') + '">';
+                    html += '<div class="subcategory-header" onclick="this.parentElement.classList.toggle(\'expanded\')">';
+                    html += '<span class="chevron chevron-sub">\u25BC</span>';
+                    html += '<span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview(\'' + escAttr(cat) + '\')" title="点击查看分类详情">' + escHtml(sub) + '</span>';
+                    html += '<span class="category-count">' + subCount + '</span>';
+                    html += '</div>';
+                    html += '<div class="subcategory-body">';
+                    var ssubs = subs[sub];
+                    Object.keys(ssubs).sort().forEach(function(ssub) {
+                        if (ssub) {
+                            html += '<div class="subsubcategory">' + escHtml(ssub) + '</div>';
+                        }
+                        ssubs[ssub].forEach(function(kp) {
+                            var active = currentId === kp.id ? ' active' : '';
+                            var subCls = ssub ? ' kp-item-sub' : '';
+                            html += '<div class="kp-item' + subCls + active + '" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' + escHtml(kp.title) + '</div>';
+                        });
                     });
+                    html += '</div></div>';
                 });
 
                 html += '</div></div>';
             });
 
             sidebarNav.innerHTML = html;
+        }
+
+        // ===== Save / Restore Sidebar Expand State =====
+        function saveSidebarState() {
+            var state = { categories: {}, subcategories: {} };
+            document.querySelectorAll('#sidebar-nav .category').forEach(function(el) {
+                var nameEl = el.querySelector('.category-name');
+                if (nameEl) state.categories[nameEl.textContent] = el.classList.contains('expanded');
+            });
+            document.querySelectorAll('#sidebar-nav .subcategory').forEach(function(el) {
+                var nameEl = el.querySelector('.subcategory-name');
+                if (nameEl) state.subcategories[nameEl.textContent] = el.classList.contains('expanded');
+            });
+            return state;
+        }
+        function restoreSidebarState(state) {
+            document.querySelectorAll('#sidebar-nav .category').forEach(function(el) {
+                var nameEl = el.querySelector('.category-name');
+                if (nameEl && state.categories.hasOwnProperty(nameEl.textContent)) {
+                    el.classList.toggle('expanded', state.categories[nameEl.textContent]);
+                }
+            });
+            document.querySelectorAll('#sidebar-nav .subcategory').forEach(function(el) {
+                var nameEl = el.querySelector('.subcategory-name');
+                if (nameEl && state.subcategories.hasOwnProperty(nameEl.textContent)) {
+                    el.classList.toggle('expanded', state.subcategories[nameEl.textContent]);
+                }
+            });
         }
 
         // ===== Select Knowledge Point =====
@@ -1186,12 +1272,10 @@
             // Update URL
             location.hash = id;
 
-            // Update sidebar active
-            document.querySelectorAll('.kp-item').forEach(function(el) {
-                el.classList.remove('active');
-            });
-            // Rebuild sidebar to update active state
+            // Update sidebar active (preserve expand/collapse state)
+            var savedState = saveSidebarState();
             buildSidebar(searchInput.value);
+            restoreSidebarState(savedState);
 
             // Scroll to top
             contentEl.scrollTop = 0;
@@ -1226,12 +1310,14 @@
         // ===== Catalog Page =====
         function showCatalog() {
             currentId = null;
-            // Build category tree
+            // Build category tree (3-level: category > subcategory > subSubcategory)
             var tree = {};
             KNOWLEDGE_DATA.forEach(function(kp) {
                 if (!tree[kp.category]) tree[kp.category] = {};
-                if (!tree[kp.category][kp.subcategory]) tree[kp.category][kp.subcategory] = [];
-                tree[kp.category][kp.subcategory].push(kp);
+                if (!tree[kp.category][kp.subcategory]) tree[kp.category][kp.subcategory] = {};
+                var ssub = kp.subSubcategory || '';
+                if (!tree[kp.category][kp.subcategory][ssub]) tree[kp.category][kp.subcategory][ssub] = [];
+                tree[kp.category][kp.subcategory][ssub].push(kp);
             });
 
             var cats = Object.keys(tree).sort();
@@ -1254,7 +1340,9 @@
             // Category sections
             cats.forEach(function(cat) {
                 var subs = tree[cat];
-                var catCount = Object.values(subs).reduce(function(s, arr) { return s + arr.length; }, 0);
+                var catCount = Object.values(subs).reduce(function(s, ssubs) {
+                    return s + Object.values(ssubs).reduce(function(s2, arr) { return s2 + arr.length; }, 0);
+                }, 0);
                 var catMeta = (typeof CATEGORY_META !== 'undefined' && CATEGORY_META[cat]) || {};
                 html += '<div class="catalog-category">';
                 html += '<div class="catalog-category-header" onclick="this.parentElement.classList.toggle(\'expanded\')">';
@@ -1271,14 +1359,21 @@
                 html += '<div class="catalog-category-body">';
                 html += '<div class="catalog-sub-grid">';
                 Object.keys(subs).sort().forEach(function(sub) {
+                    var ssubs = subs[sub];
+                    var subCount = Object.values(ssubs).reduce(function(s, arr) { return s + arr.length; }, 0);
                     html += '<div class="catalog-subcard">';
                     html += '<div class="catalog-subtitle">' +
                         '<span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview(\'' + escAttr(cat) + '\')" title="点击查看分类详情">' + escHtml(sub) + '</span>' +
-                        '<span class="catalog-subtitle-count">' + subs[sub].length + ' 个</span></div>';
+                        '<span class="catalog-subtitle-count">' + subCount + ' 个</span></div>';
                     html += '<ul class="catalog-kp-list">';
-                    subs[sub].forEach(function(kp) {
-                        html += '<li class="catalog-kp-item" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' +
-                            escHtml(kp.title) + '</li>';
+                    Object.keys(ssubs).sort().forEach(function(ssub) {
+                        if (ssub) {
+                            html += '<li class="catalog-subsub-title">' + escHtml(ssub) + '</li>';
+                        }
+                        ssubs[ssub].forEach(function(kp) {
+                            html += '<li class="catalog-kp-item" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' +
+                                escHtml(kp.title) + '</li>';
+                        });
                     });
                     html += '</ul></div>';
                 });
@@ -1301,8 +1396,10 @@
             var subs = {};
             KNOWLEDGE_DATA.forEach(function(kp) {
                 if (kp.category !== catName) return;
-                if (!subs[kp.subcategory]) subs[kp.subcategory] = [];
-                subs[kp.subcategory].push(kp);
+                if (!subs[kp.subcategory]) subs[kp.subcategory] = {};
+                var ssub = kp.subSubcategory || '';
+                if (!subs[kp.subcategory][ssub]) subs[kp.subcategory][ssub] = [];
+                subs[kp.subcategory][ssub].push(kp);
             });
 
             var html = '<div class="category-overview">';
@@ -1321,16 +1418,21 @@
             Object.keys(subs).sort().forEach(function(subName) {
                 var subKey = catName + '|' + subName;
                 var subMeta = (typeof SUBCATEGORY_META !== 'undefined' && SUBCATEGORY_META[subKey]) || {};
+                var ssubs = subs[subName];
+                var subCount = Object.values(ssubs).reduce(function(s, arr) { return s + arr.length; }, 0);
 
                 html += '<div class="subcategory-block">';
                 html += '<div class="subcategory-block-title">' + escHtml(subName);
-                html += ' <span style="color:var(--text-secondary);font-size:0.75rem;font-weight:400;">(' + subs[subName].length + ' 个知识点)</span></div>';
+                html += ' <span style="color:var(--text-secondary);font-size:0.75rem;font-weight:400;">(' + subCount + ' 个知识点)</span></div>';
                 if (subMeta.description) {
                     html += '<p class="subcategory-block-desc">' + escHtml(subMeta.description) + '</p>';
                 }
                 html += '<div class="subcategory-kp-grid">';
-                subs[subName].forEach(function(kp) {
-                    html += '<div class="subcategory-kp-card" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' + escHtml(kp.title) + '</div>';
+                Object.keys(ssubs).sort().forEach(function(ssub) {
+                    ssubs[ssub].forEach(function(kp) {
+                        var ssubLabel = ssub ? '<span style="font-size:0.7rem;color:var(--text-muted);display:block;margin-bottom:0.2rem;">' + escHtml(ssub) + '</span>' : '';
+                        html += '<div class="subcategory-kp-card" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' + ssubLabel + escHtml(kp.title) + '</div>';
+                    });
                 });
                 html += '</div></div>';
             });

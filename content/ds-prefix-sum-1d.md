@@ -3,6 +3,7 @@ id: ds-prefix-sum-1d
 title: '一维前缀和（区间和查询）'
 category: 数据结构
 subcategory: 前缀和与差分
+subSubcategory: 一维
 tags: ["数据结构", "前缀和", "一维", "区间查询", "预处理", "数学"]
 timeComplexity: '预处理O(n)，查询O(1)'
 spaceComplexity: 'O(n)'

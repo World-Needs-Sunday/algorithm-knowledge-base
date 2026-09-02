@@ -3,6 +3,7 @@ id: ds-uf-weighted-food
 title: '带权并查集（扩展题目 - 食物链P2024）'
 category: 数据结构
 subcategory: 并查集
+subSubcategory: 带权
 tags: ["数据结构", "并查集", "带权并查集", "食物链", "关系推理"]
 timeComplexity: 'O(α(n))'
 spaceComplexity: 'O(n)'

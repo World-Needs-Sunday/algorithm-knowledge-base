@@ -3,6 +3,7 @@ id: graph-dijkstra-heap
 title: 'Dijkstra 最短路（堆优化）'
 category: 图论
 subcategory: 最短路
+subSubcategory: 单源最短路
 tags: ["图论", "最短路", "Dijkstra", "堆优化", "优先队列", "单源最短路", "贪心"]
 timeComplexity: 'O((V+E) log V)'
 spaceComplexity: 'O(V+E)'

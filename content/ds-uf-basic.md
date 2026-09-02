@@ -3,6 +3,7 @@ id: ds-uf-basic
 title: '并查集（基础 - 仅路径压缩）'
 category: 数据结构
 subcategory: 并查集
+subSubcategory: 基础
 tags: ["数据结构", "并查集", "路径压缩", "连通性"]
 timeComplexity: '均摊O(α(n))'
 spaceComplexity: 'O(n)'

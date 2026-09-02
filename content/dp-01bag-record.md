@@ -3,6 +3,7 @@ id: dp-01bag-record
 title: '01背包（带记录/路径还原）'
 category: 动态规划
 subcategory: 背包问题
+subSubcategory: 01背包
 tags: ["动态规划", "背包问题", "01背包", "路径还原", "DP"]
 timeComplexity: 'O(N×V)'
 spaceComplexity: 'O(N×V)'

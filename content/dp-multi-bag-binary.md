@@ -3,6 +3,7 @@ id: dp-multi-bag-binary
 title: '多重背包（二进制优化）'
 category: 动态规划
 subcategory: 背包问题
+subSubcategory: 多重背包
 tags: ["动态规划", "背包问题", "多重背包", "二进制优化", "DP"]
 timeComplexity: 'O(W×Σlog(m_i))'
 spaceComplexity: 'O(W+Σlog(m_i))'

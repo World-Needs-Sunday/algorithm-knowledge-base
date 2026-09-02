@@ -3,6 +3,7 @@ id: graph-spfa
 title: 'Bellman-Ford 批量松弛优化（类SPFA变体）'
 category: 图论
 subcategory: 最短路
+subSubcategory: 单源最短路
 tags: ["图论", "最短路", "Bellman-Ford", "批量松弛", "队列优化", "负权边", "类SPFA"]
 timeComplexity: '均摊O(kE)，最坏O(VE)'
 spaceComplexity: 'O(V+E)'

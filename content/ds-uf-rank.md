@@ -3,6 +3,7 @@ id: ds-uf-rank
 title: '并查集（带秩优化）'
 category: 数据结构
 subcategory: 并查集
+subSubcategory: 基础
 tags: ["数据结构", "并查集", "路径压缩", "按秩合并", "连通性"]
 timeComplexity: 'O(α(n))'
 spaceComplexity: 'O(n)'

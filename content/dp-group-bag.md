@@ -3,6 +3,7 @@ id: dp-group-bag
 title: '分组背包'
 category: 动态规划
 subcategory: 背包问题
+subSubcategory: 分组背包
 tags: ["动态规划", "背包问题", "分组背包", "DP"]
 timeComplexity: 'O(n×m)'
 spaceComplexity: 'O(m)'

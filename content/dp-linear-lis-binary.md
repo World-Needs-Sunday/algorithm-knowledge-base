@@ -3,6 +3,7 @@ id: dp-linear-lis-binary
 title: '最长上升子序列（二分）'
 category: 动态规划
 subcategory: 线性DP
+subSubcategory: LIS
 tags: ["动态规划", "线性DP", "最长上升子序列", "LIS", "二分查找", "DP"]
 timeComplexity: 'O(n log n)'
 spaceComplexity: 'O(n)'

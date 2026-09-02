@@ -3,6 +3,7 @@ id: dp-count-01bag
 title: '计数01背包（最大值方案计数）'
 category: 动态规划
 subcategory: 背包问题
+subSubcategory: 01背包
 tags: ["动态规划", "背包问题", "计数", "01背包", "DP"]
 timeComplexity: 'O(N×V)'
 spaceComplexity: 'O(V)'

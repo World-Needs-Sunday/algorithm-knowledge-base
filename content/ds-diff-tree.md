@@ -3,6 +3,7 @@ id: ds-diff-tree
 title: '树上点差分（路径点权修改）'
 category: 数据结构
 subcategory: 前缀和与差分
+subSubcategory: 树上
 tags: ["数据结构", "差分", "树上", "LCA", "倍增", "路径修改", "子树和"]
 timeComplexity: '修改O(log n)，还原O(n)'
 spaceComplexity: 'O(n log n)'

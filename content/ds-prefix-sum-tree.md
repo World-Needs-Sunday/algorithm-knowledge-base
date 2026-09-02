@@ -3,6 +3,7 @@ id: ds-prefix-sum-tree
 title: '树上前缀和（路径点权和查询）'
 category: 数据结构
 subcategory: 前缀和与差分
+subSubcategory: 树上
 tags: ["数据结构", "前缀和", "树上", "LCA", "倍增", "路径查询"]
 timeComplexity: '预处理O(n log n)，查询O(log n)'
 spaceComplexity: 'O(n log n)'

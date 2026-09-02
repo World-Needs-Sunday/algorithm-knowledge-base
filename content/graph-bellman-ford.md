@@ -3,6 +3,7 @@ id: graph-bellman-ford
 title: 'Bellman-Ford 单源最短路（含负权）'
 category: 图论
 subcategory: 最短路
+subSubcategory: 单源最短路
 tags: ["图论", "最短路", "Bellman-Ford", "负权边", "松弛", "动态规划", "负环检测"]
 timeComplexity: 'O(V×E)'
 spaceComplexity: 'O(V+E)'

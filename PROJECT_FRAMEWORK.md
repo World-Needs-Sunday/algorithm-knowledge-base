@@ -43,6 +43,7 @@
 | `KNOWLEDGE_DATA` | 知识点数组（含 id/title/category/content/prerequisites/related 等） | content/*.md + knowledge_graph.json |
 | `CATEGORY_META` | 大类元数据（nature/description/problemDomain） | knowledge_graph.json |
 | `SUBCATEGORY_META` | 子分类描述（key: "大类\|子分类"） | knowledge_graph.json |
+| `SUBSUBCATEGORY_META` | 小分类描述（key: "大类\|子分类\|小分类"） | knowledge_graph.json |
 
 ### problems_data.js 输出结构
 
@@ -54,7 +55,7 @@
 
 ## 2. 知识点分类体系
 
-当前已有 69 个知识点，分 8 个大类：
+当前已有 70 个知识点，分 8 个大类：
 
 | 大类 (category) | 子分类 (subcategory) | 知识点 ID |
 |---|---|---|
@@ -62,22 +63,22 @@
 | 基础算法 | 双指针 | `basic-two-pointer-cycle` |
 | 基础算法 | 分治 | `basic-divide-conquer-merge-inversion`, `basic-quickselect-kth` |
 | 基础算法 | 数位提升 | `basic-digit-power-cycle-self` |
-| 动态规划 | 背包问题 | `dp-01bag-2d`, `dp-01bag-record`, `dp-01bag-standard`, `dp-complete-bag`, `dp-count-01bag`, `dp-group-bag`, `dp-multi-bag-binary`, `dp-multi-bag-monotone` |
-| 动态规划 | 线性DP | `dp-linear-edit-distance`, `dp-linear-lcs-length`, `dp-linear-lcs-output`, `dp-linear-lcs-substring`, `dp-linear-lis-binary`, `dp-linear-lis-bit-count`, `dp-linear-maxsub`, `dp-linear-triangle` |
+| 动态规划 | 背包问题 | 01背包: `dp-01bag-standard`, `dp-01bag-2d`, `dp-01bag-record`, `dp-count-01bag`; 完全背包: `dp-complete-bag`; 多重背包: `dp-multi-bag-binary`, `dp-multi-bag-monotone`; 分组背包: `dp-group-bag` |
+| 动态规划 | 线性DP | LCS: `dp-linear-lcs-length`, `dp-linear-lcs-output`, `dp-linear-lcs-substring`; LIS: `dp-linear-lis-binary`, `dp-linear-lis-bit-count`; 经典模型: `dp-linear-edit-distance`, `dp-linear-maxsub`, `dp-linear-triangle` |
 | 动态规划 | 树形DP | `dp-tree-01bag`, `dp-tree-dance` |
 | 数据结构 | 树状数组 | `ds-bit-point-range`, `ds-bit-range-point` |
 | 数据结构 | 分块 | `ds-block-decomposition` |
 | 数据结构 | 莫队 | `ds-mo-team` |
 | 数据结构 | 单调队列 | `ds-monoqueue-1d`, `ds-monoqueue-2d` |
-| 数据结构 | 前缀和与差分 | `ds-prefix-sum-1d`, `ds-diff-1d`, `ds-prefix-sum-2d`, `ds-diff-2d`, `ds-prefix-sum-tree`, `ds-diff-tree` |
+| 数据结构 | 前缀和与差分 | 一维: `ds-prefix-sum-1d`, `ds-diff-1d`; 二维: `ds-prefix-sum-2d`, `ds-diff-2d`; 树上: `ds-prefix-sum-tree`, `ds-diff-tree` |
 | 数据结构 | 可持久化线段树 | `ds-persistent-segtree-3919`, `ds-persistent-segtree-template` |
 | 数据结构 | 线段树 | `ds-segtree-basic`, `ds-segtree-discretize`, `ds-segtree-mul` |
 | 数据结构 | 平衡树 | `ds-splay` |
 | 数据结构 | 堆 | `ds-dual-heap` |
-| 数据结构 | 栈 | `ds-stack-prefix-max` |
+| 数据结构 | 栈 | `ds-stack-prefix-max`（前缀最值）, `ds-monostack-histogram`（单调栈） |
 | 数据结构 | ST表 | `ds-st-table-1`, `ds-st-table-2` |
-| 数据结构 | 并查集 | `ds-uf-basic`, `ds-uf-extended-domain`, `ds-uf-rank`, `ds-uf-weighted-food`, `ds-uf-weighted-old` |
-| 图论 | 最短路 | `graph-bellman-ford`, `graph-dijkstra-heap`, `graph-floyd`, `graph-johnson`, `graph-spfa` |
+| 数据结构 | 并查集 | 基础: `ds-uf-basic`, `ds-uf-rank`; 带权: `ds-uf-weighted-old`, `ds-uf-weighted-food`; 扩展域: `ds-uf-extended-domain` |
+| 图论 | 最短路 | 单源最短路: `graph-dijkstra-heap`, `graph-bellman-ford`, `graph-spfa`; 全源最短路: `graph-floyd`, `graph-johnson` |
 | 图论 | 最小生成树 | `graph-kruskal`, `graph-prim` |
 | 图论 | 最近公共祖先 | `graph-lca-doubling`, `graph-lca-tarjan`, `graph-lca-hld` |
 | 图论 | 拓扑排序 | `graph-topo-sort` |
@@ -140,6 +141,7 @@ codePath: '图论\最短路\Johnson\Untitled1.cpp'
 | `title` | 是 | 显示标题，用单引号包裹 | `'Johnson 全源最短路（负权图）'` |
 | `category` | 是 | 大类（见分类体系表） | `图论` |
 | `subcategory` | 是 | 子分类 | `最短路` |
+| `subSubcategory` | 否 | 小分类（子分类内的进一步分组，如"栈"下设"前缀最值""单调栈"） | `单调栈` |
 | `tags` | 否 | 标签数组 | `["图论", "最短路", "Johnson"]` |
 | `timeComplexity` | 否 | 时间复杂度 | `'O(nm log n)'` |
 | `spaceComplexity` | 否 | 空间复杂度 | `'O(n^2 + n + m)'` |
@@ -213,6 +215,14 @@ codePath: '图论\最短路\Johnson\Untitled1.cpp'
       "description": "维护不相交集合的数据结构..."
     }
   },
+  "subSubcategories": {
+    "数据结构|并查集|基础": {
+      "description": "基础并查集，仅路径压缩或按秩合并..."
+    },
+    "数据结构|并查集|带权": {
+      "description": "带权并查集，在路径压缩时维护权值关系..."
+    }
+  },
   "knowledgePoints": {
     "ds-uf-basic": {
       "prerequisites": [],
@@ -227,7 +237,7 @@ codePath: '图论\最短路\Johnson\Untitled1.cpp'
 | 字段 | 位置 | 说明 |
 |---|---|---|
 | `nature` | categories | 分类性质标签（如"最优化方法"） |
-| `description` | categories/subcategories | 分类/子分类的详细描述 |
+| `description` | categories/subcategories/subSubcategories | 分类/子分类/小分类的详细描述 |
 | `problemDomain` | categories | 该分类处理的问题领域 |
 | `prerequisites` | knowledgePoints | 前置知识点 ID 数组（学习本知识点前应掌握的内容） |
 | `related` | knowledgePoints | 相关知识点 ID 数组（延伸阅读） |
@@ -235,6 +245,7 @@ codePath: '图论\最短路\Johnson\Untitled1.cpp'
 **维护规则**：
 - 添加新知识点时，在 `knowledgePoints` 中添加对应条目
 - 新增子分类时，在 `subcategories` 中添加描述（key: `"大类|子分类"`）
+- 新增小分类时，在 `subSubcategories` 中添加描述（key: `"大类|子分类|小分类"`），同时在对应 .md 文件的 frontmatter 中设置 `subSubcategory` 字段
 - 新增大类时，在 `categories` 中添加描述
 - 前置/相关关系使用知识点 ID 引用，build.js 会在构建时自动关联标题
 

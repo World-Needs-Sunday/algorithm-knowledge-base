@@ -3,6 +3,7 @@ id: dp-linear-maxsub
 title: '长度不超过m的最大子段和'
 category: 动态规划
 subcategory: 线性DP
+subSubcategory: 经典模型
 tags: ["动态规划", "线性DP", "单调队列", "前缀和", "DP"]
 timeComplexity: 'O(n)'
 spaceComplexity: 'O(n)'

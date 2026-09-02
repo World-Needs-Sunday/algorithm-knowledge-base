@@ -3,6 +3,7 @@ id: dp-linear-lcs-output
 title: '最长公共子序列（带输出）'
 category: 动态规划
 subcategory: 线性DP
+subSubcategory: LCS
 tags: ["动态规划", "线性DP", "最长公共子序列", "LCS", "路径还原", "DP"]
 timeComplexity: 'O(|a|×|b|)'
 spaceComplexity: 'O(|a|×|b|)'

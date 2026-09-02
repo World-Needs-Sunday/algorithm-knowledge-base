@@ -3,6 +3,7 @@ id: dp-multi-bag-monotone
 title: '多重背包（单调队列优化）'
 category: 动态规划
 subcategory: 背包问题
+subSubcategory: 多重背包
 tags: ["动态规划", "背包问题", "多重背包", "单调队列", "DP"]
 timeComplexity: 'O(n×W)'
 spaceComplexity: 'O(W)'

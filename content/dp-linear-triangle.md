@@ -3,6 +3,7 @@ id: dp-linear-triangle
 title: '数字三角形'
 category: 动态规划
 subcategory: 线性DP
+subSubcategory: 经典模型
 tags: ["动态规划", "线性DP", "路径DP", "DP"]
 timeComplexity: 'O(n²)'
 spaceComplexity: 'O(n²)（可优化为O(n)）'

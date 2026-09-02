@@ -3,6 +3,7 @@ id: graph-johnson
 title: 'Johnson 全源最短路（负权图）'
 category: 图论
 subcategory: 最短路
+subSubcategory: 全源最短路
 tags: ["图论", "最短路", "Johnson", "全源最短路", "负权边", "势能函数", "重赋权", "Dijkstra"]
 timeComplexity: 'O(nm log n)'
 spaceComplexity: 'O(n^2 + n + m)'

@@ -3,6 +3,7 @@ id: dp-linear-lcs-length
 title: '最长公共子序列长度（普通）'
 category: 动态规划
 subcategory: 线性DP
+subSubcategory: LCS
 tags: ["动态规划", "线性DP", "最长公共子序列", "LCS", "DP"]
 timeComplexity: 'O(|a|×|b|)'
 spaceComplexity: 'O(|a|×|b|)'

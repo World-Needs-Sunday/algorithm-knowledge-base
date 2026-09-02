@@ -3,6 +3,7 @@ id: dp-linear-lcs-substring
 title: '最长公共子串'
 category: 动态规划
 subcategory: 线性DP
+subSubcategory: LCS
 tags: ["动态规划", "线性DP", "最长公共子串", "字符串", "DP"]
 timeComplexity: 'O(|A|×|B|)'
 spaceComplexity: 'O(|A|×|B|)'

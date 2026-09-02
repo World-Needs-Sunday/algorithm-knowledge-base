@@ -3,6 +3,7 @@ id: dp-linear-lis-bit-count
 title: '最长上升子序列（树状数组优化·带计数）'
 category: 动态规划
 subcategory: 线性DP
+subSubcategory: LIS
 tags: ["动态规划", "线性DP", "最长上升子序列", "LIS", "树状数组", "BIT", "离散化", "计数"]
 timeComplexity: 'O(n log n)'
 spaceComplexity: 'O(n)'
