@@ -1,0 +1,17 @@
+# 编译产物
+*.exe
+*.o
+*.obj
+
+# IDE/编辑器
+.vscode/
+.idea/
+
+# Node.js
+node_modules/
+package-lock.json
+
+# 系统
+Thumbs.db
+desktop.ini
+.DS_Store

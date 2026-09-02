@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算法知识点查询系统</title>
+    <script>
+        // 防止主题闪烁
+        (function() {
+            var t = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', t);
+        })();
+    </script>
+    <link rel="stylesheet" href="vendor/katex.min.css">
+    <link rel="stylesheet" href="vendor/github-dark.min.css">
+    <style>
+        /* ===== Theme Variables ===== */
+        :root {
+            --bg: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-sidebar: #1e293b;
+            --bg-sidebar-header: #0f172a;
+            --bg-code: #0d1117;
+            --bg-code-header: #161b22;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --text-sidebar: #cbd5e1;
+            --text-sidebar-hover: #ffffff;
+            --text-sidebar-muted: #64748b;
+            --primary: #3b82f6;
+            --primary-light: #60a5fa;
+            --border: #e2e8f0;
+            --border-sidebar: #334155;
+            --badge-time-bg: #dbeafe;
+            --badge-time-text: #1e40af;
+            --badge-space-bg: #dcfce7;
+            --badge-space-text: #166534;
+            --tag-bg: #f1f5f9;
+            --tag-text: #475569;
+            --hover-bg: #f1f5f9;
+            --sidebar-hover: #334155;
+            --sidebar-active: #1e3a5f;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08);
+            --sidebar-width: 280px;
+            --content-max: 820px;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', monospace;
+        }
+
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --bg-secondary: #1e293b;
+            --text: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --border: #334155;
+            --badge-time-bg: #1e3a5f;
+            --badge-time-text: #93c5fd;
+            --badge-space-bg: #14532d;
+            --badge-space-text: #86efac;
+            --tag-bg: #1e293b;
+            --tag-text: #94a3b8;
+            --hover-bg: #1e293b;
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* ===== Reset & Base ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100vh;
+            overflow: hidden;
+            font-family: var(--font-sans);
+            background: var(--bg);
+            color: var(--text);
+            transition: background 0.2s, color 0.2s;
+        }
+
+        /* ===== Layout ===== */
+        #app { display: flex; height: 100vh; }
+
+        /* ===== Sidebar ===== */
+        #sidebar {
+            width: var(--sidebar-width);
+            flex-shrink: 0;
+            background: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border-sidebar);
+            height: 100vh;
+        }
+
+        .sidebar-header {
+            padding: 1rem 1.25rem 0.75rem;
+            background: var(--bg-sidebar-header);
+            flex-shrink: 0;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 0.6rem;
+            letter-spacing: 0.02em;
+        }
+
+        .search-box { position: relative; }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.45rem 0.7rem;
+            border: 1px solid #334155;
+            border-radius: 0.375rem;
+            background: #0f172a;
+            color: #e2e8f0;
+            font-size: 0.82rem;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        .search-box input::placeholder { color: #475569; }
+        .search-box input:focus { border-color: var(--primary-light); }
+
+        .catalog-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            margin: 0.5rem 1rem 0;
+            padding: 0.4rem 0.7rem;
+            border: 1px solid #334155;
+            border-radius: 0.375rem;
+            background: #1e3a5f;
+            color: #93c5fd;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        .catalog-btn:hover { background: #1e40af; border-color: var(--primary-light); color: #fff; }
+
+        .mode-switcher {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 0.6rem;
+        }
+        .mode-btn {
+            flex: 1;
+            padding: 0.38rem 0.5rem;
+            border: 1px solid #334155;
+            border-radius: 0.375rem;
+            background: #0f172a;
+            color: #64748b;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+        }
+        .mode-btn.active {
+            background: #1e3a5f;
+            border-color: var(--primary-light);
+            color: #93c5fd;
+        }
+        .mode-btn:hover:not(.active) {
+            background: #1e293b;
+            color: #cbd5e1;
+        }
+
+        #sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0.5rem 0;
+        }
+
+        .sidebar-footer {
+            padding: 0.5rem 1.25rem;
+            font-size: 0.72rem;
+            color: #475569;
+            border-top: 1px solid var(--border-sidebar);
+            flex-shrink: 0;
+        }
+
+        /* ===== Sidebar Tree ===== */
+        .category-header {
+            display: flex;
+            align-items: center;
+            padding: 0.45rem 1rem;
+            cursor: pointer;
+            color: var(--text-sidebar);
+            font-weight: 600;
+            font-size: 0.85rem;
+            user-select: none;
+            transition: background 0.12s;
+        }
+
+        .category-header:hover { background: var(--sidebar-hover); }
+
+        .chevron {
+            font-size: 0.65rem;
+            margin-right: 0.4rem;
+            transition: transform 0.2s;
+            color: var(--text-sidebar-muted);
+        }
+
+        .category:not(.expanded) .chevron { transform: rotate(-90deg); }
+        .category:not(.expanded) .category-body { display: none; }
+
+        .category-name { flex: 1; }
+        .category-count {
+            font-size: 0.7rem;
+            color: var(--text-sidebar-muted);
+            background: rgba(255,255,255,0.08);
+            padding: 0.1rem 0.35rem;
+            border-radius: 0.25rem;
+        }
+
+        .subcategory {
+            padding: 0.35rem 1rem 0.15rem 2rem;
+            color: var(--text-sidebar-muted);
+            font-size: 0.72rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .kp-item {
+            padding: 0.38rem 1rem 0.38rem 2.5rem;
+            color: var(--text-sidebar);
+            font-size: 0.82rem;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.12s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .kp-item:hover {
+            background: var(--sidebar-hover);
+            color: var(--text-sidebar-hover);
+        }
+
+        .kp-item.active {
+            background: var(--sidebar-active);
+            border-left-color: var(--primary-light);
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .no-results {
+            padding: 1.5rem 1rem;
+            text-align: center;
+            color: var(--text-sidebar-muted);
+            font-size: 0.82rem;
+        }
+
+        /* ===== Content Area ===== */
+        #content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2.5rem 3rem 4rem;
+            background: var(--bg);
+            scroll-behavior: smooth;
+        }
+
+        .article {
+            max-width: var(--content-max);
+            margin: 0 auto;
+        }
+
+        .article h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text);
+            line-height: 1.3;
+        }
+
+        /* ===== Meta Bar ===== */
+        .meta-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.45rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .badge {
+            padding: 0.22rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.76rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .badge-time { background: var(--badge-time-bg); color: var(--badge-time-text); }
+        .badge-space { background: var(--badge-space-bg); color: var(--badge-space-text); }
+
+        .badge-difficulty-easy { background: #dcfce7; color: #166534; }
+        .badge-difficulty-medium { background: #fef9c3; color: #854d0e; }
+        .badge-difficulty-hard { background: #fee2e2; color: #991b1b; }
+        [data-theme="dark"] .badge-difficulty-easy { background: #14532d; color: #86efac; }
+        [data-theme="dark"] .badge-difficulty-medium { background: #713f12; color: #fde047; }
+        [data-theme="dark"] .badge-difficulty-hard { background: #7f1d1d; color: #fca5a5; }
+
+        .badge-oj { background: #ede9fe; color: #5b21b6; }
+        [data-theme="dark"] .badge-oj { background: #2e1065; color: #c4b5fd; }
+        .badge-pid { background: var(--tag-bg); color: var(--tag-text); font-family: var(--font-mono); font-size: 0.72rem; }
+
+        .tag {
+            padding: 0.22rem 0.55rem;
+            border-radius: 0.3rem;
+            font-size: 0.76rem;
+            background: var(--tag-bg);
+            color: var(--tag-text);
+        }
+
+        /* ===== Markdown Body Typography ===== */
+        .markdown-body { color: var(--text); line-height: 1.8; }
+
+        .markdown-body h2 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 2.5rem;
+            margin-bottom: 0.9rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .markdown-body h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.6rem;
+            color: var(--text);
+        }
+
+        .markdown-body h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            margin-bottom: 0.4rem;
+            color: var(--text-secondary);
+        }
+
+        .markdown-body p {
+            margin-bottom: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .markdown-body ul, .markdown-body ol {
+            margin-bottom: 0.9rem;
+            padding-left: 1.4rem;
+        }
+
+        .markdown-body li {
+            margin-bottom: 0.3rem;
+            line-height: 1.7;
+        }
+
+        .markdown-body li > ul, .markdown-body li > ol {
+            margin-top: 0.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .markdown-body strong { font-weight: 600; color: var(--text); }
+
+        .markdown-body blockquote {
+            margin: 1rem 0;
+            padding: 0.5rem 1rem;
+            border-left: 3px solid var(--primary-light);
+            background: var(--bg-secondary);
+            border-radius: 0 0.3rem 0.3rem 0;
+            color: var(--text-secondary);
+        }
+
+        .markdown-body a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .markdown-body a:hover { text-decoration: underline; }
+
+        /* ===== Inline Code ===== */
+        .markdown-body code {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            background: var(--bg-secondary);
+            padding: 0.12rem 0.38rem;
+            border-radius: 0.25rem;
+            color: var(--primary);
+            border: 1px solid var(--border);
+        }
+
+        /* ===== Code Blocks in Markdown ===== */
+        .markdown-body pre {
+            background: var(--bg-code);
+            border-radius: 0.5rem;
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            border: 1px solid #21262d;
+        }
+
+        .markdown-body pre code {
+            font-family: var(--font-mono);
+            background: none;
+            border: none;
+            padding: 0;
+            border-radius: 0;
+            color: #e2e8f0;
+            font-size: 0.82rem;
+            line-height: 1.6;
+        }
+
+        /* ===== Tables ===== */
+        .markdown-body table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+        }
+
+        .markdown-body th, .markdown-body td {
+            border: 1px solid var(--border);
+            padding: 0.5rem 0.75rem;
+            text-align: left;
+        }
+
+        .markdown-body th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+        }
+
+        .markdown-body tr:nth-child(even) td { background: var(--bg-secondary); }
+
+        /* ===== KaTeX ===== */
+        .markdown-body .katex-display {
+            margin: 1.2rem 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding: 0.5rem 0;
+        }
+
+        .markdown-body .katex { font-size: 1.05em; }
+
+        /* ===== Code Section ===== */
+        .code-section {
+            margin-top: 2.5rem;
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.55rem 1rem;
+            background: var(--bg-code-header);
+            border-bottom: 1px solid #21262d;
+        }
+
+        .code-filename {
+            font-size: 0.8rem;
+            color: #8b949e;
+            font-family: var(--font-mono);
+        }
+
+        .copy-btn {
+            padding: 0.25rem 0.6rem;
+            border: 1px solid #30363d;
+            border-radius: 0.25rem;
+            background: #21262d;
+            color: #c9d1d9;
+            font-size: 0.76rem;
+            cursor: pointer;
+            transition: background 0.12s;
+        }
+
+        .copy-btn:hover { background: #30363d; }
+
+        .code-section pre {
+            margin: 0;
+            border-radius: 0;
+            border: none;
+            background: var(--bg-code);
+        }
+
+        .code-section code {
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+        }
+
+        /* ===== Nav Buttons ===== */
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 0.9rem;
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            background: var(--bg-secondary);
+            color: var(--text);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.12s;
+            max-width: 48%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .nav-prev { text-align: left; }
+        .nav-next { text-align: right; margin-left: auto; }
+
+        /* ===== Catalog Page ===== */
+        .catalog-page {
+            max-width: var(--content-max);
+            margin: 0 auto;
+        }
+        .catalog-page h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: var(--text);
+        }
+        .catalog-desc {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .catalog-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .catalog-stat {
+            padding: 0.4rem 0.8rem;
+            background: var(--bg-secondary);
+            border-radius: 0.4rem;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: baseline;
+            gap: 0.35rem;
+        }
+        .catalog-stat-num {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .catalog-stat-label {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+        .catalog-category {
+            margin-bottom: 1.25rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--primary);
+            border-radius: 0.4rem;
+            overflow: hidden;
+        }
+        .catalog-category-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.55rem 0.9rem;
+            cursor: pointer;
+            transition: background 0.12s;
+            user-select: none;
+        }
+        .catalog-category-header:hover {
+            background: var(--tag-bg);
+        }
+        .catalog-category-header-left {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+        .catalog-category-chevron {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+        .catalog-category.expanded .catalog-category-chevron {
+            transform: rotate(90deg);
+        }
+        .catalog-category-body {
+            display: none;
+            padding: 0 0.9rem 0.75rem;
+        }
+        .catalog-category.expanded .catalog-category-body {
+            display: block;
+        }
+        .catalog-category-name {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .catalog-category-nature {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+        }
+        .catalog-category-count {
+            font-size: 0.72rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            background: var(--tag-bg);
+            padding: 0.1rem 0.45rem;
+            border-radius: 0.25rem;
+        }
+        .catalog-category-detail-link {
+            font-size: 0.75rem;
+            color: var(--primary);
+            opacity: 0.7;
+            transition: opacity 0.12s;
+        }
+        .catalog-category-header:hover .catalog-category-detail-link {
+            opacity: 1;
+        }
+        .catalog-sub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 0.6rem;
+        }
+        .catalog-subcard {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 0.35rem;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.15s;
+        }
+        .catalog-subcard:hover {
+            border-color: var(--primary-light);
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .catalog-subtitle {
+            font-weight: 600;
+            font-size: 0.82rem;
+            color: var(--text);
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .catalog-subtitle-count {
+            font-size: 0.68rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+        .catalog-kp-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .catalog-kp-item {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            padding: 0.15rem 0;
+            cursor: pointer;
+            transition: color 0.12s;
+            line-height: 1.4;
+        }
+        .catalog-kp-item:hover { color: var(--primary); }
+        .catalog-kp-item::before {
+            content: '·';
+            color: var(--primary);
+            font-weight: 700;
+            margin-right: 0.3rem;
+        }
+
+        /* ===== Theme Toggle ===== */
+        #theme-toggle {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow);
+            z-index: 100;
+            transition: transform 0.15s;
+        }
+
+        #theme-toggle:hover { transform: scale(1.1); }
+
+        /* ===== Placeholder ===== */
+        .placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* ===== Prerequisite & Related Sections ===== */
+        .kp-links-section {
+            margin: 1.5rem 0;
+            padding: 0.85rem 1.1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+        }
+        .kp-links-section.prereq { border-left: 3px solid var(--primary-light); }
+        .kp-links-section.related { border-left: 3px solid #10b981; margin-top: 2.5rem; }
+        .kp-links-title {
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 0.55rem;
+            color: var(--text);
+        }
+        .kp-links-list { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+        .kp-link-chip {
+            padding: 0.2rem 0.65rem;
+            border-radius: 0.3rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.12s;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text-secondary);
+        }
+        .kp-link-chip.prereq-chip { border-color: var(--primary); color: var(--primary); }
+        .kp-link-chip.related-chip { border-color: #10b981; color: #059669; }
+        .kp-link-chip:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
+        .kp-link-chip.prereq-chip:hover { background: var(--badge-time-bg); }
+        .kp-link-chip.related-chip:hover { background: var(--badge-space-bg); }
+        .kp-no-prereq { font-size: 0.8rem; color: var(--text-secondary); font-style: italic; }
+
+        /* ===== Category Overview Page ===== */
+        .category-overview { max-width: var(--content-max); margin: 0 auto; }
+        .category-overview h1 { font-size: 1.7rem; font-weight: 700; margin-bottom: 0.5rem; color: var(--text); }
+        .category-nature-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 0.3rem;
+            font-size: 0.76rem;
+            font-weight: 500;
+            background: var(--badge-time-bg);
+            color: var(--badge-time-text);
+            margin-bottom: 0.75rem;
+        }
+        .category-overview-desc { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.7; margin-bottom: 0.5rem; }
+        .category-overview-domain {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .category-overview-domain strong { color: var(--text); }
+        .subcategory-block { margin-bottom: 2rem; }
+        .subcategory-block-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 0.4rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 2px solid var(--primary);
+        }
+        .subcategory-block-desc { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 0.75rem; }
+        .subcategory-kp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.6rem;
+        }
+        .subcategory-kp-card {
+            padding: 0.5rem 0.8rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 0.375rem;
+            font-size: 0.82rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+        .subcategory-kp-card:hover {
+            border-color: var(--primary-light);
+            color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
+        }
+        .category-name-link { cursor: pointer; }
+        .category-name-link:hover { color: var(--primary-light); text-decoration: underline; }
+        .subcategory-link { cursor: pointer; }
+        .subcategory-link:hover { color: var(--primary-light); }
+
+        /* ===== Scrollbar ===== */
+        #sidebar-nav::-webkit-scrollbar { width: 5px; }
+        #sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+        #sidebar-nav::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+        #content::-webkit-scrollbar { width: 6px; }
+        #content::-webkit-scrollbar-track { background: transparent; }
+        #content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        /* ===== Mobile Menu Toggle ===== */
+        #menu-toggle {
+            display: none;
+            position: fixed;
+            top: 0.75rem;
+            left: 0.75rem;
+            z-index: 101;
+            width: 2.2rem;
+            height: 2.2rem;
+            border-radius: 0.3rem;
+            border: 1px solid var(--border);
+            background: var(--bg-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            #sidebar {
+                position: fixed;
+                left: calc(-1 * var(--sidebar-width));
+                transition: left 0.3s;
+                z-index: 100;
+            }
+            #sidebar.open { left: 0; }
+            #menu-toggle { display: flex; align-items: center; justify-content: center; }
+            #content { padding: 3.5rem 1rem 4rem; }
+            .article h1 { font-size: 1.4rem; }
+            .markdown-body h2 { font-size: 1.15rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">算法知识点查询系统</h1>
+                <div class="mode-switcher">
+                    <button class="mode-btn active" id="mode-kp" onclick="switchMode('kp')">📖 知识点</button>
+                    <button class="mode-btn" id="mode-prob" onclick="switchMode('prob')">📝 题目专辑</button>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="搜索知识点... (按 / 聚焦)">
+                </div>
+                <div class="catalog-btn" id="catalog-btn" onclick="if(currentMode==='kp'){showCatalog();}else{showProblemCatalog();}">📑 总目录</div>
+            </div>
+            <nav id="sidebar-nav"></nav>
+            <div class="sidebar-footer">
+                <span id="kp-count">0</span> 个知识点
+            </div>
+        </aside>
+        <main id="content">
+            <div class="placeholder">请从左侧选择一个知识点</div>
+        </main>
+    </div>
+    <button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+    <button id="theme-toggle" onclick="toggleDark()"><span id="theme-icon">🌙</span></button>
+
+    <script src="data.js"></script>
+    <script src="problems_data.js"></script>
+    <script src="code_data.js"></script>
+    <script src="vendor/marked.min.js"></script>
+    <script src="vendor/katex.min.js"></script>
+    <script src="vendor/auto-render.min.js"></script>
+    <script src="vendor/highlight.min.js"></script>
+
+    <script>
+        // ===== State =====
+        let currentId = null;
+        let currentMode = 'kp'; // 'kp' = 知识点, 'prob' = 题目专辑
+        let isDark = localStorage.getItem('theme') === 'dark';
+
+        // ===== DOM =====
+        const sidebarNav = document.getElementById('sidebar-nav');
+        const contentEl = document.getElementById('content');
+        const searchInput = document.getElementById('search-input');
+        const kpCountEl = document.getElementById('kp-count');
+
+        // ===== Init =====
+        function init() {
+            // Check library loading
+            var missingLibs = [];
+            if (typeof marked === 'undefined') missingLibs.push('marked.js');
+            if (typeof katex === 'undefined') missingLibs.push('katex.js');
+            if (typeof renderMathInElement === 'undefined') missingLibs.push('auto-render.js');
+            if (typeof hljs === 'undefined') missingLibs.push('highlight.js');
+            if (missingLibs.length > 0) {
+                contentEl.innerHTML = '<div style="padding:2rem;color:#cc0000;font-size:1rem;">' +
+                    '<h2 style="margin-bottom:1rem;">库文件加载失败</h2>' +
+                    '<p>以下库未能加载: <strong>' + missingLibs.join(', ') + '</strong></p>' +
+                    '<p style="margin-top:0.5rem;">请确保 vendor/ 目录中存在对应文件。</p></div>';
+                kpCountEl.textContent = (typeof KNOWLEDGE_DATA !== 'undefined') ? KNOWLEDGE_DATA.length : 0;
+                return;
+            }
+
+            // Theme
+            const icon = document.getElementById('theme-icon');
+            icon.textContent = isDark ? '☀️' : '🌙';
+
+            // Marked config
+            marked.setOptions({ breaks: true, gfm: true });
+
+            // Count
+            updateFooter();
+
+            // Sidebar
+            buildSidebar();
+
+            // Search
+            searchInput.addEventListener('input', function(e) {
+                if (currentMode === 'kp') {
+                    buildSidebar(e.target.value);
+                } else {
+                    buildProblemSidebar(e.target.value);
+                }
+            });
+
+            // Keyboard
+            document.addEventListener('keydown', handleKeyboard);
+
+            // Hash routing
+            window.addEventListener('hashchange', function() {
+                var hash = location.hash.slice(1);
+                if (hash && KNOWLEDGE_DATA.find(function(k) { return k.id === hash; })) {
+                    switchMode('kp');
+                    selectKP(hash);
+                } else if (hash && typeof PROBLEMS_DATA !== 'undefined' && PROBLEMS_DATA.find(function(p) { return p.id === hash; })) {
+                    switchMode('prob');
+                    selectProblem(hash);
+                }
+            });
+
+            // Load from hash or default to catalog
+            var hash = location.hash.slice(1);
+            if (hash && KNOWLEDGE_DATA.find(function(k) { return k.id === hash; })) {
+                selectKP(hash);
+            } else if (hash && typeof PROBLEMS_DATA !== 'undefined' && PROBLEMS_DATA.find(function(p) { return p.id === hash; })) {
+                switchMode('prob');
+                selectProblem(hash);
+            } else {
+                showCatalog();
+            }
+        }
+
+        // ===== Build Sidebar =====
+        function buildSidebar(filter) {
+            filter = filter || '';
+            var tree = {};
+
+            KNOWLEDGE_DATA.forEach(function(kp) {
+                if (filter) {
+                    var q = filter.toLowerCase();
+                    var matches = kp.title.toLowerCase().indexOf(q) >= 0 ||
+                        kp.category.toLowerCase().indexOf(q) >= 0 ||
+                        kp.subcategory.toLowerCase().indexOf(q) >= 0 ||
+                        (kp.tags && kp.tags.some(function(t) { return t.toLowerCase().indexOf(q) >= 0; })) ||
+                        (kp.content && kp.content.toLowerCase().indexOf(q) >= 0);
+                    if (!matches) return;
+                }
+                if (!tree[kp.category]) tree[kp.category] = {};
+                if (!tree[kp.category][kp.subcategory]) tree[kp.category][kp.subcategory] = [];
+                tree[kp.category][kp.subcategory].push(kp);
+            });
+
+            var html = '';
+            var cats = Object.keys(tree).sort();
+
+            if (cats.length === 0 && filter) {
+                html = '<div class="no-results">未找到匹配的知识点</div>';
+                sidebarNav.innerHTML = html;
+                return;
+            }
+
+            cats.forEach(function(cat) {
+                var subs = tree[cat];
+                var totalCount = Object.values(subs).reduce(function(s, arr) { return s + arr.length; }, 0);
+                var expanded = !filter ? ' expanded' : ' expanded';
+
+                html += '<div class="category' + expanded + '">';
+                html += '<div class="category-header" onclick="this.parentElement.classList.toggle(\'expanded\')">';
+                html += '<span class="chevron">▼</span>';
+                html += '<span class="category-name category-name-link" onclick="event.stopPropagation(); showCategoryOverview(\'' + escAttr(cat) + '\')">' + escHtml(cat) + '</span>';
+                html += '<span class="category-count">' + totalCount + '</span>';
+                html += '</div>';
+                html += '<div class="category-body">';
+
+                Object.keys(subs).sort().forEach(function(sub) {
+                    html += '<div class="subcategory subcategory-link" onclick="showCategoryOverview(\'' + escAttr(cat) + '\')" title="点击查看分类详情">' + escHtml(sub) + '</div>';
+                    subs[sub].forEach(function(kp) {
+                        var active = currentId === kp.id ? ' active' : '';
+                        html += '<div class="kp-item' + active + '" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' + escHtml(kp.title) + '</div>';
+                    });
+                });
+
+                html += '</div></div>';
+            });
+
+            sidebarNav.innerHTML = html;
+        }
+
+        // ===== Select Knowledge Point =====
+        function selectKP(id) {
+            var kp = KNOWLEDGE_DATA.find(function(k) { return k.id === id; });
+            if (!kp) return;
+
+            currentId = id;
+
+            // Meta bar
+            var metaHtml = '<div class="meta-bar">';
+            metaHtml += '<span class="badge badge-time">⏱ ' + escHtml(kp.timeComplexity) + '</span>';
+            metaHtml += '<span class="badge badge-space">💾 ' + escHtml(kp.spaceComplexity) + '</span>';
+            if (kp.tags && Array.isArray(kp.tags)) {
+                kp.tags.forEach(function(tag) {
+                    metaHtml += '<span class="tag">' + escHtml(tag) + '</span>';
+                });
+            }
+            metaHtml += '</div>';
+
+            // Render content: extract math → parse Markdown → restore math
+            // Placeholders protect LaTeX from being mangled by marked.js
+            // (e.g. __builtin_clz in LaTeX becomes bold markers in Markdown)
+            var contentHtml = '';
+            try {
+                var raw = kp.content || '';
+                var mathStore = [];
+
+                // Step 1: Extract block math $$...$$ → placeholder
+                raw = raw.replace(/\$\$([\s\S]+?)\$\$/g, function(m, p1) {
+                    var idx = mathStore.length;
+                    mathStore.push({ type: 'block', tex: p1 });
+                    return '@@KATEX' + idx + '@@';
+                });
+
+                // Step 2: Extract inline math $...$ → placeholder
+                raw = raw.replace(/\$([^\$\n]+?)\$/g, function(m, p1) {
+                    var idx = mathStore.length;
+                    mathStore.push({ type: 'inline', tex: p1 });
+                    return '@@KATEX' + idx + '@@';
+                });
+
+                // Step 3: Parse Markdown (placeholders are plain text, safe from marked.js)
+                contentHtml = marked.parse(raw);
+
+                // Step 4: Replace placeholders with KaTeX-rendered HTML
+                for (var i = 0; i < mathStore.length; i++) {
+                    var placeholder = '@@KATEX' + i + '@@';
+                    var rendered = '';
+                    try {
+                        rendered = katex.renderToString(mathStore[i].tex, {
+                            displayMode: mathStore[i].type === 'block',
+                            throwOnError: false,
+                            errorColor: '#cc0000'
+                        });
+                    } catch (e) {
+                        rendered = '<code>' + escHtml(mathStore[i].tex) + '</code>';
+                    }
+                    contentHtml = contentHtml.split(placeholder).join(rendered);
+                }
+            } catch(e) {
+                contentHtml = '<p>内容渲染出错: ' + escHtml(e.message) + '</p>';
+            }
+
+            // Code section placeholder
+            var codeHtml = '';
+            if (kp.codePath && typeof CODE_DATA !== 'undefined' && CODE_DATA[kp.codePath]) {
+                codeHtml = '<div class="code-section">' +
+                    '<div class="code-header">' +
+                    '<span class="code-filename">📄 ' + escHtml(kp.codePath.split('\\').pop()) + '</span>' +
+                    '<button class="copy-btn" onclick="copyCode(this)">📋 复制</button>' +
+                    '</div>' +
+                    '<pre><code class="language-cpp" id="code-block"></code></pre>' +
+                    '</div>';
+            }
+
+            // Nav buttons
+            var idx = KNOWLEDGE_DATA.findIndex(function(k) { return k.id === id; });
+            var navHtml = '<div class="nav-buttons">';
+            if (idx > 0) {
+                navHtml += '<button class="nav-btn nav-prev" onclick="selectKP(\'' + KNOWLEDGE_DATA[idx-1].id + '\')" title="' + escAttr(KNOWLEDGE_DATA[idx-1].title) + '">← ' + escHtml(KNOWLEDGE_DATA[idx-1].title) + '</button>';
+            } else {
+                navHtml += '<span></span>';
+            }
+            if (idx < KNOWLEDGE_DATA.length - 1) {
+                navHtml += '<button class="nav-btn nav-next" onclick="selectKP(\'' + KNOWLEDGE_DATA[idx+1].id + '\')" title="' + escAttr(KNOWLEDGE_DATA[idx+1].title) + '">' + escHtml(KNOWLEDGE_DATA[idx+1].title) + ' →</button>';
+            } else {
+                navHtml += '<span></span>';
+            }
+            navHtml += '</div>';
+
+            // Prerequisites section
+            var prereqHtml = '<div class="kp-links-section prereq">' +
+                '<div class="kp-links-title">📖 前置知识点</div>';
+            if (kp.prerequisites && kp.prerequisites.length > 0) {
+                prereqHtml += '<div class="kp-links-list">';
+                kp.prerequisites.forEach(function(pid) {
+                    var pk = KNOWLEDGE_DATA.find(function(k) { return k.id === pid; });
+                    if (pk) {
+                        prereqHtml += '<span class="kp-link-chip prereq-chip" onclick="selectKP(\'' + pid + '\')" title="' + escAttr(pk.title) + '">' + escHtml(pk.title) + '</span>';
+                    }
+                });
+                prereqHtml += '</div>';
+            } else {
+                prereqHtml += '<span class="kp-no-prereq">本知识点为基础内容，无特定前置要求</span>';
+            }
+            prereqHtml += '</div>';
+
+            // Related section
+            var relatedHtml = '';
+            if (kp.related && kp.related.length > 0) {
+                relatedHtml = '<div class="kp-links-section related">' +
+                    '<div class="kp-links-title">🔗 相关知识点</div>' +
+                    '<div class="kp-links-list">';
+                kp.related.forEach(function(rid) {
+                    var rk = KNOWLEDGE_DATA.find(function(k) { return k.id === rid; });
+                    if (rk) {
+                        relatedHtml += '<span class="kp-link-chip related-chip" onclick="selectKP(\'' + rid + '\')" title="' + escAttr(rk.title) + '">' + escHtml(rk.title) + '</span>';
+                    }
+                });
+                relatedHtml += '</div></div>';
+            }
+
+            // Assemble
+            contentEl.innerHTML =
+                '<article class="article">' +
+                '<h1>' + escHtml(kp.title) + '</h1>' +
+                metaHtml +
+                prereqHtml +
+                '<div class="markdown-body">' + contentHtml + '</div>' +
+                codeHtml +
+                relatedHtml +
+                navHtml +
+                '</article>';
+
+            // Set code content safely (avoids template literal injection)
+            var codeBlock = document.getElementById('code-block');
+            if (codeBlock && kp.codePath && CODE_DATA[kp.codePath]) {
+                codeBlock.textContent = CODE_DATA[kp.codePath];
+                hljs.highlightElement(codeBlock);
+            }
+
+            // Highlight code blocks in content
+            contentEl.querySelectorAll('.markdown-body pre code').forEach(function(block) {
+                hljs.highlightElement(block);
+            });
+
+            // Render math (fallback for \(...\) and \[...\] delimiters only)
+            // $...$ and $$...$$ are already rendered via placeholder approach above
+            try {
+                renderMathInElement(contentEl, {
+                    delimiters: [
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option', 'annotation', 'math'],
+                    throwOnError: false,
+                    errorColor: '#cc0000'
+                });
+            } catch(e) {
+                console.warn('KaTeX render error:', e);
+            }
+
+            // Update URL
+            location.hash = id;
+
+            // Update sidebar active
+            document.querySelectorAll('.kp-item').forEach(function(el) {
+                el.classList.remove('active');
+            });
+            // Rebuild sidebar to update active state
+            buildSidebar(searchInput.value);
+
+            // Scroll to top
+            contentEl.scrollTop = 0;
+
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        }
+
+        // ===== Copy Code =====
+        function copyCode(btn) {
+            var codeBlock = document.getElementById('code-block');
+            if (!codeBlock) return;
+            var text = codeBlock.textContent;
+            navigator.clipboard.writeText(text).then(function() {
+                btn.textContent = '✅ 已复制';
+                setTimeout(function() { btn.textContent = '📋 复制'; }, 2000);
+            }).catch(function() {
+                // Fallback
+                var ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                btn.textContent = '✅ 已复制';
+                setTimeout(function() { btn.textContent = '📋 复制'; }, 2000);
+            });
+        }
+
+        // ===== Catalog Page =====
+        function showCatalog() {
+            currentId = null;
+            // Build category tree
+            var tree = {};
+            KNOWLEDGE_DATA.forEach(function(kp) {
+                if (!tree[kp.category]) tree[kp.category] = {};
+                if (!tree[kp.category][kp.subcategory]) tree[kp.category][kp.subcategory] = [];
+                tree[kp.category][kp.subcategory].push(kp);
+            });
+
+            var cats = Object.keys(tree).sort();
+            var totalKp = KNOWLEDGE_DATA.length;
+            var totalCats = cats.length;
+            var totalSubs = 0;
+            cats.forEach(function(c) { totalSubs += Object.keys(tree[c]).length; });
+
+            var html = '<div class="catalog-page">';
+            html += '<h1>📑 知识点总目录</h1>';
+            html += '<div class="catalog-desc">按分类浏览所有知识点，点击任意知识点即可跳转查看详情。</div>';
+
+            // Stats
+            html += '<div class="catalog-stats">';
+            html += '<div class="catalog-stat"><div class="catalog-stat-num">' + totalKp + '</div><div class="catalog-stat-label">知识点</div></div>';
+            html += '<div class="catalog-stat"><div class="catalog-stat-num">' + totalCats + '</div><div class="catalog-stat-label">大类</div></div>';
+            html += '<div class="catalog-stat"><div class="catalog-stat-num">' + totalSubs + '</div><div class="catalog-stat-label">子分类</div></div>';
+            html += '</div>';
+
+            // Category sections
+            cats.forEach(function(cat) {
+                var subs = tree[cat];
+                var catCount = Object.values(subs).reduce(function(s, arr) { return s + arr.length; }, 0);
+                var catMeta = (typeof CATEGORY_META !== 'undefined' && CATEGORY_META[cat]) || {};
+                html += '<div class="catalog-category">';
+                html += '<div class="catalog-category-header" onclick="this.parentElement.classList.toggle(\'expanded\')">';
+                html += '<div class="catalog-category-header-left">';
+                html += '<span class="catalog-category-chevron">▶</span>';
+                html += '<span class="catalog-category-name">' + escHtml(cat) + '</span>';
+                if (catMeta.nature) {
+                    html += '<span class="catalog-category-nature">' + escHtml(catMeta.nature) + '</span>';
+                }
+                html += '<span class="catalog-category-count">' + catCount + '</span>';
+                html += '</div>';
+                html += '<span class="catalog-category-detail-link" onclick="event.stopPropagation(); showCategoryOverview(\'' + escAttr(cat) + '\')">查看详情 →</span>';
+                html += '</div>';
+                html += '<div class="catalog-category-body">';
+                html += '<div class="catalog-sub-grid">';
+                Object.keys(subs).sort().forEach(function(sub) {
+                    html += '<div class="catalog-subcard">';
+                    html += '<div class="catalog-subtitle">' +
+                        '<span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview(\'' + escAttr(cat) + '\')" title="点击查看分类详情">' + escHtml(sub) + '</span>' +
+                        '<span class="catalog-subtitle-count">' + subs[sub].length + ' 个</span></div>';
+                    html += '<ul class="catalog-kp-list">';
+                    subs[sub].forEach(function(kp) {
+                        html += '<li class="catalog-kp-item" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' +
+                            escHtml(kp.title) + '</li>';
+                    });
+                    html += '</ul></div>';
+                });
+                html += '</div></div></div>';
+            });
+
+            html += '</div>';
+            contentEl.innerHTML = html;
+            window.scrollTo(0, 0);
+
+            // Close mobile sidebar
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        // ===== Category Overview Page =====
+        function showCategoryOverview(catName) {
+            currentId = null;
+            var catMeta = (typeof CATEGORY_META !== 'undefined' && CATEGORY_META[catName]) || {};
+
+            var subs = {};
+            KNOWLEDGE_DATA.forEach(function(kp) {
+                if (kp.category !== catName) return;
+                if (!subs[kp.subcategory]) subs[kp.subcategory] = [];
+                subs[kp.subcategory].push(kp);
+            });
+
+            var html = '<div class="category-overview">';
+            html += '<h1>' + escHtml(catName) + '</h1>';
+
+            if (catMeta.nature) {
+                html += '<span class="category-nature-badge">' + escHtml(catMeta.nature) + '</span>';
+            }
+            if (catMeta.description) {
+                html += '<p class="category-overview-desc">' + escHtml(catMeta.description) + '</p>';
+            }
+            if (catMeta.problemDomain) {
+                html += '<p class="category-overview-domain"><strong>问题领域：</strong>' + escHtml(catMeta.problemDomain) + '</p>';
+            }
+
+            Object.keys(subs).sort().forEach(function(subName) {
+                var subKey = catName + '|' + subName;
+                var subMeta = (typeof SUBCATEGORY_META !== 'undefined' && SUBCATEGORY_META[subKey]) || {};
+
+                html += '<div class="subcategory-block">';
+                html += '<div class="subcategory-block-title">' + escHtml(subName);
+                html += ' <span style="color:var(--text-secondary);font-size:0.75rem;font-weight:400;">(' + subs[subName].length + ' 个知识点)</span></div>';
+                if (subMeta.description) {
+                    html += '<p class="subcategory-block-desc">' + escHtml(subMeta.description) + '</p>';
+                }
+                html += '<div class="subcategory-kp-grid">';
+                subs[subName].forEach(function(kp) {
+                    html += '<div class="subcategory-kp-card" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' + escHtml(kp.title) + '</div>';
+                });
+                html += '</div></div>';
+            });
+
+            html += '</div>';
+            contentEl.innerHTML = html;
+            contentEl.scrollTop = 0;
+
+            document.querySelectorAll('.kp-item').forEach(function(el) {
+                el.classList.remove('active');
+            });
+
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        }
+
+        // ===== Mode Switch =====
+        function switchMode(mode) {
+            if (mode === currentMode) return;
+            currentMode = mode;
+            document.getElementById('mode-kp').classList.toggle('active', mode === 'kp');
+            document.getElementById('mode-prob').classList.toggle('active', mode === 'prob');
+            searchInput.value = '';
+            updateFooter();
+            if (mode === 'kp') {
+                buildSidebar();
+                searchInput.placeholder = '搜索知识点... (按 / 聚焦)';
+                showCatalog();
+            } else {
+                buildProblemSidebar();
+                searchInput.placeholder = '搜索题目... (按 / 聚焦)';
+                showProblemCatalog();
+            }
+        }
+
+        function updateFooter() {
+            if (currentMode === 'kp') {
+                kpCountEl.textContent = KNOWLEDGE_DATA.length;
+                document.querySelector('.sidebar-footer').innerHTML = '<span id="kp-count">' + KNOWLEDGE_DATA.length + '</span> 个知识点';
+            } else {
+                var count = (typeof PROBLEMS_DATA !== 'undefined') ? PROBLEMS_DATA.length : 0;
+                document.querySelector('.sidebar-footer').innerHTML = '<span id="kp-count">' + count + '</span> 个题目';
+            }
+        }
+
+        // ===== Build Problem Sidebar =====
+        function buildProblemSidebar(filter) {
+            filter = filter || '';
+            if (typeof PROBLEMS_DATA === 'undefined' || PROBLEMS_DATA.length === 0) {
+                sidebarNav.innerHTML = '<div class="no-results">暂无题目，请添加题目到 problems/ 目录</div>';
+                return;
+            }
+
+            var tree = {};
+
+            PROBLEMS_DATA.forEach(function(prob) {
+                if (filter) {
+                    var q = filter.toLowerCase();
+                    var matches = prob.title.toLowerCase().indexOf(q) >= 0 ||
+                        (prob.category && prob.category.toLowerCase().indexOf(q) >= 0) ||
+                        (prob.oj && prob.oj.toLowerCase().indexOf(q) >= 0) ||
+                        (prob.tags && prob.tags.some(function(t) { return t.toLowerCase().indexOf(q) >= 0; })) ||
+                        (prob.content && prob.content.toLowerCase().indexOf(q) >= 0);
+                    if (!matches) return;
+                }
+                var cat = prob.category || '未分类';
+                if (!tree[cat]) tree[cat] = [];
+                tree[cat].push(prob);
+            });
+
+            var html = '';
+            var cats = Object.keys(tree).sort();
+
+            if (cats.length === 0 && filter) {
+                html = '<div class="no-results">未找到匹配的题目</div>';
+                sidebarNav.innerHTML = html;
+                return;
+            }
+
+            cats.forEach(function(cat) {
+                var probs = tree[cat];
+                var expanded = !filter ? ' expanded' : ' expanded';
+
+                html += '<div class="category' + expanded + '">';
+                html += '<div class="category-header" onclick="this.parentElement.classList.toggle(\'expanded\')">';
+                html += '<span class="chevron">▼</span>';
+                html += '<span class="category-name">' + escHtml(cat) + '</span>';
+                html += '<span class="category-count">' + probs.length + '</span>';
+                html += '</div>';
+                html += '<div class="category-body">';
+
+                probs.forEach(function(prob) {
+                    var active = currentId === prob.id ? ' active' : '';
+                    var label = prob.title;
+                    if (prob.difficulty) {
+                        var diffIcon = prob.difficulty === '简单' ? '🟢' : (prob.difficulty === '中等' ? '🟡' : (prob.difficulty === '困难' ? '🔴' : '⚪'));
+                        label = diffIcon + ' ' + label;
+                    }
+                    html += '<div class="kp-item' + active + '" onclick="selectProblem(\'' + prob.id + '\')" title="' + escAttr(prob.title) + '">' + escHtml(label) + '</div>';
+                });
+
+                html += '</div></div>';
+            });
+
+            sidebarNav.innerHTML = html;
+        }
+
+        // ===== Select Problem =====
+        function selectProblem(id) {
+            var prob = PROBLEMS_DATA.find(function(p) { return p.id === id; });
+            if (!prob) return;
+
+            currentId = id;
+
+            // Meta bar
+            var diffClass = 'badge-difficulty-medium';
+            if (prob.difficulty === '简单') diffClass = 'badge-difficulty-easy';
+            else if (prob.difficulty === '困难') diffClass = 'badge-difficulty-hard';
+
+            var metaHtml = '<div class="meta-bar">';
+            metaHtml += '<span class="badge ' + diffClass + '"> difficulty: ' + escHtml(prob.difficulty) + '</span>';
+            if (prob.oj) {
+                metaHtml += '<span class="badge badge-oj">' + escHtml(prob.oj) + '</span>';
+            }
+            if (prob.problemId) {
+                metaHtml += '<span class="badge badge-pid">' + escHtml(prob.problemId) + '</span>';
+            }
+            metaHtml += '<span class="badge badge-time">⏱ ' + escHtml(prob.timeComplexity) + '</span>';
+            metaHtml += '<span class="badge badge-space">💾 ' + escHtml(prob.spaceComplexity) + '</span>';
+            if (prob.tags && Array.isArray(prob.tags)) {
+                prob.tags.forEach(function(tag) {
+                    metaHtml += '<span class="tag">' + escHtml(tag) + '</span>';
+                });
+            }
+            metaHtml += '</div>';
+
+            // Render content (same LaTeX protection as knowledge points)
+            var contentHtml = '';
+            try {
+                var raw = prob.content || '';
+                var mathStore = [];
+
+                raw = raw.replace(/\$\$([\s\S]+?)\$\$/g, function(m, p1) {
+                    var idx = mathStore.length;
+                    mathStore.push({ type: 'block', tex: p1 });
+                    return '@@KATEX' + idx + '@@';
+                });
+
+                raw = raw.replace(/\$([^\$\n]+?)\$/g, function(m, p1) {
+                    var idx = mathStore.length;
+                    mathStore.push({ type: 'inline', tex: p1 });
+                    return '@@KATEX' + idx + '@@';
+                });
+
+                contentHtml = marked.parse(raw);
+
+                for (var i = 0; i < mathStore.length; i++) {
+                    var placeholder = '@@KATEX' + i + '@@';
+                    var rendered = '';
+                    try {
+                        rendered = katex.renderToString(mathStore[i].tex, {
+                            displayMode: mathStore[i].type === 'block',
+                            throwOnError: false,
+                            errorColor: '#cc0000'
+                        });
+                    } catch (e) {
+                        rendered = '<code>' + escHtml(mathStore[i].tex) + '</code>';
+                    }
+                    contentHtml = contentHtml.split(placeholder).join(rendered);
+                }
+            } catch(e) {
+                contentHtml = '<p>内容渲染出错: ' + escHtml(e.message) + '</p>';
+            }
+
+            // Code section
+            var codeHtml = '';
+            if (prob.codePath && typeof CODE_DATA !== 'undefined' && CODE_DATA[prob.codePath]) {
+                codeHtml = '<div class="code-section">' +
+                    '<div class="code-header">' +
+                    '<span class="code-filename">📄 ' + escHtml(prob.codePath.split('\\').pop()) + '</span>' +
+                    '<button class="copy-btn" onclick="copyCode(this)">📋 复制</button>' +
+                    '</div>' +
+                    '<pre><code class="language-cpp" id="code-block"></code></pre>' +
+                    '</div>';
+            }
+
+            // Nav buttons
+            var idx = PROBLEMS_DATA.findIndex(function(p) { return p.id === id; });
+            var navHtml = '<div class="nav-buttons">';
+            if (idx > 0) {
+                navHtml += '<button class="nav-btn nav-prev" onclick="selectProblem(\'' + PROBLEMS_DATA[idx-1].id + '\')" title="' + escAttr(PROBLEMS_DATA[idx-1].title) + '">← ' + escHtml(PROBLEMS_DATA[idx-1].title) + '</button>';
+            } else {
+                navHtml += '<span></span>';
+            }
+            if (idx < PROBLEMS_DATA.length - 1) {
+                navHtml += '<button class="nav-btn nav-next" onclick="selectProblem(\'' + PROBLEMS_DATA[idx+1].id + '\')" title="' + escAttr(PROBLEMS_DATA[idx+1].title) + '">' + escHtml(PROBLEMS_DATA[idx+1].title) + ' →</button>';
+            } else {
+                navHtml += '<span></span>';
+            }
+            navHtml += '</div>';
+
+            // Assemble
+            contentEl.innerHTML =
+                '<article class="article">' +
+                '<h1>' + escHtml(prob.title) + '</h1>' +
+                metaHtml +
+                '<div class="markdown-body">' + contentHtml + '</div>' +
+                codeHtml +
+                navHtml +
+                '</article>';
+
+            // Set code content safely
+            var codeBlock = document.getElementById('code-block');
+            if (codeBlock && prob.codePath && CODE_DATA[prob.codePath]) {
+                codeBlock.textContent = CODE_DATA[prob.codePath];
+                hljs.highlightElement(codeBlock);
+            }
+
+            // Highlight code blocks in content
+            contentEl.querySelectorAll('.markdown-body pre code').forEach(function(block) {
+                hljs.highlightElement(block);
+            });
+
+            // Render math fallback
+            try {
+                renderMathInElement(contentEl, {
+                    delimiters: [
+                        {left: '\\(', right: '\\)', display: false},
+                        {left: '\\[', right: '\\]', display: true}
+                    ],
+                    ignoredTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option', 'annotation', 'math'],
+                    throwOnError: false,
+                    errorColor: '#cc0000'
+                });
+            } catch(e) {
+                console.warn('KaTeX render error:', e);
+            }
+
+            // Update URL
+            location.hash = id;
+
+            // Update sidebar active
+            buildProblemSidebar(searchInput.value);
+
+            // Scroll to top
+            contentEl.scrollTop = 0;
+
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        }
+
+        // ===== Problem Catalog Page =====
+        function showProblemCatalog() {
+            currentId = null;
+
+            if (typeof PROBLEMS_DATA === 'undefined' || PROBLEMS_DATA.length === 0) {
+                contentEl.innerHTML = '<div class="placeholder">暂无题目<br><span style="font-size:0.85rem;margin-top:0.5rem;display:block;">将题目 .md 文件放入 problems/ 目录后运行 node build.js</span></div>';
+                return;
+            }
+
+            // Build category tree
+            var tree = {};
+            PROBLEMS_DATA.forEach(function(prob) {
+                var cat = prob.category || '未分类';
+                if (!tree[cat]) tree[cat] = [];
+                tree[cat].push(prob);
+            });
+
+            var cats = Object.keys(tree).sort();
+            var totalProb = PROBLEMS_DATA.length;
+
+            // Difficulty stats
+            var easyCount = PROBLEMS_DATA.filter(function(p) { return p.difficulty === '简单'; }).length;
+            var medCount = PROBLEMS_DATA.filter(function(p) { return p.difficulty === '中等'; }).length;
+            var hardCount = PROBLEMS_DATA.filter(function(p) { return p.difficulty === '困难'; }).length;
+
+            var html = '<div class="catalog-page">';
+            html += '<h1>📝 题目专辑</h1>';
+            html += '<div class="catalog-desc">按分类浏览所有题目，点击题目即可查看题解详情。</div>';
+
+            // Stats
+            html += '<div class="catalog-stats">';
+            html += '<div class="catalog-stat"><div class="catalog-stat-num">' + totalProb + '</div><div class="catalog-stat-label">题目总数</div></div>';
+            html += '<div class="catalog-stat"><div class="catalog-stat-num">' + cats.length + '</div><div class="catalog-stat-label">分类</div></div>';
+            html += '<div class="catalog-stat"><div class="catalog-stat-num" style="color:#166534;">' + easyCount + '</div><div class="catalog-stat-label">🟢 简单</div></div>';
+            html += '<div class="catalog-stat"><div class="catalog-stat-num" style="color:#854d0e;">' + medCount + '</div><div class="catalog-stat-label">🟡 中等</div></div>';
+            html += '<div class="catalog-stat"><div class="catalog-stat-num" style="color:#991b1b;">' + hardCount + '</div><div class="catalog-stat-label">🔴 困难</div></div>';
+            html += '</div>';
+
+            // Category sections
+            cats.forEach(function(cat) {
+                var probs = tree[cat];
+                html += '<div class="catalog-category">';
+                html += '<div class="catalog-category-header" onclick="this.parentElement.classList.toggle(\'expanded\')">';
+                html += '<div class="catalog-category-header-left">';
+                html += '<span class="catalog-category-chevron">▶</span>';
+                html += '<span class="catalog-category-name">' + escHtml(cat) + '</span>';
+                html += '<span class="catalog-category-count">' + probs.length + '</span>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="catalog-category-body">';
+                html += '<div class="catalog-sub-grid">';
+                html += '<div class="catalog-subcard" style="grid-column: 1 / -1;">';
+                html += '<ul class="catalog-kp-list">';
+                probs.forEach(function(prob) {
+                    var diffIcon = prob.difficulty === '简单' ? '🟢' : (prob.difficulty === '中等' ? '🟡' : (prob.difficulty === '困难' ? '🔴' : '⚪'));
+                    var ojLabel = prob.oj ? ' [' + escHtml(prob.oj) + (prob.problemId ? ' ' + escHtml(prob.problemId) : '') + ']' : '';
+                    html += '<li class="catalog-kp-item" onclick="selectProblem(\'' + prob.id + '\')" title="' + escAttr(prob.title) + '">' +
+                        diffIcon + ' ' + escHtml(prob.title) + '<span style="color:var(--text-secondary);font-size:0.75rem;">' + ojLabel + '</span></li>';
+                });
+                html += '</ul></div>';
+                html += '</div></div></div>';
+            });
+
+            html += '</div>';
+            contentEl.innerHTML = html;
+            contentEl.scrollTop = 0;
+
+            document.getElementById('sidebar').classList.remove('open');
+        }
+
+        // ===== Toggle Dark =====
+        function toggleDark() {
+            isDark = !isDark;
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+        }
+
+        // ===== Keyboard =====
+        function handleKeyboard(e) {
+            // '/' focuses search
+            if (e.key === '/' && document.activeElement !== searchInput) {
+                e.preventDefault();
+                searchInput.focus();
+                return;
+            }
+            // Escape clears search
+            if (e.key === 'Escape' && document.activeElement === searchInput) {
+                searchInput.value = '';
+                if (currentMode === 'kp') buildSidebar();
+                else buildProblemSidebar();
+                searchInput.blur();
+                return;
+            }
+            // Alt+Left/Right for prev/next
+            if (e.altKey && currentId) {
+                if (currentMode === 'kp') {
+                    var idx = KNOWLEDGE_DATA.findIndex(function(k) { return k.id === currentId; });
+                    if (e.key === 'ArrowLeft' && idx > 0) {
+                        e.preventDefault();
+                        selectKP(KNOWLEDGE_DATA[idx-1].id);
+                    }
+                    if (e.key === 'ArrowRight' && idx < KNOWLEDGE_DATA.length - 1) {
+                        e.preventDefault();
+                        selectKP(KNOWLEDGE_DATA[idx+1].id);
+                    }
+                } else if (currentMode === 'prob' && typeof PROBLEMS_DATA !== 'undefined') {
+                    var idx = PROBLEMS_DATA.findIndex(function(p) { return p.id === currentId; });
+                    if (e.key === 'ArrowLeft' && idx > 0) {
+                        e.preventDefault();
+                        selectProblem(PROBLEMS_DATA[idx-1].id);
+                    }
+                    if (e.key === 'ArrowRight' && idx < PROBLEMS_DATA.length - 1) {
+                        e.preventDefault();
+                        selectProblem(PROBLEMS_DATA[idx+1].id);
+                    }
+                }
+            }
+        }
+
+        // ===== Helpers =====
+        function escHtml(text) {
+            if (!text) return '';
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function escAttr(text) {
+            if (!text) return '';
+            return text.replace(/'/g, '&#39;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ===== Start =====
+        init();
+    </script>
+</body>
+</html>
