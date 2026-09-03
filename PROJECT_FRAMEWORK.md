@@ -66,6 +66,7 @@
 | 动态规划 | 背包问题 | 01背包: `dp-01bag-standard`, `dp-01bag-2d`, `dp-01bag-record`, `dp-count-01bag`; 完全背包: `dp-complete-bag`; 多重背包: `dp-multi-bag-binary`, `dp-multi-bag-monotone`; 分组背包: `dp-group-bag` |
 | 动态规划 | 线性DP | LCS: `dp-linear-lcs-length`, `dp-linear-lcs-output`, `dp-linear-lcs-substring`; LIS: `dp-linear-lis-binary`, `dp-linear-lis-bit-count`; 经典模型: `dp-linear-edit-distance`, `dp-linear-maxsub`, `dp-linear-triangle` |
 | 动态规划 | 树形DP | `dp-tree-01bag`, `dp-tree-dance` |
+| 动态规划 | 状态压缩DP | 路径问题: `dp-bitmask-hamilton` |
 | 数据结构 | 树状数组 | `ds-bit-point-range`, `ds-bit-range-point` |
 | 数据结构 | 分块 | `ds-block-decomposition` |
 | 数据结构 | 莫队 | `ds-mo-team` |
@@ -78,10 +79,11 @@
 | 数据结构 | 栈 | `ds-stack-prefix-max`（前缀最值）, `ds-monostack-histogram`（单调栈） |
 | 数据结构 | ST表 | `ds-st-table-1`, `ds-st-table-2` |
 | 数据结构 | 并查集 | 基础: `ds-uf-basic`, `ds-uf-rank`; 带权: `ds-uf-weighted-old`, `ds-uf-weighted-food`; 扩展域: `ds-uf-extended-domain` |
-| 图论 | 最短路 | 单源最短路: `graph-dijkstra-heap`, `graph-bellman-ford`, `graph-spfa`; 全源最短路: `graph-floyd`, `graph-johnson` |
+| 图论 | 最短路 | 单源最短路: `graph-dijkstra-heap`, `graph-bellman-ford`, `graph-spfa`; 全源最短路: `graph-floyd`, `graph-johnson`; DAG最短路: `graph-dag-shortest-path` |
 | 图论 | 最小生成树 | `graph-kruskal`, `graph-prim` |
 | 图论 | 最近公共祖先 | `graph-lca-doubling`, `graph-lca-tarjan`, `graph-lca-hld` |
 | 图论 | 拓扑排序 | `graph-topo-sort` |
+| 图论 | 树链剖分 | `graph-hld-segtree` |
 | 输入输出 | IO优化 | `io-fast-io` |
 | 数学 | 数论计数 | `math-lcm-pair-count` |
 | 数学 | 快速幂 | `math-quick-pow-basic`, `math-quick-pow-highprecision` |
