@@ -109,14 +109,17 @@
     "图论|树链剖分": {
       "description": "将树拆分为若干条重链，使任意路径最多跨越O(log n)条链。配合线段树实现O(log²n)路径修改/查询和O(log n)子树修改/查询，是静态树上操作的核心工具。"
     },
+    "图论|强连通分量": {
+      "description": "求有向图中极大的强连通子图（SCC）。每个SCC内的节点互相可达，缩点后原图变为DAG。Tarjan算法是最常用的SCC求解方法，一次DFS即可完成。"
+    },
     "字符串|字符串哈希": {
       "description": "将字符串映射为数值，通过多项式滚动哈希实现O(n+m)的子串匹配。注意双哈希防碰撞。"
     },
     "字符串|最小表示法": {
       "description": "求循环同构串中字典序最小的表示，通过双指针比较实现O(n)求解。"
     },
-    "字符串|KMP": {
-      "description": "Knuth-Morris-Pratt 字符串匹配算法，通过next数组（前缀函数）实现O(n+m)的单模式串匹配，主串指针永不回退。"
+    "字符串|字符串匹配": {
+      "description": "在文本串中查找模式串的所有出现位置。涵盖KMP（前缀函数）、Sunday等经典线性时间匹配算法。"
     },
     "数学|快速幂": {
       "description": "利用指数的二进制分解，在O(log n)次乘法内完成幂运算，支持模意义下的高效计算。"
@@ -129,6 +132,9 @@
     },
     "基础算法|分治": {
       "description": "将问题分解为子问题分别求解，再合并结果。分治是递归思想的核心应用，归并排序求逆序对是其经典实例。"
+    },
+    "基础算法|排序": {
+      "description": "非比较型排序算法，通过按位分解和计数排序实现线性时间排序。基数排序是其中的经典代表，优于比较排序的O(n log n)下界。"
     }
   },
   "knowledgePoints": {
@@ -662,6 +668,28 @@
         "dp-tree-dance"
       ]
     },
+    "graph-tarjan-scc": {
+      "prerequisites": [
+        "graph-topo-sort"
+      ],
+      "related": [
+        "graph-topo-sort",
+        "graph-lca-tarjan",
+        "graph-dag-shortest-path",
+        "graph-scc-condensation"
+      ]
+    },
+    "graph-scc-condensation": {
+      "prerequisites": [
+        "graph-tarjan-scc",
+        "graph-topo-sort"
+      ],
+      "related": [
+        "graph-tarjan-scc",
+        "graph-dag-shortest-path",
+        "graph-topo-sort"
+      ]
+    },
     "io-fast-io": {
       "prerequisites": [],
       "related": []
@@ -711,7 +739,15 @@
       "prerequisites": [],
       "related": [
         "str-hash",
-        "str-minimal-representation"
+        "str-minimal-representation",
+        "str-sunday"
+      ]
+    },
+    "str-sunday": {
+      "prerequisites": [],
+      "related": [
+        "str-kmp",
+        "str-hash"
       ]
     },
     "basic-divide-conquer-merge-inversion": {
@@ -763,6 +799,15 @@
         "ds-monoqueue-1d",
         "ds-monoqueue-2d",
         "ds-dual-heap"
+      ]
+    },
+    "basic-radix-sort-k": {
+      "prerequisites": [
+        "basic-divide-conquer-merge-inversion"
+      ],
+      "related": [
+        "basic-quickselect-kth",
+        "basic-divide-conquer-merge-inversion"
       ]
     }
   },

@@ -127,6 +127,32 @@ const KNOWLEDGE_DATA = [
         ]
     },
     {
+        "id": "basic-radix-sort-k",
+        "category": "基础算法",
+        "subcategory": "排序",
+        "subSubcategory": "",
+        "title": "k 进制基数排序",
+        "content": "## 算法原理\n\n基数排序（Radix Sort）是一种**非比较型**排序算法。它不通过元素间的比较来决定顺序，而是将每个数按\"位\"分解，从低位到高位依次进行**稳定排序**（通常是计数排序），最终得到有序序列。\n\n### k 进制基数排序\n\n传统的基数排序以 10 为基数（十进制），逐位排序。而 **k 进制基数排序**将每个数视为 k 进制数，按 k 进制的\"位\"进行排序。每次排序只看当前位的数字（范围 $0 \\sim k-1$），用计数排序完成。\n\n### 为什么从低位到高位\n\n基数排序必须**从最低位到最高位**排序。原因是：高位比低位更重要，因此低位先排好序后，在排高位时，计数排序的稳定性会保留低位已排好的顺序。如果从高位开始排，就不能利用稳定性传递低位信息。\n\n### 核心思想\n\n1. 将所有数转为 k 进制表示\n2. 对第 0 位（最低位）做计数排序\n3. 对第 1 位做计数排序（稳定性保留第 0 位的顺序）\n4. 重复直到最高位\n5. 最终序列有序\n\n## 核心公式\n\n### 轮数计算\n\n设 $n$ 个数中最大值为 $V_{\\max}$，基数为 $k$，则排序轮数为：\n\n$$\nd = \\lceil \\log_k(V_{\\max} + 1) \\rceil\n$$\n\n代码中用除法代替对数：\n\n$$\nd = 1 + \\left\\lfloor \\frac{V_{\\max}}{k} \\right\\rfloor + \\left\\lfloor \\frac{V_{\\max}}{k^2} \\right\\rfloor + \\cdots\n$$\n\n实际实现是不断除以 $k$ 直到为 0，统计轮数 $m$。\n\n### 第 i 位的提取\n\n$$\n\\text{digit}_i(x) = \\left\\lfloor \\frac{x}{k^i} \\right\\rfloor \\bmod k\n$$\n\n### 负数处理\n\n代码用异或 `^ (1u << 31)` 将有符号整数映射为无符号整数：\n- 最高位（符号位）翻转：负数变为大正数，正数仍为小正数\n- 排序完成后再异或回来还原\n\n## 算法步骤\n\n### 预处理阶段（init 函数）\n\n1. 将所有数异或 `(1 << 31)`，转为无符号整数（处理负数）\n2. 找最大值 $V_{\\max}$\n3. 计算排序轮数 $m$：不断除以 $k$ 直到为 0\n\n### 排序阶段（base_sort 函数）\n\n对每一位 $i = 0, 1, \\ldots, m-1$：\n\n1. **计数**：统计每个位值（$0 \\sim k-1$）出现的次数\n2. **前缀和**：将计数数组转为前缀和，得到每个位值对应的输出位置\n3. **放置**：从后往前遍历原数组，根据当前位值放入对应位置（保证稳定性）\n4. **复制**：将临时数组复制回原数组\n5. **进位**：`base *= k`，准备处理下一位\n\n## 逐行代码解析\n\n### 全局变量\n\n```cpp\nint n;                          // 元素个数\nunsigned int m, k;              // 排序轮数 / 基数\nvector<int> A;                  // 原始数组（有符号）\nvector<unsigned int> tmp, cnt;  // 临时数组 / 计数数组\n```\n\n### init 函数：预处理\n\n```cpp\nvoid init(vector<unsigned int>& val)\n{\n    for (int i = 0; i < n; i++)\n        val[i] = (unsigned int)A[i] ^ ((unsigned int)1 << 31);  // 负数映射\n    unsigned int nmax = 0;\n    tmp.assign(n, 0);\n    cnt.assign(k, 0);\n    for (int i = 0; i < n; i++) nmax = max(nmax, val[i]);  // 找最大值\n    m = 1;\n    while (nmax >= k)   // 计算轮数\n    {\n        nmax /= k;\n        ++m;\n    }\n}\n```\n\n**关键点**：\n- `^ ((unsigned int)1 << 31)`：将 int 的符号位翻转。负数最高位为 1，异或后变 0（变成小的无符号数）；正数最高位为 0，异或后变 1（变成大的无符号数）。这样负数 < 正数的顺序在无符号比较中得以保持\n- `m` 的计算：最大值 $V_{\\max}$ 除以 $k$ 的次数加 1，即 $V_{\\max}$ 的 k 进制位数\n\n### base_sort 函数：基数排序主体\n\n```cpp\nvoid base_sort()\n{\n    vector<unsigned int> val(n, 0);\n    init(val);\n    unsigned int base = 1;\n    for (int i = 0; i < m; i++)           // 枚举每一位\n    {\n        for (int j = 0; j < k; j++) cnt[j] = 0;              // 清空计数\n        for (int j = 0; j < n; j++) cnt[val[j] / base % k]++; // 统计当前位\n        for (int j = 1; j < k; j++) cnt[j] += cnt[j - 1];     // 前缀和\n        for (int j = n - 1; j >= 0; j--)                      // 逆序放置（保证稳定）\n        {\n            tmp[cnt[val[j] / base % k] - 1] = val[j];\n            --cnt[val[j] / base % k];\n        }\n        for (int j = 0; j < n; j++) val[j] = tmp[j];          // 复制回原数组\n        base *= k;                                             // 进位\n    }\n    for (int i = 0; i < n; i++)\n        A[i] = val[i] ^ ((unsigned int)1 << 31);               // 还原为有符号\n}\n```\n\n**逐段解读**：\n\n| 代码段 | 含义 |\n|--------|------|\n| `val[j] / base % k` | 提取第 $i$ 位的数字（$0 \\sim k-1$） |\n| `cnt[j] += cnt[j-1]` | 前缀和，cnt[v] 变为\"位值 $\\le v$ 的元素个数\" |\n| `j = n-1; j >= 0; j--` | **逆序遍历**是保证稳定性的关键 |\n| `tmp[cnt[...] - 1] = val[j]` | 根据前缀和确定的位置放入临时数组 |\n| `--cnt[...]` | 放置一个后，该位值的下一个位置前移 |\n| `base *= k` | 下一位的权重 |\n\n### 主函数\n\n```cpp\nint main()\n{\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr); cout.tie(nullptr);\n    cin >> n >> k;\n    A.assign(n, 0);\n    for (int i = 0; i < n; i++) cin >> A[i];\n    base_sort();\n    for (int i = 0; i < n; i++) cout << A[i] << ' ';\n    return 0;\n}\n```\n\n输入 $n$ 个数和基数 $k$，排序后输出。\n\n## 复杂度分析\n\n### 时间复杂度\n\n$$\nT(n, k, d) = O(d \\cdot (n + k))\n$$\n\n其中 $d$ 是最大值的 k 进制位数，$k$ 是基数。\n\n- 当 $k = n$ 时，$d \\approx \\log_n V_{\\max}$，此时 $T = O((n + k) \\log_n V_{\\max}) = O(n \\log_n V_{\\max})$\n- 当 $k$ 较大时（如 $k = 256$），轮数 $d$ 减少，但每次计数排序的常数增大\n- 当 $k$ 较小时（如 $k = 2$），轮数 $d$ 增多，但每次计数排序很快\n\n### 空间复杂度\n\n$$\nS(n, k) = O(n + k)\n$$\n\n- 临时数组 `tmp`：$O(n)$\n- 计数数组 `cnt`：$O(k)$\n\n## k 的选择策略\n\n| k 值 | 轮数 d | 每轮代价 | 总代价 | 适用场景 |\n|------|--------|---------|--------|---------|\n| $k = 2$ | 最多（32轮） | $O(n+2)$ | $O(32n)$ | 数据范围小 |\n| $k = 256$ | 4轮（32位整数） | $O(n+256)$ | $O(4n)$ | 通用排序，**最常用** |\n| $k = 65536$ | 2轮 | $O(n+65536)$ | $O(2n)$ | 内存充足时最快 |\n| $k = n$ | $\\log_n V_{\\max}$ | $O(2n)$ | $O(n \\log_n V_{\\max})$ | 理论最优 |\n\n竞赛中 $k = 256$ 是最常用的选择，因为：\n- 4 轮即可完成 32 位整数排序\n- 计数数组仅需 256 个元素，缓存友好\n- 每轮的 $n + 256$ 代价中，256 的常数可忽略\n\n## 排序过程演示\n\n以数组 `A = [3, 1, 4, 2, 5]`，$k = 3$ 为例（简化演示，不考虑负数处理）：\n\n**最大值 5，轮数 m = 2（5 >= 3 → 5/3=1 >= 3? 否 → m=2）**\n\n**第 0 轮（base = 1）：**\n\n| 元素 | x % 3 |\n|------|-------|\n| 3 | 0 |\n| 1 | 1 |\n| 4 | 1 |\n| 2 | 2 |\n| 5 | 2 |\n\n计数：cnt = [1, 2, 2] → 前缀和：cnt = [1, 3, 5]\n\n逆序放置：\n- 5 (位2) → tmp[4] = 5, cnt[2] = 4\n- 2 (位2) → tmp[3] = 2, cnt[2] = 3\n- 4 (位1) → tmp[2] = 4, cnt[1] = 2\n- 1 (位1) → tmp[1] = 1, cnt[1] = 1\n- 3 (位0) → tmp[0] = 3, cnt[0] = 0\n\n结果：`[3, 1, 4, 2, 5]`（第 0 位已有序）\n\n**第 1 轮（base = 3）：**\n\n| 元素 | x/3 % 3 |\n|------|---------|\n| 3 | 1 |\n| 1 | 0 |\n| 4 | 1 |\n| 2 | 0 |\n| 5 | 1 |\n\n计数：cnt = [2, 3, 0] → 前缀和：cnt = [2, 5, 5]\n\n逆序放置：\n- 5 (位1) → tmp[4] = 5\n- 2 (位0) → tmp[1] = 2\n- 4 (位1) → tmp[3] = 4\n- 1 (位0) → tmp[0] = 1\n- 3 (位1) → tmp[2] = 3\n\n结果：`[1, 2, 3, 4, 5]` ✅ 有序\n\n## 适用场景\n\n1. **整数排序**：基数排序只能用于可按位分解的键值（如整数、字符串），不能用于浮点数\n2. **大数据量排序**：当 $n$ 很大时，基数排序的 $O(d \\cdot n)$ 优于比较排序的 $O(n \\log n)$\n3. **固定范围整数**：如 IP 地址排序、学号排序等\n4. **需要稳定排序的场景**：基数排序的每一轮都是稳定排序，最终结果也是稳定的\n5. **竞赛中的选择**：当需要比 `std::sort` 更快地排序大量整数时\n\n## 常见陷阱与注意事项\n\n1. **必须从低位到高位**：从高位开始排会丢失低位信息，无法保证正确性\n2. **计数排序的稳定性**：每一轮的计数排序必须是**稳定的**。代码中逆序遍历（`j = n-1` 到 `0`）是保证稳定性的关键——相同位值的元素保持原来的相对顺序\n3. **负数处理**：直接对负数取模或除法在 C++ 中行为不确定。代码用异或符号位的方式将所有数映射为无符号数，排序后再还原\n4. **k 的选择**：$k$ 太小（如 2）轮数过多；$k$ 太大（如 $n$）计数数组太大。$k = 256$ 是 32 位整数的最佳选择\n5. **整数溢出**：`base *= k` 在多轮后可能溢出。当 $k = 256$ 时，4 轮后 `base = $256^4 = 2^{32}$`，正好是 `unsigned int` 上限，不会溢出\n6. **init 中的 m 计算**：当最大值为 0 时，`m = 1`，会执行一轮（实际上不需要排序，但执行一轮也不会出错）\n\n## 与比较排序的对比\n\n| 特性 | 比较排序（如 std::sort） | k 进制基数排序 |\n|------|------------------------|---------------|\n| 时间复杂度 | $O(n \\log n)$ | $O(d(n+k))$ |\n| 适用类型 | 任意可比较类型 | 仅限可按位分解的类型（整数等） |\n| 稳定性 | std::sort 不稳定 | 稳定 |\n| 空间 | $O(\\log n)$（栈） | $O(n+k)$ |\n| 常数 | 较小 | 中等 |\n| 大 n 优势 | $\\log n$ 增长 | $d$ 近似常数（$k=256$ 时 $d=4$） |\n\n当 $n = 10^6$ 时：\n- `std::sort`：约 $10^6 \\times 20 = 2 \\times 10^7$ 次比较\n- 基数排序（$k=256$）：约 $4 \\times 10^6$ 次操作\n\n基数排序快约 5 倍。\n\n## 扩展：字符串基数排序\n\n基数排序也可用于字符串排序：将每个字符视为一个\"位\"，从最后一位字符开始向前排序。但由于字符串长度可变，需要处理空位（短的字符串在高位用 0 补齐）。",
+        "timeComplexity": "O(d*(n+k))",
+        "spaceComplexity": "O(n+k)",
+        "tags": [
+            "基础算法",
+            "排序",
+            "基数排序",
+            "非比较排序",
+            "计数排序",
+            "位运算"
+        ],
+        "codePath": "基础算法\\排序\\k进制基数排序\\源.cpp",
+        "prerequisites": [
+            "basic-divide-conquer-merge-inversion"
+        ],
+        "related": [
+            "basic-quickselect-kth",
+            "basic-divide-conquer-merge-inversion"
+        ]
+    },
+    {
         "id": "basic-two-pointer-cycle",
         "category": "基础算法",
         "subcategory": "双指针",
@@ -1657,6 +1683,33 @@ const KNOWLEDGE_DATA = [
         ]
     },
     {
+        "id": "graph-scc-condensation",
+        "category": "图论",
+        "subcategory": "强连通分量",
+        "subSubcategory": "",
+        "title": "SCC 缩点（强连通分量缩点）",
+        "content": "## 算法原理\n\n**缩点（Condensation）**是强连通分量（SCC）最重要的应用之一：将每个强连通分量压缩成一个\"超级点\"，原图中跨 SCC 的边变成超级点之间的边。缩点后得到的图一定是**有向无环图（DAG）**，从而可以使用拓扑排序、DAG 上 DP 等高效算法。\n\n### 为什么要缩点\n\n在一般有向图中，由于存在环，很多问题难以高效求解（比如最长路是 NP-hard 的）。但如果把每个 SCC 缩成一个点，图就变成了 DAG，而 DAG 上的很多问题可以在 $O(n+m)$ 时间内解决。\n\n### 核心思想\n\n1. 先用 Tarjan 或 Kosaraju 算法求出所有 SCC，给每个节点标记所属分量编号 `col[u]`\n2. 遍历原图的每条边 $u \\to v$：\n   - 若 `col[u] != col[v]`，说明这是一条跨 SCC 的边\n   - 在缩点图中添加边 `col[u] → col[v]`\n3. 为避免重复边（同一个 SCC 对之间可能有多条原边），需要去重\n\n### 缩点图的性质\n\n- 缩点图一定是 DAG（如果缩点图有环，那环上的超级点应该被合并成一个 SCC，矛盾）\n- 缩点图的节点数 = SCC 的数量 = `cnt`\n- 缩点图的边数 ≤ 原图边数 $m$\n\n## 算法步骤\n\n### 第一步：求 SCC\n\n用 Tarjan 算法求出所有强连通分量，得到：\n- `col[u]`：节点 $u$ 所属的 SCC 编号（1 ~ cnt）\n- `ans[i]`：第 $i$ 个 SCC 包含的节点列表\n- `cnt`：SCC 的总数\n\n### 第二步：构建缩点图\n\n```\n初始化 scc_edges, scc_in, scc_out 大小为 cnt+1\n对于每个 SCC u (1 ~ cnt):\n    对于 u 中的每个节点 i:\n        对于 i 的每条出边 j:\n            v = col[j]   // 边的终点所在的 SCC\n            如果 v == u: 跳过（自环）\n            如果 u->v 这条边已经加过: 跳过（去重）\n            在 scc_edges[u] 中加入 v\n            scc_out[u]++   // u 的出度 +1\n            scc_in[v]++    // v 的入度 +1\n```\n\n### 第三步：去重技巧\n\n代码中用 `vis[v] = u` 的方式来去重：\n- 用一个 `vis` 数组记录\"当前处理的 SCC u 已经向 v 连过边了\"\n- 因为 u 从 1 到 cnt 依次处理，每次处理 u 时，只有 `vis[v] == u` 的才是本轮已加过的边\n- 这样不需要每次清空 vis 数组，节省时间\n\n## 逐行代码解析\n\n### 新增变量\n\n```cpp\nvector<vector<int>> scc_edges;  // 缩点图的邻接表\nvector<int> scc_in, scc_out;    // 每个超级点的入度、出度\n```\n\n### SCC 函数：求 SCC + 缩点一体化\n\n```cpp\nvoid SCC(int n)\n{\n    init(n);\n    for (int i = 1; i <= n; i++)\n    {\n        if (!dns[i]) tarjan(i);  // 第一步：Tarjan 求所有 SCC\n    }\n\n    // 第二步：构建缩点图\n    scc_edges.assign(cnt + 1, vector<int>());\n    scc_in.assign(cnt + 1, 0);\n    scc_out.assign(cnt + 1, 0);\n    vector<int> vis(cnt + 1, false);  // 去重标记数组\n\n    for (int u = 1; u <= cnt; u++)        // 枚举每个 SCC（超级点 u）\n    {\n        for (int i : ans[u])              // 枚举 u 中的每个原图节点\n        {\n            for (int j : edges[i])        // 枚举该节点的每条出边\n            {\n                int v = col[j];           // 边的终点所属的 SCC\n                if (vis[v] == u || u == v) continue;  // 去重 + 跳过自环\n                scc_edges[u].emplace_back(v);\n                vis[v] = u;               // 标记 u 已经向 v 连过边\n                scc_out[u]++;\n                scc_in[v]++;\n            }\n        }\n    }\n}\n```\n\n**关键细节解读：**\n\n| 代码行 | 含义 |\n|--------|------|\n| `int v = col[j]` | 将原边的终点映射到它所在的 SCC 编号 |\n| `u == v` | 边在同一个 SCC 内部，是自环，不需要加到缩点图 |\n| `vis[v] == u` | SCC u 已经向 SCC v 连过边了，避免重复加边 |\n| `vis[v] = u` | 用当前 SCC 编号 u 作为标记值，不需要清空数组 |\n\n### 主函数调用\n\n```cpp\nSCC(n);  // 一次性完成求 SCC 和缩点\ncout << \"SCC缩点和有 \" << cnt << \" 个强联通分量\" << '\\n';\nfor (int i = 1; i <= cnt; i++)\n{\n    // 输出每个超级点包含的原节点\n    cout << \"超级点\" << i << \"含有: \";\n    for (int j : ans[i]) cout << j << ' ';\n    cout << '\\n';\n    // 输出入度、出度\n    cout << \"超级点\" << i << \"有\" << scc_in[i] << \"个入度, \" << scc_out[i] << \"个出度\" << '\\n';\n    // 输出缩点图的边\n    for (int j : scc_edges[i])\n    {\n        cout << i << \"->\" << j << '\\n';\n    }\n}\n```\n\n## 复杂度分析\n\n- **时间复杂度**：$O(n+m)$\n  - Tarjan 求 SCC：$O(n+m)$\n  - 构建缩点图：遍历所有节点和边，仍是 $O(n+m)$\n  - 去重操作每条边只处理一次，不增加复杂度量级\n- **空间复杂度**：$O(n+m)$\n  - 缩点图邻接表：$O(m)$（最坏情况每条边都跨 SCC）\n  - 入度出度数组：$O(cnt) \\approx O(n)$\n\n## 去重方法对比\n\n缩点图的构建中，去重是关键步骤。常见的去重方法有三种：\n\n| 方法 | 思路 | 时间 | 空间 | 适用场景 |\n|------|------|------|------|---------|\n| **vis 数组法**（本代码） | 用 `vis[v] = u` 标记，无需清空 | $O(n+m)$ | $O(cnt)$ | 边数较多，追求效率 |\n| **set 去重法** | 用 `set<int>` 存每个超级点的邻居 | $O(m \\log cnt)$ | $O(m)$ | 代码简洁，边数不多 |\n| **排序去重法** | 先全加进去，再 sort + unique | $O(m \\log m)$ | $O(m)$ | 需要边按顺序排列 |\n\n本代码用的 vis 数组法是最快的，也是竞赛中最常用的写法。\n\n## 适用场景\n\n1. **DAG 上的动态规划**：将一般图缩点成 DAG 后，可以在拓扑序上做 DP\n   - 求经过节点权值最大的路径\n   - 求方案数、期望值等\n2. **入度/出度统计问题**：\n   - 至少需要加多少条边才能让整个图强连通（答案 = max(入度为0的点数, 出度为0的点数)）\n   - 求有多少个起点可以到达全图（入度为 0 的 SCC 数量）\n3. **2-SAT 问题**：用 SCC 判断可行性后，缩点图的拓扑序决定变量取值\n4. **图的简化**：将复杂有向图简化为 DAG，便于分析结构\n\n## 常见陷阱与注意事项\n\n1. **自环要跳过**：`u == v` 时不能加边，否则缩点图会有自环，不再是严格的 DAG\n2. **边要去重**：同一个 SCC 对之间可能有多条原边，如果不去重，缩点图的边数会膨胀，影响后续算法效率\n3. **vis 数组的含义**：`vis[v] == u` 表示\"在处理 SCC u 时，已经加过 u→v 的边\"，不是\"v 被访问过\"。这种写法利用了 u 递增的特性，无需每次清空数组\n4. **分量编号从 1 开始**：代码中 `ans.assign(1, {})` 和 SCC 编号从 1 到 cnt，所以缩点图数组也要开 `cnt + 1`\n5. **SCC 函数的参数**：传入的是节点数 n，不是边数 m\n\n## 缩点 + 拓扑 DP 示例\n\n缩点后最常见的操作就是在 DAG 上做拓扑 DP。以下是一个典型模板：\n\n```cpp\n// 伪代码：缩点后求每个超级点出发的最长路\nvector<int> topo;          // 拓扑序\nvector<int> deg(cnt + 1);  // 入度（已在 scc_in 中计算好）\nqueue<int> q;\n\nfor (int i = 1; i <= cnt; i++)\n    if (scc_in[i] == 0) q.push(i);\n\nwhile (!q.empty())\n{\n    int u = q.front(); q.pop();\n    topo.push_back(u);\n    for (int v : scc_edges[u])\n    {\n        scc_in[v]--;\n        if (scc_in[v] == 0) q.push(v);\n    }\n}\n\n// 在拓扑序上 DP\nvector<int> dp(cnt + 1);\nfor (int u : topo)\n    for (int v : scc_edges[u])\n        dp[v] = max(dp[v], dp[u] + weight[v]);\n```\n\n## 与其他图算法的关系\n\n| 算法 | 关系 |\n|------|------|\n| Tarjan / Kosaraju | 缩点的前置步骤，用于求出 SCC |\n| 拓扑排序 | 缩点后常用的下一步操作，DAG 上 DP 的基础 |\n| DAG 最短路 / 最长路 | 缩点后可以用拓扑序在 DAG 上求最短路/最长路 |\n| 2-SAT | 用 SCC 求解后，缩点图的拓扑序决定变量真假 |",
+        "timeComplexity": "O(n+m)",
+        "spaceComplexity": "O(n+m)",
+        "tags": [
+            "图论",
+            "强连通分量",
+            "缩点",
+            "Tarjan",
+            "DAG"
+        ],
+        "codePath": "图论\\强连通分量\\缩点\\源.cpp",
+        "prerequisites": [
+            "graph-tarjan-scc",
+            "graph-topo-sort"
+        ],
+        "related": [
+            "graph-tarjan-scc",
+            "graph-dag-shortest-path",
+            "graph-topo-sort"
+        ]
+    },
+    {
         "id": "graph-spfa",
         "category": "图论",
         "subcategory": "最短路",
@@ -1681,6 +1734,33 @@ const KNOWLEDGE_DATA = [
         "related": [
             "graph-bellman-ford",
             "graph-dijkstra-heap"
+        ]
+    },
+    {
+        "id": "graph-tarjan-scc",
+        "category": "图论",
+        "subcategory": "强连通分量",
+        "subSubcategory": "",
+        "title": "Tarjan 强连通分量",
+        "content": "## 算法原理\n\nTarjan 算法由 Robert Tarjan 于 1972 年提出，基于**一次深度优先搜索（DFS）**找出有向图中所有的强连通分量（Strongly Connected Components, SCC），时间复杂度为 $O(n+m)$。\n\n### 什么是强连通分量\n\n在有向图中，若两个节点 $u$ 和 $v$ 互相可达（即存在 $u \\to v$ 的路径，也存在 $v \\to u$ 的路径），则称它们强连通。图中**极大的强连通子图**称为强连通分量。\n\n强连通分量的意义在于：**将每个 SCC 缩成一个点后，原图变成 DAG**，从而可以用拓扑排序等 DAG 专属算法高效解决问题。\n\n### 核心思想\n\n在 DFS 过程中，用两个关键数组标记每个节点：\n\n| 数组 | 含义 |\n|------|------|\n| `dns[u]`（dfn） | 节点 $u$ 被首次访问的时间戳（DFS 序） |\n| `low[u]` | 从 $u$ 出发，通过**一条返祖边**或通过**后代的返祖边**能回到的最早节点的时间戳 |\n\n核心结论：**当 `dfs[u] == low[u]` 时，以 $u$ 为根的子树中所有仍在栈里的节点恰好构成一个强连通分量。**\n\n### 为什么正确\n\n- 如果 `low[u] < dns[u]`，说明 $u$ 能通过某条路径回到更早的祖先，因此 $u$ 一定和那个祖先在同一个 SCC 中\n- 如果 `low[u] == dns[u]`，说明 $u$ 无法回到任何更早的节点，它就是当前 SCC 的\"最高点\"（根），此时栈中从 $u$ 到栈顶的所有节点都属于这个 SCC\n\n## 算法步骤\n\n1. **初始化**：`dns`、`low` 全为 0（未访问），栈为空，时间戳 `tim = 1`，分量计数 `cnt = 0`\n2. **遍历所有节点**：对每个未访问的节点启动 DFS\n3. **DFS 过程**：\n   - 标记当前节点的 `dns` 和 `low`，将节点压入栈并标记在栈中\n   - 遍历每条出边：\n     - 若后继未访问：递归 DFS，回溯时更新 `low[u] = min(low[u], low[v])`\n     - 若后继已访问且仍在栈中（返祖边）：更新 `low[u] = min(low[u], dns[v])`\n   - 遍历结束后，若 `dns[u] == low[u]`：弹出栈中元素直到包含 $u$，这些节点构成一个 SCC\n\n## 逐行代码解析\n\n### 变量与数组\n\n```cpp\nvector<vector<int>> edges, ans;  // 邻接表 / 各分量的节点列表\nvector<int> sk, dns, low, col;   // 栈 / 时间戳 / 能回退的最早时间 / 所属分量\nvector<bool> in_sk;              // 节点是否在栈中\nint idx, tim, cnt;               // 栈顶指针 / 时间戳 / 分量计数\n```\n\n### 初始化\n\n```cpp\ninline void init(int n)\n{\n    idx = 0, tim = 1, cnt = 0;\n    sk.assign(n + 1, 0);\n    in_sk.assign(n + 1, false);\n    dns.assign(n + 1, 0);\n    low.assign(n + 1, 0);\n    col.assign(n + 1, 0);\n    ans.assign(1, {});  // ans[0] 占位，分量从 1 开始\n}\n```\n\n### 标记节点首次访问\n\n```cpp\ninline void mark(int rt)\n{\n    dns[rt] = tim;\n    low[rt] = tim;   // 初始假设只能回到自己\n    sk[idx++] = rt;  // 入栈\n    in_sk[rt] = true;\n    tim++;\n}\n```\n\n### Tarjan DFS 主体\n\n```cpp\nvoid tarjan(int rt)\n{\n    mark(rt);\n    for (int i : edges[rt])\n    {\n        if (!dns[i])          // 树边：后继未访问\n        {\n            tarjan(i);\n            low[rt] = min(low[rt], low[i]);  // 用儿子的low更新自己\n        }\n        else if (in_sk[i])    // 返祖边：后继已访问且在栈中\n            low[rt] = min(low[rt], dns[i]);  // 用后继的dfn更新自己\n    }\n    if (dns[rt] == low[rt])   // rt是SCC的根\n    {\n        ++cnt;\n        ans.emplace_back();\n        while (in_sk[rt])     // 弹出到rt为止的所有节点\n        {\n            col[sk[idx - 1]] = cnt;       // 标记所属分量\n            ans[cnt].emplace_back(sk[idx - 1]);\n            in_sk[sk[idx - 1]] = false;\n            --idx;\n        }\n    }\n}\n```\n\n### 主函数：处理不连通图\n\n```cpp\nfor (int i = 1; i <= n; i++)\n{\n    if (!dns[i]) tarjan(i);  // 每个未访问的节点都要启动一次DFS\n}\n```\n\n图可能不连通，需要对每个连通分量分别运行 Tarjan。\n\n## 复杂度分析\n\n- **时间复杂度**：$O(n+m)$\n  - 每个节点恰好入栈一次、出栈一次\n  - 每条边恰好被访问一次\n  - DFS 总代价线性\n- **空间复杂度**：$O(n+m)$\n  - 邻接表：$O(m)$\n  - dns、low、col、in_sk、栈：$O(n)$\n\n## 适用场景\n\n1. **强连通分量检测**：找出图中所有 SCC，常用于图的结构分析\n2. **缩点**：将每个 SCC 缩成一个点，把一般有向图转化为 DAG，然后做拓扑 DP、最长路等\n3. **2-SAT 问题**：利用 Tarjan 求 SCC 后，根据每个变量的两个状态是否在同一 SCC 中判断可行性\n4. **有向图的连通性问题**：判断两个节点是否互相可达\n\n## 常见陷阱与注意事项\n\n1. **in_sk 的判断**：返祖边的条件是 `dns[i] != 0 && in_sk[i] == true`，不能只判断 `dns[i] != 0`。因为如果 `i` 已经被弹出栈（属于其他 SCC），就不是返祖边而是横叉边\n2. **low 的更新方式**：树边用 `low[v]` 更新，返祖边用 `dns[v]` 更新（不是 `low[v]`）。返祖边只能跳一步，不能用后代的 low 值\n3. **栈的弹出条件**：当 `dns[rt] == low[rt]` 时，弹出**从栈顶到 rt** 的所有节点，不是只弹 rt\n4. **多连通分量**：图可能不连通，必须遍历所有节点，对未访问的都跑一次 Tarjan\n5. **ans 的索引**：代码中 `ans.assign(1, {})` 让 ans 从下标 1 开始，分量编号从 1 到 cnt\n6. **变量名 dns**：部分教材写作 dfn（depth-first number），含义相同\n\n## 缩点：SCC 的典型应用\n\n求出 SCC 后，可以构建**缩点图**：每个 SCC 是一个新节点，原图中跨 SCC 的边变成缩点图中的边。缩点图一定是 DAG。\n\n```cpp\n// 伪代码：构建缩点图\nvector<vector<int>> new_edges(cnt + 1);\nfor (int u = 1; u <= n; u++)\n    for (int v : edges[u])\n        if (col[u] != col[v])\n            new_edges[col[u]].push_back(col[v]);\n```\n\n缩点后可以做：\n- 拓扑排序上的 DP（比如求经过节点权值最大的路径）\n- 求 DAG 上的最长路/最短路\n- 统计入度为 0 的缩点个数（至少需要多少个起点才能走遍全图）\n\n## 与 Kosaraju 算法对比\n\n| 算法 | 思路 | DFS 次数 | 常数 | 直观程度 |\n|------|------|---------|------|---------|\n| Tarjan | 一次DFS + 栈 + dfn/low | 1 次 | 小 | 较难理解 |\n| Kosaraju | 正向DFS出栈序 + 反向图DFS | 2 次 | 稍大 | 直观易理解 |\n\n两者时间复杂度相同（都是 $O(n+m)$），Tarjan 只需要一次 DFS 所以常数更小；Kosaraju 思路更清晰但代码稍长。竞赛中 Tarjan 更常用。",
+        "timeComplexity": "O(n+m)",
+        "spaceComplexity": "O(n+m)",
+        "tags": [
+            "图论",
+            "强连通分量",
+            "Tarjan",
+            "DFS",
+            "缩点"
+        ],
+        "codePath": "图论\\强连通分量\\Untitled1.cpp",
+        "prerequisites": [
+            "graph-topo-sort"
+        ],
+        "related": [
+            "graph-topo-sort",
+            "graph-lca-tarjan",
+            "graph-dag-shortest-path",
+            "graph-scc-condensation"
         ]
     },
     {
@@ -1827,7 +1907,7 @@ const KNOWLEDGE_DATA = [
     {
         "id": "str-kmp",
         "category": "字符串",
-        "subcategory": "KMP",
+        "subcategory": "字符串匹配",
         "subSubcategory": "",
         "title": "KMP 字符串匹配算法",
         "content": "## 算法原理\n\nKMP（Knuth-Morris-Pratt）算法是一种高效的字符串匹配算法，用于在文本串（主串）$s$ 中查找模式串（子串）$p$ 的所有出现位置。\n\n### 朴素匹配的问题\n\n朴素（暴力）匹配：对主串的每个起始位置尝试与模式串逐位比较，失配后主串指针回退、模式串指针归零。最坏情况下时间复杂度为 $O(n \\cdot m)$，当两个串都很长且有大量部分匹配时效率极低。\n\nKMP 的核心思想：**利用已匹配的信息，避免主串指针回退**。当发生失配时，根据模式串自身的前后缀公共信息，将模式串\"跳\"到合适的位置继续匹配，主串指针 $i$ 始终只前进不后退。\n\n### next 数组（前缀函数）\n\nKMP 的关键是预处理模式串，得到一个 `next` 数组（也叫前缀函数 / failure function）。\n\n**定义**：`next[i]` 表示模式串 $p[0 \\dots i]$ 中，最长相等前缀和后缀的长度（严格小于子串长度）。换句话说，`next[i] = j` 意味着 $p[0 \\dots j] = p[i-j \\dots i]$，且这是满足条件的最大 $j$。\n\n本代码实现中，`next[0] = -1`（哨兵值，表示已经退无可退，主串指针需要前进一位），其余位置 `next[i]` 表示的是\"最长相等前后缀的末尾下标\"（即长度 $-1$）。\n\n### 匹配过程\n\n设主串指针为 $i$（遍历主串），模式串指针为 $j$（当前已匹配到模式串的第 $j$ 位）：\n\n1. 若 $j = -1$ 或 $s[i] = p[j+1]$，则 $i$ 前进一位，$j$ 前进一位\n2. 若 $s[i] \\neq p[j+1]$，则 $j = \\text{next}[j]$（模式串\"回退\"到最长可匹配前缀的位置）\n3. 当 $j = m-1$（模式串末尾）时，说明找到了一次匹配，记录位置后继续 `j = next[j]` 寻找下一个\n\n整个匹配过程中主串指针 $i$ 只增不减，因此匹配阶段时间复杂度为 $O(n)$。\n\n### 复杂度\n\n| 操作 | 时间 | 空间 |\n|---|---|---|\n| 求 next 数组（预处理） | $O(m)$ | $O(m)$ |\n| KMP 匹配 | $O(n)$ | $O(1)$ 额外 |\n| 总体 | $O(n + m)$ | $O(m)$ |\n\n## 匹配过程示意\n\n### next 数组构造示例\n\n以模式串 $p =$ `\"ababc\"` 为例，逐步构造 `next` 数组：\n\n```\n模式串 p:  a  b  a  b  c\n下标:     0  1  2  3  4\n\n初始化:\n  next[0] = -1     (哨兵)\n  j = -1, i 从 1 开始\n\ni=1 (p[1]='b'):\n  j = -1，比较 p[1] 与 p[j+1]=p[0]='a'\n  'b' != 'a'，j = -1（已无法回退）\n  因 j = -1，进入 if 分支：j 不变\n  next[1] = j = -1\n  含义: \"ab\" 没有真前后缀相等\n\ni=2 (p[2]='a'):\n  j = -1，比较 p[2]='a' 与 p[0]='a'\n  相等！j++ → j = 0\n  next[2] = 0\n  含义: \"aba\" 的最长相等前后缀是 \"a\"，长度 1，末尾下标 0\n\ni=3 (p[3]='b'):\n  j = 0，比较 p[3]='b' 与 p[j+1]=p[1]='b'\n  相等！j++ → j = 1\n  next[3] = 1\n  含义: \"abab\" 的最长相等前后缀是 \"ab\"，长度 2，末尾下标 1\n\ni=4 (p[4]='c'):\n  j = 1，比较 p[4]='c' 与 p[j+1]=p[2]='a'\n  'c' != 'a' → j = next[j] = next[1] = -1\n  现在 j = -1，比较 p[4]='c' 与 p[0]='a'\n  不等，j = -1，进入 if 分支：j 不变\n  next[4] = -1\n  含义: \"ababc\" 没有真前后缀相等\n\n最终 next 数组:\n  下标:    0    1    2    3    4\n  next:   -1   -1    0    1   -1\n```\n\n### KMP 匹配示例\n\n主串 $s =$ `\"aababcababc\"`，模式串 $p =$ `\"ababc\"`（next 数组如上）：\n\n```\ns = a a b a b c a b a b c\n    0 1 2 3 4 5 6 7 8 9 10\np = a b a b c   (m = 5)\n    0 1 2 3 4\n\n初始: i=0, j=-1\n\nStep 1: i=0, j=-1\n  j==-1 → i++=1, j++=0\n  状态: s[0]='a' 与 p[0]='a' 匹配，当前匹配到 j=0\n\nStep 2: i=1, j=0\n  比较 s[1]='a' vs p[1]='b' → 不等！\n  j = next[j] = next[0] = -1\n  j==-1 → i++=2, j++=0\n  状态: 从 s[2] 重新开始匹配 p[0]\n\nStep 3: i=2, j=0\n  比较 s[2]='b' vs p[1]='a' → 不等！\n  j = next[j] = next[0] = -1\n  j==-1 → i++=3, j++=0\n  状态: 从 s[3] 重新开始匹配 p[0]\n\nStep 4: i=3, j=0\n  比较 s[3]='a' vs p[1]='b' → 不等！\n  j = next[0] = -1\n  j==-1 → i++=4, j++=0\n  状态: 从 s[4] 重新开始匹配 p[0]\n\n... 继续推进，最终找到匹配:\n  当 i=5 时 j=4 (j == m-1)，匹配成功！\n  匹配起始位置: i - m + 1 = 5 - 5 + 1 = 1\n  即 s[1..5] = \"ababc\" ✓\n  然后 j = next[4] = -1，继续寻找下一个匹配\n```\n\n## 核心操作详解\n\n### next 数组预处理\n\n```cpp\nvoid init(const string& str)\n{\n    kmp_next.clear();\n    int m = str.size(), j = -1;\n    kmp_next.resize(m, -1);\n    for (int i = 1; i < m; i++)\n    {\n        while (j != -1 && str[i] != str[j + 1]) j = kmp_next[j];\n        if (str[i] == str[j + 1]) j++;\n        kmp_next[i] = j;\n    }\n}\n```\n\n`next` 数组的计算本身就是一个\"自己匹配自己\"的 KMP 过程。$i$ 遍历模式串（从 1 开始，因为 `next[0]=-1` 已知），$j$ 表示当前已匹配的前缀末尾下标。每一步：\n- 如果当前字符不匹配，就用 `next` 数组回退 $j$\n- 如果匹配，$j$ 前进一位\n- 将 $j$ 记录为 `next[i]`\n\n### KMP 匹配过程\n\n```cpp\nvoid kmp(const string& a, const string& b)\n{\n    int n = a.size(), m = b.size();\n    int j = -1;\n    for (int i = 0; i < n; i++)\n    {\n        while (j != -1 && a[i] != b[j + 1]) j = kmp_next[j];\n        if (a[i] == b[j + 1]) j++;\n        if (j == m - 1)\n        {\n            ans.emplace_back(i - m + 1);\n            j = kmp_next[j];\n        }\n    }\n}\n```\n\n匹配逻辑与求 next 数组高度相似：\n- $i$ 遍历主串（从 0 开始），$j$ 是模式串已匹配位置\n- 失配时 $j$ 通过 `next` 回退，$i$ 不回退\n- 当 $j = m-1$ 时匹配成功，记录起始位置 `i - m + 1`，然后 `j = next[j]` 继续匹配（可处理重叠匹配）\n\n## 逐行代码解析\n\n```cpp\n#include<bits/stdc++.h>\nusing namespace std;\nvector<int> kmp_next, ans;\n```\n\n- `kmp_next`：存储模式串的 next 数组\n- `ans`：存储所有匹配成功的起始位置\n\n```cpp\nvoid init(const string& str)\n{\n    kmp_next.clear();\n    int m = str.size(), j = -1;\n    kmp_next.resize(m, -1);\n    for (int i = 1; i < m; i++)\n    {\n        while (j != -1 && str[i] != str[j + 1]) j = kmp_next[j];\n        if (str[i] == str[j + 1]) j++;\n        kmp_next[i] = j;\n    }\n}\n```\n\n- `j = -1`：初始化为哨兵，表示尚未匹配任何前缀\n- `kmp_next.resize(m, -1)`：next[0] = -1 作为初始条件\n- $i$ 从 1 开始：因为 `next[0]` 已经确定为 -1\n- `while` 循环：当前字符不匹配时，不断用 next 回退 j，直到 j=-1 或匹配成功\n- `if (str[i] == str[j+1]) j++`：匹配成功，j 前进一位\n- `kmp_next[i] = j`：记录 next[i] = j（最长相等前后缀的末尾下标）\n\n```cpp\nvoid kmp(const string& a, const string& b)\n{\n    int n = a.size(), m = b.size();\n    int j = -1;\n    for (int i = 0; i < n; i++)\n    {\n        while (j != -1 && a[i] != b[j + 1]) j = kmp_next[j];\n        if (a[i] == b[j + 1]) j++;\n        if (j == m - 1)\n        {\n            ans.emplace_back(i - m + 1);\n            j = kmp_next[j];\n        }\n    }\n}\n```\n\n- $i$ 遍历主串每个字符，永不回退\n- `while` 失配回退：当前位置不匹配时，利用 next 数组将模式串\"滑\"到最长可匹配前缀位置\n- 匹配成功后 j 前进\n- `j == m - 1`：模式串全部匹配完，找到一个匹配位置\n- `ans.emplace_back(i - m + 1)`：记录匹配起始下标（0-based）\n- `j = kmp_next[j]`：匹配成功后不从头开始，而是回退到 next[j] 继续匹配，以支持重叠匹配（例如 \"AAAAA\" 中找 \"AA\"，可找到 4 个）\n\n```cpp\nint main()\n{\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr); cout.tie(nullptr);\n    int T;\n    cin >> T;\n    while (T--)\n    {\n        string p;\n        int t;\n        cin >> p >> t;\n        init(p);\n        while (t--)\n        {\n            ans.clear();\n            string s;\n            cin >> s;\n            kmp(s, p);\n            if (ans.empty()) cout << -1;\n            else for (int i : ans) cout << i << ' ';\n            cout << '\\n';\n        }\n    }\n    return 0;\n}\n```\n\n- 多组测试用例：每组先输入模式串 $p$ 和测试次数 $t$\n- `init(p)`：预处理模式串的 next 数组\n- 每组测试输入主串 $s$，调用 `kmp(s, p)` 找所有匹配\n- 无匹配输出 `-1`，否则输出所有匹配起始位置（0-based）\n\n## 复杂度分析\n\n### 时间复杂度\n\n| 操作 | 复杂度 | 说明 |\n|---|---|---|\n| 求 next 数组 | $O(m)$ | 双重循环看似 $O(m^2)$，实际 j 的增加次数与回退次数均不超过 $m$ |\n| KMP 匹配 | $O(n)$ | i 只增不减（$n$ 次），j 的总增加量不超过 $n$，总回退量也不超过 $n$ |\n| 总体 | $O(n + m)$ | 线性时间，与朴素匹配的 $O(n \\cdot m)$ 形成鲜明对比 |\n\n**为什么是线性的？** 关键观察：$j$ 每次至少增加 1（`j++`），每次回退至少减少 1（`j = next[j]`）。整个过程中 $j$ 的总增量不超过 $n$（或 $m$），因此总回退量也不超过总增量，while 循环总执行次数为 $O(n)$。\n\n### 空间复杂度\n\n| 数据 | 空间 | 说明 |\n|---|---|---|\n| next 数组 | $O(m)$ | 长度等于模式串长度 |\n| ans 数组 | $O(k)$ | 匹配次数，最坏 $O(n)$ |\n| **总计** | $O(m)$ | next 数组占主导（不计结果存储） |\n\n## 适用场景\n\n1. **单模式串匹配**：在一个文本串中查找一个模式串的所有出现位置，是 KMP 最经典的应用\n2. **多文本串匹配同一模式串**：如本题代码结构——预处理一次模式串，对多个主串分别匹配，next 数组复用\n3. **循环同构判定**：将 $s + s$ 与 $t$ 做 KMP 匹配，判断 $t$ 是否是 $s$ 的循环同构\n4. **周期判定**：若 $m - \\text{next}[m-1] - 1$ 整除 $m$，则模式串存在周期（最小周期长度为 $m - \\text{next}[m-1] - 1$）\n5. **前缀函数的其他应用**：求字符串的最短循环节、压缩表示等\n\n**不适用场景**：\n- 多模式串匹配 → 应使用 AC 自动机（Aho-Corasick）\n- 超长文本、多次查询且模式串较少 → 后缀自动机或后缀数组\n- 动态插入/删除模式串 → 后缀树/后缀自动机更灵活\n\n## 常见陷阱与注意事项\n\n1. **下标体系（0-based vs 1-based）**\n   - 本代码使用 0-based 下标，`next[0] = -1` 作为哨兵\n   - 不同实现可能用 1-based（`next[0] = 0` 或 `next[1] = 0`），需注意区分\n   - 匹配成功位置 `i - m + 1` 也是 0-based\n\n2. **j = -1 的哨兵含义**\n   - `j = -1` 表示模式串指针已经退到最前面，再退就没了\n   - 当 `j = -1` 且失配时，主串指针 $i$ 必须前进，模式串指针重置为 0（`j++` 后为 0）\n\n3. **匹配成功后的回退**\n   - 找到一个匹配后，`j = next[j]` 而不是 `j = -1`\n   - 这样做是为了支持**重叠匹配**，例如 \"AAAA\" 中找 \"AA\" 可以找到 3 个位置\n   - 如果不需要重叠匹配，可以设置 `j = -1` 或根据题目要求调整\n\n4. **while 回退的边界条件**\n   - 必须写 `while (j != -1 && ...)`，不能漏 `j != -1`\n   - 如果 `j = -1` 时还执行 `j = next[j]`，`next[-1]` 会越界\n\n5. **字符串为空的边界情况**\n   - 模式串为空时应直接返回所有位置（或根据题意处理）\n   - 主串为空且模式串非空时无匹配\n   - 本题代码中 `m = str.size()`，若 `m = 0` 则循环不执行，需注意\n\n6. **next 数组的两种定义**\n   - 定义 1（本代码）：`next[i]` 是最长相等前后缀的末尾下标（长度 - 1），`next[0] = -1`\n   - 定义 2：`next[i]` 是最长相等前后缀的长度，`next[0] = 0`\n   - 两种定义等价，但匹配时的比较方式不同（`p[j+1]` vs `p[j]`），不要混用\n\n## 对比与扩展\n\n| 算法 | 预处理时间 | 匹配时间 | 空间 | 特点 |\n|---|---|---|---|---|\n| **KMP（本算法）** | $O(m)$ | $O(n)$ | $O(m)$ | 单模式串，在线匹配，实现简洁 |\n| 朴素匹配 | 无 | $O(n \\cdot m)$ | $O(1)$ | 实现最简单，但最坏情况慢 |\n| Rabin-Karp（字符串哈希） | $O(n + m)$ | $O(n + k)$ | $O(n)$ | 可支持多模式串，有概率碰撞 |\n| BM（Boyer-Moore） | $O(m + \\Sigma)$ | 最好 $O(n/m)$，最坏 $O(n \\cdot m)$ | $O(\\Sigma)$ | 从右往左比较，实际中常更快 |\n| AC 自动机 | $O(\\sum m_i)$ | $O(n + k)$ | $O(\\sum m_i)$ | 多模式串匹配 |\n| 后缀数组 | $O(n)$ 或 $O(n \\log n)$ | $O(m \\log n)$ | $O(n)$ | 支持任意多模式查询，预处理较复杂 |\n\n### 扩展\n\n- **扩展 KMP（Z 函数）**：对于每个位置 $i$，求 $s[i \\dots]$ 与 $s$ 的最长公共前缀长度。思想类似 KMP，也是利用已匹配信息避免重复比较\n- **AC 自动机**：KMP 的多模式串版本，将多个模式串建成 trie 树，再在 trie 上建立 fail 指针（类似 KMP 的 next 数组），实现一次扫描匹配所有模式串\n- **前缀函数的应用**：\n  - 求字符串的最小周期：若 $(m-1) - \\text{next}[m-1]$ 整除 $m$，则最小周期为 $(m-1) - \\text{next}[m-1]$\n  - 字符串压缩：利用 next 数组找到重复单元\n  - 求每个前缀的出现次数",
@@ -1841,11 +1921,12 @@ const KNOWLEDGE_DATA = [
             "前缀函数",
             "线性时间"
         ],
-        "codePath": "字符串\\KMP\\源.cpp",
+        "codePath": "字符串\\字符串匹配\\KMP\\源.cpp",
         "prerequisites": [],
         "related": [
             "str-hash",
-            "str-minimal-representation"
+            "str-minimal-representation",
+            "str-sunday"
         ]
     },
     {
@@ -1871,6 +1952,29 @@ const KNOWLEDGE_DATA = [
         "related": [
             "str-hash",
             "basic-two-pointer-cycle"
+        ]
+    },
+    {
+        "id": "str-sunday",
+        "category": "字符串",
+        "subcategory": "字符串匹配",
+        "subSubcategory": "",
+        "title": "Sunday 字符串匹配算法",
+        "content": "## 算法原理\n\nSunday 算法由 Daniel M. Sunday 于 1990 年提出，是一种高效的字符串匹配算法。它的核心思想是：**当匹配失败时，关注主串中当前窗口的下一个字符，根据该字符在模式串中的位置来决定模式串向右移动多少位**。\n\n与 KMP 相比，Sunday 算法代码更简洁，在实际应用中往往比 KMP 更快（尤其在字符集较大、模式串较短时），但其最坏时间复杂度为 $O(nm)$，而 KMP 最坏仍是 $O(n+m)$。\n\n### 核心思想\n\n假设主串为 $s$（长度 $n$），模式串为 $p$（长度 $m$）：\n\n1. 从左到右将模式串与主串当前窗口对齐比较\n2. 如果匹配成功，记录起始位置\n3. 如果匹配失败，看**主串中当前窗口右边的第一个字符**（即 $s[i+m]$）：\n   - 如果这个字符**在模式串中出现过**，就把模式串右移，让模式串中最右边的该字符与主串中的该字符对齐\n   - 如果这个字符**不在模式串中**，直接把模式串右移 $m+1$ 位（跳过这个不可能匹配的字符）\n\n### 为什么高效\n\nSunday 算法每次移动的步长通常比 KMP 更大，尤其当模式串中字符不重复时，平均每次可以移动很多位，因此实际运行很快。\n\n## 偏移表（next 数组）\n\nSunday 算法需要预处理一个**偏移表**（也叫 shift 表或 next 数组），记录每个字符对应的移动步数：\n\n$$\n\\text{next}[c] =\n\\begin{cases}\nm - \\text{pos}(c) & \\text{若 } c \\text{ 在模式串中出现，pos}(c) \\text{ 是最右出现位置} \\\\\nm + 1 & \\text{若 } c \\text{ 不在模式串中}\n\\end{cases}\n$$\n\n其中 $m$ 是模式串长度。\n\n### 偏移表示例\n\n以模式串 `p = \"abcab\"` 为例（$m = 5$）：\n\n| 字符 | 最右位置 | next 值（移动步数） |\n|------|---------|-------------------|\n| a | 3 | 5 - 3 = 2 |\n| b | 4 | 5 - 4 = 1 |\n| c | 2 | 5 - 2 = 3 |\n| 其他 | - | 5 + 1 = 6 |\n\n解释：\n- 如果窗口右边的字符是 `a`，模式串右移 2 位（让模式串最右的 `a` 对齐）\n- 如果窗口右边的字符是 `b`，模式串右移 1 位\n- 如果窗口右边的字符是 `z`，模式串直接右移 6 位\n\n## 算法步骤\n\n1. **预处理偏移表**：遍历模式串，记录每个字符最右边的出现位置，计算每个字符对应的移动步数\n2. **匹配过程**：\n   - 主串指针 $i = 0$\n   - 当 $i \\le n - m$ 时：\n     - 比较 $s[i..i+m-1]$ 与 $p[0..m-1]$\n     - 若完全匹配：记录位置 $i$，然后继续找下一个\n     - 若不匹配且 $i + m < n$：$i \\mathrel{+}= \\text{next}[s[i+m]]$\n     - 若不匹配且 $i + m \\ge n$：结束\n\n## 逐行代码解析\n\n### 全局变量\n\n```cpp\nvector<int> sunday_next, ans;  // 偏移表 / 匹配结果（所有匹配的起始位置）\n```\n\n### 预处理偏移表 init\n\n```cpp\nvoid init(const string& str)\n{\n    int m = str.size();\n    sunday_next.assign(128, m + 1);  // 初始所有字符的移动步数为 m+1\n    for (int i = 0; i < m; i++)\n        sunday_next[str[i]] = m - i; // 字符 str[i] 出现在位置 i，移动 m-i 步\n}\n```\n\n**关键点**：\n- 数组大小 128，对应 ASCII 码表的所有字符\n- 初始值设为 $m+1$（不在模式串中的字符移动 $m+1$ 位）\n- 从左到右遍历，后面的位置会覆盖前面的，因此最终每个字符保存的是**最右边**的出现位置\n\n### Sunday 匹配主体\n\n```cpp\nvoid sunday(const string& a, const string& b)\n{\n    ans.clear();\n    int n = a.size(), m = b.size();\n    for (int i = 0; i <= n - m; i += sunday_next[a[i + m]])\n    {\n        int j = 0;\n        while (j < m && a[i + j] == b[j]) j++;  // 逐字符比较\n        if (j == m) ans.emplace_back(i);        // 完全匹配，记录位置\n    }\n}\n```\n\n**逐行解读**：\n\n| 代码 | 含义 |\n|------|------|\n| `for (int i = 0; i <= n - m; ...)` | $i$ 是主串当前窗口的起始位置，最多到 $n-m$ |\n| `i += sunday_next[a[i + m]]` | 匹配失败后，根据窗口右边第一个字符 $s[i+m]$ 查偏移表，移动相应步数 |\n| `while (j < m && a[i + j] == b[j]) j++` | 从左到右逐字符比较，j 是匹配成功的字符数 |\n| `if (j == m)` | 所有字符都匹配上了，说明找到一个匹配位置 |\n| `ans.emplace_back(i)` | 记录匹配的起始下标 |\n\n### 主函数：多模式匹配\n\n```cpp\nint main()\n{\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr); cout.tie(nullptr);\n    int T;\n    cin >> T;\n    while (T--)\n    {\n        string p;\n        int t;\n        cin >> p >> t;\n        init(p);                  // 预处理模式串的偏移表\n        while (t--)\n        {\n            ans.clear();\n            string s;\n            cin >> s;\n            sunday(s, p);         // 在主串 s 中找模式串 p\n            if (ans.empty()) cout << -1;\n            else for (int i : ans) cout << i << ' ';\n            cout << '\\n';\n        }\n    }\n    return 0;\n}\n```\n\n这是一个多测试用例模板：一个模式串对应多个主串，偏移表只需预处理一次。\n\n## 复杂度分析\n\n### 时间复杂度\n\n- **预处理**：$O(m)$ — 遍历模式串一次\n- **匹配**：\n  - **平均情况**：$O(n/m)$ — 每次平均移动 $m/2$ 位左右，总比较次数很少\n  - **最坏情况**：$O(nm)$ — 例如主串全是 `a`，模式串是 `aaaaab`，每次只能移动 1 位，且每次比较到最后才失败\n- **实际表现**：在随机数据下，Sunday 通常比 KMP、Boyer-Moore 都快\n\n### 空间复杂度\n\n- $O(|\\Sigma|)$ — 偏移表大小等于字符集大小（ASCII 为 128）\n- 与模式串长度无关\n\n## 匹配过程演示\n\n以主串 $s = \\text{\"abcabcabx\"}$，模式串 $p = \\text{\"abcabx\"}$（$m=6$）为例：\n\n**初始偏移表**：\n```\nnext['a'] = 5, next['b'] = 4, next['c'] = 3, next['x'] = 1\n其他字符 = 7\n```\n\n**第 1 轮（i = 0）**：\n```\ns: a b c a b c a b x\np: a b c a b x   ← 比较到第5位('c' vs 'x')不匹配\n         ↑\n窗口右边字符: s[0+6] = s[6] = 'a' → next['a'] = 5\ni += 5 → i = 5\n```\n\n**第 2 轮（i = 5）**：\n```\ns: a b c a b c a b x\np:           a b c a b x   ← 超出主串范围，结束\n```\n\n最终无匹配。\n\n## 常见陷阱与注意事项\n\n1. **数组越界问题**：当 `i + m >= n` 时，`a[i+m]` 会越界。代码中 `i <= n - m` 的循环条件保证了最后一次可能匹配的窗口是合法的，但若最后一次匹配失败后需要继续移动，则会越界。因此匹配失败后如果无法再移动（`i + m >= n`），应直接退出\n2. **偏移表初始化**：必须先全部设为 `m+1`，再用模式串中的字符覆盖。不能只初始化出现过的字符\n3. **最右位置**：从左到右遍历时，后面的赋值会覆盖前面的，这样自然得到了每个字符的最右出现位置，无需额外处理\n4. **字符集大小**：代码中用 128 对应 ASCII，如果是更大的字符集（如 Unicode）需要调整\n5. **下标从 0 开始**：Sunday 算法通常用 0 下标实现，与 KMP 类似\n6. **找所有匹配位置**：找到一个匹配后，移动步数仍按 `next[s[i+m]]` 计算（而不是移动 1 位），这样可以保持高效\n\n## 与 KMP 算法对比\n\n| 特性 | KMP | Sunday |\n|------|-----|--------|\n| 核心思想 | 前缀函数（next 数组），利用已匹配的前缀信息 | 偏移表，关注窗口右侧字符 |\n| 预处理 | $O(m)$ | $O(m)$ |\n| 最坏时间 | $O(n+m)$ | $O(nm)$ |\n| 平均时间 | $O(n+m)$ | $O(n/m)$（更快） |\n| 空间 | $O(m)$ | $O(\\|\\Sigma\\|)$（常数级） |\n| 代码复杂度 | 稍复杂（前缀函数需要理解） | 简洁易懂 |\n| 适用场景 | 保证线性时间，最坏情况也可靠 | 实际运行快，竞赛中常用 |\n| 主串指针 | 不回退 | 每次跳跃前进 |\n\n**竞赛建议**：大多数题目中 Sunday 算法更快且代码更短，是首选。只有当题目构造了最坏情况数据（如大量重复字符）时，才考虑用 KMP 保证时间。\n\n## 扩展：从右往左比较的变体\n\nSunday 算法也可以从右往左比较（类似 Boyer-Moore），但核心移动策略不变——始终根据窗口右侧的字符决定移动步数。从右往左比较的好处是：如果第一个比较的字符就不匹配，可以直接跳过，速度更快。\n\n```cpp\n// 从右往左比较的版本（伪代码）\nint j = m - 1;\nwhile (j >= 0 && a[i + j] == b[j]) j--;\nif (j < 0) ans.push_back(i);  // 匹配成功\n```\n\n实际竞赛中，从左往右和从右往左的版本差异不大，选择自己习惯的写法即可。",
+        "timeComplexity": "平均O(n/m)，最坏O(nm)",
+        "spaceComplexity": "O(|Σ|)",
+        "tags": [
+            "字符串",
+            "Sunday",
+            "模式匹配",
+            "线性时间",
+            "偏移表"
+        ],
+        "codePath": "字符串\\字符串匹配\\Sunday\\源.cpp",
+        "prerequisites": [],
+        "related": [
+            "str-kmp",
+            "str-hash"
         ]
     }
 ];
@@ -1986,14 +2090,17 @@ const SUBCATEGORY_META = {
     "图论|树链剖分": {
         "description": "将树拆分为若干条重链，使任意路径最多跨越O(log n)条链。配合线段树实现O(log²n)路径修改/查询和O(log n)子树修改/查询，是静态树上操作的核心工具。"
     },
+    "图论|强连通分量": {
+        "description": "求有向图中极大的强连通子图（SCC）。每个SCC内的节点互相可达，缩点后原图变为DAG。Tarjan算法是最常用的SCC求解方法，一次DFS即可完成。"
+    },
     "字符串|字符串哈希": {
         "description": "将字符串映射为数值，通过多项式滚动哈希实现O(n+m)的子串匹配。注意双哈希防碰撞。"
     },
     "字符串|最小表示法": {
         "description": "求循环同构串中字典序最小的表示，通过双指针比较实现O(n)求解。"
     },
-    "字符串|KMP": {
-        "description": "Knuth-Morris-Pratt 字符串匹配算法，通过next数组（前缀函数）实现O(n+m)的单模式串匹配，主串指针永不回退。"
+    "字符串|字符串匹配": {
+        "description": "在文本串中查找模式串的所有出现位置。涵盖KMP（前缀函数）、Sunday等经典线性时间匹配算法。"
     },
     "数学|快速幂": {
         "description": "利用指数的二进制分解，在O(log n)次乘法内完成幂运算，支持模意义下的高效计算。"
@@ -2006,6 +2113,9 @@ const SUBCATEGORY_META = {
     },
     "基础算法|分治": {
         "description": "将问题分解为子问题分别求解，再合并结果。分治是递归思想的核心应用，归并排序求逆序对是其经典实例。"
+    },
+    "基础算法|排序": {
+        "description": "非比较型排序算法，通过按位分解和计数排序实现线性时间排序。基数排序是其中的经典代表，优于比较排序的O(n log n)下界。"
     }
 };
 

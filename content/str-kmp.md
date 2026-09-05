@@ -2,11 +2,11 @@
 id: str-kmp
 title: 'KMP 字符串匹配算法'
 category: 字符串
-subcategory: KMP
+subcategory: 字符串匹配
 tags: ["字符串", "KMP", "next数组", "模式匹配", "前缀函数", "线性时间"]
 timeComplexity: '预处理O(m)，匹配O(n)'
 spaceComplexity: 'O(m)'
-codePath: '字符串\KMP\源.cpp'
+codePath: '字符串\字符串匹配\KMP\源.cpp'
 ---
 
 ## 算法原理

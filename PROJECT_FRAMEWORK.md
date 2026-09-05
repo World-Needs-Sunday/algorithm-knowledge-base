@@ -63,6 +63,7 @@
 | 基础算法 | 双指针 | `basic-two-pointer-cycle` |
 | 基础算法 | 分治 | `basic-divide-conquer-merge-inversion`, `basic-quickselect-kth` |
 | 基础算法 | 数位提升 | `basic-digit-power-cycle-self` |
+| 基础算法 | 排序 | `basic-radix-sort-k`（k进制基数排序） |
 | 动态规划 | 背包问题 | 01背包: `dp-01bag-standard`, `dp-01bag-2d`, `dp-01bag-record`, `dp-count-01bag`; 完全背包: `dp-complete-bag`; 多重背包: `dp-multi-bag-binary`, `dp-multi-bag-monotone`; 分组背包: `dp-group-bag` |
 | 动态规划 | 线性DP | LCS: `dp-linear-lcs-length`, `dp-linear-lcs-output`, `dp-linear-lcs-substring`; LIS: `dp-linear-lis-binary`, `dp-linear-lis-bit-count`; 经典模型: `dp-linear-edit-distance`, `dp-linear-maxsub`, `dp-linear-triangle` |
 | 动态规划 | 树形DP | `dp-tree-01bag`, `dp-tree-dance` |
@@ -84,12 +85,13 @@
 | 图论 | 最近公共祖先 | `graph-lca-doubling`, `graph-lca-tarjan`, `graph-lca-hld` |
 | 图论 | 拓扑排序 | `graph-topo-sort` |
 | 图论 | 树链剖分 | `graph-hld-segtree` |
+| 图论 | 强连通分量 | `graph-tarjan-scc`（Tarjan求SCC）, `graph-scc-condensation`（SCC缩点） |
 | 输入输出 | IO优化 | `io-fast-io` |
 | 数学 | 数论计数 | `math-lcm-pair-count` |
 | 数学 | 快速幂 | `math-quick-pow-basic`, `math-quick-pow-highprecision` |
 | 字符串 | 字符串哈希 | `str-hash` |
 | 字符串 | 最小表示法 | `str-minimal-representation` |
-| 字符串 | KMP | `str-kmp` |
+| 字符串 | 字符串匹配 | `str-kmp`（KMP算法）, `str-sunday`（Sunday算法） |
 
 ### ID 命名规范
 
