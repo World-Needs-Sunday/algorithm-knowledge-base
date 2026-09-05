@@ -85,9 +85,11 @@
 | 图论 | 最近公共祖先 | `graph-lca-doubling`, `graph-lca-tarjan`, `graph-lca-hld` |
 | 图论 | 拓扑排序 | `graph-topo-sort` |
 | 图论 | 树链剖分 | `graph-hld-segtree` |
+| 图论 | 割点与桥 | `graph-tarjan-cut-vertex`（Tarjan求割点） |
 | 图论 | 强连通分量 | `graph-tarjan-scc`（Tarjan求SCC）, `graph-scc-condensation`（SCC缩点） |
 | 输入输出 | IO优化 | `io-fast-io` |
 | 数学 | 数论计数 | `math-lcm-pair-count` |
+| 数学 | 矩阵 | `math-matrix-multiplication`（矩阵乘法） |
 | 数学 | 快速幂 | `math-quick-pow-basic`, `math-quick-pow-highprecision` |
 | 字符串 | 字符串哈希 | `str-hash` |
 | 字符串 | 最小表示法 | `str-minimal-representation` |

@@ -109,6 +109,9 @@
     "图论|树链剖分": {
       "description": "将树拆分为若干条重链，使任意路径最多跨越O(log n)条链。配合线段树实现O(log²n)路径修改/查询和O(log n)子树修改/查询，是静态树上操作的核心工具。"
     },
+    "图论|割点与桥": {
+      "description": "求无向图中的割点（关节点）和桥（割边）。割点是删除后图的连通分量增加的点，桥是删除后连通分量增加的边。Tarjan算法通过一次DFS在线性时间内求解，是点双/边双连通分量的基础。"
+    },
     "图论|强连通分量": {
       "description": "求有向图中极大的强连通子图（SCC）。每个SCC内的节点互相可达，缩点后原图变为DAG。Tarjan算法是最常用的SCC求解方法，一次DFS即可完成。"
     },
@@ -120,6 +123,9 @@
     },
     "字符串|字符串匹配": {
       "description": "在文本串中查找模式串的所有出现位置。涵盖KMP（前缀函数）、Sunday等经典线性时间匹配算法。"
+    },
+    "数学|矩阵": {
+      "description": "矩阵的基本运算与应用。包括矩阵乘法、矩阵快速幂等，是线性递推加速和动态规划优化的重要工具。"
     },
     "数学|快速幂": {
       "description": "利用指数的二进制分解，在O(log n)次乘法内完成幂运算，支持模意义下的高效计算。"
@@ -668,6 +674,13 @@
         "dp-tree-dance"
       ]
     },
+    "graph-tarjan-cut-vertex": {
+      "prerequisites": [],
+      "related": [
+        "graph-tarjan-scc",
+        "graph-lca-tarjan"
+      ]
+    },
     "graph-tarjan-scc": {
       "prerequisites": [
         "graph-topo-sort"
@@ -676,7 +689,8 @@
         "graph-topo-sort",
         "graph-lca-tarjan",
         "graph-dag-shortest-path",
-        "graph-scc-condensation"
+        "graph-scc-condensation",
+        "graph-tarjan-cut-vertex"
       ]
     },
     "graph-scc-condensation": {
@@ -706,6 +720,12 @@
       "prerequisites": [
         "math-quick-pow-basic"
       ],
+      "related": [
+        "math-quick-pow-basic"
+      ]
+    },
+    "math-matrix-multiplication": {
+      "prerequisites": [],
       "related": [
         "math-quick-pow-basic"
       ]
