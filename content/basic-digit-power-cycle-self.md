@@ -6,7 +6,7 @@ subcategory: 数位提升
 tags: ["基础算法", "数位提升", "Hensel提升", "大整数", "幂周期", "P1050"]
 timeComplexity: 'O(10k³)'
 spaceComplexity: 'O(k)'
-codePath: '基础算法(有价值的题目集)\按数位分层扩张幂周期算法\自己写的\Untitled1.cpp'
+codePath: '基础算法\按数位分层扩张幂周期算法\自己写的\Untitled1.cpp'
 ---
 
 ## 算法原理

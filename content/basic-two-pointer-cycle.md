@@ -6,7 +6,7 @@ subcategory: 双指针
 tags: ["基础算法", "双指针", "快慢指针", "Floyd", "环检测", "龟兔赛跑"]
 timeComplexity: 'O(n)'
 spaceComplexity: 'O(n)'
-codePath: '基础算法(有价值的题目集)\双指针\环检测(快慢指针)\Untitled1.cpp'
+codePath: '基础算法\双指针\环检测(快慢指针)\Untitled1.cpp'
 ---
 
 ## 算法原理

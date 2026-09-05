@@ -6,7 +6,7 @@ subcategory: 分治
 tags: ["分治", "快速选择", "Quickselect", "Top-K", "三数取中", "划分", "无序数组"]
 timeComplexity: '平均 O(n)，最坏 O(n^2)'
 spaceComplexity: 'O(log n)（递归栈）'
-codePath: '基础算法(有价值的题目集)\分治\快速选择\源.cpp'
+codePath: '基础算法\分治\快速选择\源.cpp'
 ---
 
 ## 算法原理

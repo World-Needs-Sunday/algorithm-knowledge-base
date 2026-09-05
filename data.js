@@ -18,7 +18,7 @@ const KNOWLEDGE_DATA = [
             "幂周期",
             "P1050"
         ],
-        "codePath": "基础算法(有价值的题目集)\\按数位分层扩张幂周期算法\\自己写的\\Untitled1.cpp",
+        "codePath": "基础算法\\按数位分层扩张幂周期算法\\自己写的\\Untitled1.cpp",
         "prerequisites": [
             "math-quick-pow-basic"
         ],
@@ -43,7 +43,7 @@ const KNOWLEDGE_DATA = [
             "逆序对",
             "排序"
         ],
-        "codePath": "基础算法(有价值的题目集)\\分治\\归并排序求逆序对\\Untitled1.cpp",
+        "codePath": "基础算法\\分治\\归并排序求逆序对\\Untitled1.cpp",
         "prerequisites": [],
         "related": [
             "ds-bit-point-range",
@@ -116,7 +116,7 @@ const KNOWLEDGE_DATA = [
             "划分",
             "无序数组"
         ],
-        "codePath": "基础算法(有价值的题目集)\\分治\\快速选择\\源.cpp",
+        "codePath": "基础算法\\分治\\快速选择\\源.cpp",
         "prerequisites": [
             "basic-divide-conquer-merge-inversion"
         ],
@@ -169,7 +169,7 @@ const KNOWLEDGE_DATA = [
             "环检测",
             "龟兔赛跑"
         ],
-        "codePath": "基础算法(有价值的题目集)\\双指针\\环检测(快慢指针)\\Untitled1.cpp",
+        "codePath": "基础算法\\双指针\\环检测(快慢指针)\\Untitled1.cpp",
         "prerequisites": [],
         "related": [
             "ds-monoqueue-1d",

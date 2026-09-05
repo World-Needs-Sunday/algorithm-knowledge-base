@@ -6,7 +6,7 @@ subcategory: 分治
 tags: ["基础算法", "分治", "归并排序", "逆序对", "排序"]
 timeComplexity: 'O(n log n)'
 spaceComplexity: 'O(n)'
-codePath: '基础算法(有价值的题目集)\分治\归并排序求逆序对\Untitled1.cpp'
+codePath: '基础算法\分治\归并排序求逆序对\Untitled1.cpp'
 ---
 
 ## 算法原理
