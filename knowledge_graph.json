@@ -130,6 +130,9 @@
     "数学|快速幂": {
       "description": "利用指数的二进制分解，在O(log n)次乘法内完成幂运算，支持模意义下的高效计算。"
     },
+    "数学|数论基础": {
+      "description": "数论的基础算法与核心概念，包括GCD/LCM（欧几里得算法）、埃氏筛（素数预处理）等。是数论计数、快速幂等高级数论算法的基石。"
+    },
     "数学|数论计数": {
       "description": "数论相关的计数问题，利用GCD、LCM等数论性质进行高效统计。"
     },
@@ -741,11 +744,54 @@
         "math-quick-pow-basic"
       ]
     },
+    "math-gcd-lcm": {
+      "prerequisites": [],
+      "related": [
+        "math-lcm-pair-count",
+        "math-quick-pow-basic",
+        "math-sieve-eratosthenes"
+      ]
+    },
+    "math-sieve-eratosthenes": {
+      "prerequisites": [
+        "math-gcd-lcm"
+      ],
+      "related": [
+        "math-gcd-lcm",
+        "math-quick-pow-basic",
+        "math-euler-phi"
+      ]
+    },
+    "math-euler-phi": {
+      "prerequisites": [
+        "math-gcd-lcm",
+        "math-sieve-eratosthenes"
+      ],
+      "related": [
+        "math-gcd-lcm",
+        "math-sieve-eratosthenes",
+        "math-quick-pow-basic",
+        "math-linear-sieve-phi"
+      ]
+    },
+    "math-linear-sieve-phi": {
+      "prerequisites": [
+        "math-euler-phi",
+        "math-sieve-eratosthenes"
+      ],
+      "related": [
+        "math-euler-phi",
+        "math-sieve-eratosthenes",
+        "math-gcd-lcm"
+      ]
+    },
     "math-lcm-pair-count": {
       "prerequisites": [
+        "math-gcd-lcm",
         "math-quick-pow-basic"
       ],
       "related": [
+        "math-gcd-lcm",
         "math-quick-pow-basic"
       ]
     },

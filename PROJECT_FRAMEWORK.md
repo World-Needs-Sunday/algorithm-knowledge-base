@@ -55,7 +55,7 @@
 
 ## 2. 知识点分类体系
 
-当前已有 81 个知识点，分 8 个大类：
+当前已有 85 个知识点，分 8 个大类：
 
 | 大类 (category) | 子分类 (subcategory) | 知识点 ID |
 |---|---|---|
@@ -88,6 +88,7 @@
 | 图论 | 割点与桥 | `graph-tarjan-cut-vertex`（Tarjan求割点） |
 | 图论 | 强连通分量 | `graph-tarjan-scc`（Tarjan求SCC）, `graph-scc-condensation`（SCC缩点） |
 | 输入输出 | IO优化 | `io-fast-io` |
+| 数学 | 数论基础 | `math-gcd-lcm`（GCD与LCM·欧几里得算法）, `math-sieve-eratosthenes`（埃氏筛）, `math-euler-phi`（欧拉函数） |
 | 数学 | 数论计数 | `math-lcm-pair-count` |
 | 数学 | 矩阵 | `math-matrix-multiplication`（矩阵乘法）, `math-matrix-quick-pow`（矩阵快速幂）, `math-matrix-linear-recurrence`（矩阵加速线性递推） |
 | 数学 | 快速幂 | `math-quick-pow-basic`, `math-quick-pow-highprecision` |
