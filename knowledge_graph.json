@@ -125,7 +125,7 @@
       "description": "在文本串中查找模式串的所有出现位置。涵盖KMP（前缀函数）、Sunday等经典线性时间匹配算法。"
     },
     "数学|矩阵": {
-      "description": "矩阵的基本运算与应用。包括矩阵乘法、矩阵快速幂等，是线性递推加速和动态规划优化的重要工具。"
+      "description": "矩阵的基本运算与应用。包括矩阵乘法、矩阵快速幂、矩阵加速线性递推等。矩阵快速幂是计算工具，矩阵加速线性递推是其核心应用——将线性递推的转移封装为矩阵乘法，用快速幂在 O(k^3 log n) 时间内解决 10^18 规模的问题。"
     },
     "数学|快速幂": {
       "description": "利用指数的二进制分解，在O(log n)次乘法内完成幂运算，支持模意义下的高效计算。"
@@ -727,6 +727,17 @@
     "math-matrix-multiplication": {
       "prerequisites": [],
       "related": [
+        "math-quick-pow-basic",
+        "math-matrix-quick-pow"
+      ]
+    },
+    "math-matrix-quick-pow": {
+      "prerequisites": [
+        "math-matrix-multiplication",
+        "math-quick-pow-basic"
+      ],
+      "related": [
+        "math-matrix-multiplication",
         "math-quick-pow-basic"
       ]
     },

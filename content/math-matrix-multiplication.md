@@ -47,10 +47,8 @@ mat.assign(n + 1, vector<long long>(m + 1, 0));
 ## 三、模块一：read_mat —— 读入
 
 ```cpp
-void read_mat(vector<vector<long long>>& mat)
+void read_mat(vector<vector<long long>>& mat, int n, int m)
 {
-    int n, m;
-    cin >> n >> m;
     mat.assign(n + 1, vector<long long>(m + 1, 0));
     for (int i = 1; i <= n; i++)
     {
@@ -67,6 +65,7 @@ void read_mat(vector<vector<long long>>& mat)
 | 细节 | 说明 |
 |------|------|
 | 按引用传参 `&` | 读入的目的是修改外部矩阵，必须传引用，否则函数内部的赋值会随函数结束而丢失 |
+| n/m 参数化 | 维度由调用方读入后传入，读入函数只负责填数据，职责更单一 |
 | `assign` 一石二鸟 | 既分配空间，又把所有元素初始化为 0——后续累加所需的"清零"在此一并完成 |
 | 行优先读入 | 外层扫行、内层扫列，与输入格式"每行 m 个数"一致 |
 
@@ -98,9 +97,9 @@ int n = A.size(), m = B[1].size();
 vector<vector<long long>> ans(n, vector<long long>(m, 0));
 for (int i = 1; i < n; i++)
 {
-    for (int j = 1; j < m; j++)
+    for (int k = 1; k < A[1].size(); k++)
     {
-        for (int k = 1; k < A[1].size(); k++)
+        for (int j = 1; j < m; j++)
         {
             ans[i][j] += A[i][k] * B[k][j];
         }
@@ -113,19 +112,19 @@ for (int i = 1; i < n; i++)
 | 循环变量 | 数学含义 | 范围 |
 |---------|---------|------|
 | `i` | 结果的行号 = A 的行号 | 1 .. 行A |
-| `j` | 结果的列号 = B 的列号 | 1 .. 列B |
 | `k` | 公共维度（A 的列 = B 的行） | 1 .. 列A |
+| `j` | 结果的列号 = B 的列号 | 1 .. 列B |
 
 **几个细节**：
 
 - **结果的形状**：开 `A.size() × B[1].size()`，即 `(行A+1) × (列B+1)`，有效区域正是 行A × 列B。n、m 的取值各带一个 "+1"，但配合"从 1 开始、以 `<` 为上界"的循环写法，实际遍历的恰好是有效区。
 - **内层乘积**：`A[i][k] * B[k][j]` —— A 取第 i 行第 k 个，B 取第 k 行第 j 列，正是"行乘列"的点积结构。
 - **`+=` 累加而非赋值**：k 循环把 k 个乘积逐个加到 `ans[i][j]` 上；assign 时已置 0，无需额外清零。
-- **循环顺序**：`i-j-k` 顺序可读性最好、最不易写错。若追求缓存友好性可改为 `i-k-j` 顺序（对 B 按行连续访问），属于性能优化，不影响正确性。
+- **循环顺序 `i-k-j`**：采用缓存友好顺序——内层 `j` 连续访问 `B[k][j]`（B 的第 k 行）和 `ans[i][j]`（ans 的第 i 行），两者在内存中都是连续的，缓存命中率高。相比 `i-j-k` 顺序（每次内层切换 k 时跳到 B 的不同行），减少了 cache miss。
 
-### 3. 规范性建议
+### 3. const 引用保护
 
-`mul_mat` 不修改 A、B，签名宜写成 `const vector<vector<long long>>&`——既是 C++ 的良好实践，也能在编译期防止函数体内误改。
+`mul_mat` 的签名 `const vector<vector<long long>>& A, const vector<vector<long long>>& B` 用 `const&` 接收两个乘数——既避免了值拷贝的开销，又在编译期防止函数体内误改 A、B。
 
 ## 五、模块三：write_mat —— 输出
 
@@ -172,14 +171,18 @@ int main()
     ios::sync_with_stdio(false);
     cin.tie(nullptr); cout.tie(nullptr);
     vector<vector<long long>> A, B, ans;
-    read_mat(A), read_mat(B);   // 输入
-    ans = mul_mat(A, B);        // 处理(含判维)
-    write_mat(ans);             // 输出(含失败分支)
+    int n, m;
+    cin >> n >> m;
+    read_mat(A, n, m);
+    cin >> n >> m;
+    read_mat(B, n, m);
+    ans = move(mul_mat(A, B));
+    write_mat(ans);
     return 0;
 }
 ```
 
-流程清晰：读 A、读 B、乘、打。所有分支逻辑（成功输出矩阵 / 失败输出提示）封装在 mul_mat 和 write_mat 内部，main 只负责调度——这种结构便于单独测试每个模块，也是 IO 与算法分离的标准组织方式。
+流程清晰：读 A 的维度 → 读 A → 读 B 的维度 → 读 B → 乘 → 打。main 负责维度管理和调度，`read_mat` 只管填数据，职责分离更清晰。`move` 将返回值无拷贝地移入 `ans`，避免多余的深拷贝。所有分支逻辑（成功输出矩阵 / 失败输出提示）封装在 mul_mat 和 write_mat 内部。
 
 ## 七、手动示例
 

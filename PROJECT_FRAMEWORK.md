@@ -55,7 +55,7 @@
 
 ## 2. 知识点分类体系
 
-当前已有 70 个知识点，分 8 个大类：
+当前已有 81 个知识点，分 8 个大类：
 
 | 大类 (category) | 子分类 (subcategory) | 知识点 ID |
 |---|---|---|
@@ -89,7 +89,7 @@
 | 图论 | 强连通分量 | `graph-tarjan-scc`（Tarjan求SCC）, `graph-scc-condensation`（SCC缩点） |
 | 输入输出 | IO优化 | `io-fast-io` |
 | 数学 | 数论计数 | `math-lcm-pair-count` |
-| 数学 | 矩阵 | `math-matrix-multiplication`（矩阵乘法） |
+| 数学 | 矩阵 | `math-matrix-multiplication`（矩阵乘法）, `math-matrix-quick-pow`（矩阵快速幂）, `math-matrix-linear-recurrence`（矩阵加速线性递推） |
 | 数学 | 快速幂 | `math-quick-pow-basic`, `math-quick-pow-highprecision` |
 | 字符串 | 字符串哈希 | `str-hash` |
 | 字符串 | 最小表示法 | `str-minimal-representation` |
@@ -434,17 +434,43 @@ node build.js
 
 ### 5.2 修改已有知识点
 
-**修改正文/元数据**：
+#### 5.2.1 修改正文/元数据
+
 1. 编辑 `content/{id}.md`
 2. 运行 `node build.js`
 3. Ctrl+F5 刷新
 
-**修改代码**：
-1. 编辑对应的 `.cpp` 文件
+#### 5.2.2 修改代码文件（仅改 .cpp，不改文档）
+
+当代码做了小幅修改（如修 bug、改类型、优化循环顺序），但文档中的讲解仍然适用时：
+
+1. **直接编辑** 对应的 `.cpp` 文件
 2. 运行 `node build.js`（codePath 不变则无需改 .md）
 3. Ctrl+F5 刷新
 
-**修改分类/子分类**：
+#### 5.2.3 修改代码文件（同步更新文档）
+
+当代码修改影响了文档中的代码片段或讲解内容时，必须同步更新文档：
+
+1. **更新 .cpp 文件** — 替换为最新代码
+2. **更新 content/{id}.md 中的代码块** — 找到文档中所有引用旧代码的 ```cpp 代码段，逐个替换为新代码
+3. **更新文档中的讲解文字** — 如果代码改动涉及函数签名、循环顺序、数据类型等，文档中的逐行解析、要点表、常见陷阱等文字描述也需同步修改
+4. **检查文档中的旧注意事项** — 如果文档中有"本代码用 XXX，应改为 YYY"之类的提醒，改完代码后该提醒已过时，需删除或更新为"已使用 YYY"
+5. 运行 `node build.js`
+6. Ctrl+F5 刷新
+
+**常见场景**：
+
+| 改动类型 | 需更新的文档内容 |
+|---------|----------------|
+| 变量类型变更（如 int→long long） | 代码块 + 陷阱条目 + 注意事项 |
+| 循环顺序变更（如 i-j-k→i-k-j） | 代码块 + 循环变量表 + 细节说明 |
+| 函数签名变更（加 const&、参数化） | 代码块 + 要点表 + 规范性建议 |
+| 新增/删除辅助函数 | 代码块 + 逐行解析章节 |
+| 算法逻辑变更 | 几乎全部章节需重写 |
+
+#### 5.2.4 修改分类/子分类
+
 1. 编辑 .md 的 frontmatter 中 `category`/`subcategory`
 2. 运行 `node build.js`
 3. Ctrl+F5 刷新（侧边栏树会自动重组）
