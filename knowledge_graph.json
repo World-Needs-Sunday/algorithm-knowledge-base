@@ -147,6 +147,9 @@
     },
     "基础算法|排序": {
       "description": "非比较型排序算法，通过按位分解和计数排序实现线性时间排序。基数排序是其中的经典代表，优于比较排序的O(n log n)下界。"
+    },
+    "基础算法|搜索": {
+      "description": "通过DFS/BFS等搜索策略系统地枚举所有可能的解。DFS+回溯是组合搜索的核心技术，通过递归尝试所有选择并在不满足条件时回退，配合剪枝可大幅减少无效搜索。是排列、组合、子集、N皇后等枚举问题的基础范式。"
     }
   },
   "knowledgePoints": {
@@ -814,6 +817,36 @@
       "related": [
         "math-gcd-lcm",
         "math-quick-pow-basic"
+      ]
+    },
+    "basic-permutation-dfs": {
+      "prerequisites": [],
+      "related": [
+        "basic-combination-dfs",
+        "basic-meet-in-middle-binary-search"
+      ]
+    },
+    "basic-combination-dfs": {
+      "prerequisites": [],
+      "related": [
+        "basic-permutation-dfs",
+        "basic-meet-in-middle-binary-search"
+      ]
+    },
+    "basic-meet-in-middle-binary-search": {
+      "prerequisites": [
+        "basic-combination-dfs"
+      ],
+      "related": [
+        "basic-meet-in-middle-two-pointer"
+      ]
+    },
+    "basic-meet-in-middle-two-pointer": {
+      "prerequisites": [
+        "basic-combination-dfs"
+      ],
+      "related": [
+        "basic-meet-in-middle-binary-search"
       ]
     },
     "str-hash": {
