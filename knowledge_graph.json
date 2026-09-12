@@ -885,7 +885,16 @@
       "prerequisites": [],
       "related": [
         "ds-bit-point-range",
-        "basic-interval-merge"
+        "basic-interval-merge",
+        "basic-divide-conquer-closest-pair"
+      ]
+    },
+    "basic-divide-conquer-closest-pair": {
+      "prerequisites": [
+        "basic-divide-conquer-merge-inversion"
+      ],
+      "related": [
+        "basic-divide-conquer-merge-inversion"
       ]
     },
     "ds-prefix-sum-tree": {
