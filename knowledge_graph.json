@@ -146,10 +146,10 @@
       "description": "将问题分解为子问题分别求解，再合并结果。分治是递归思想的核心应用，归并排序求逆序对是其经典实例。"
     },
     "基础算法|排序": {
-      "description": "非比较型排序算法，通过按位分解和计数排序实现线性时间排序。基数排序是其中的经典代表，优于比较排序的O(n log n)下界。"
+      "description": "各类排序算法，涵盖比较型排序（希尔排序、归并排序等）和非比较型排序（基数排序）。希尔排序是插入排序的增量改进版，通过逐步缩小gap使数组基本有序；基数排序通过按位分解和计数排序实现线性时间排序，优于比较排序的O(n log n)下界。"
     },
     "基础算法|搜索": {
-      "description": "通过DFS/BFS等搜索策略系统地枚举所有可能的解。DFS+回溯是组合搜索的核心技术，通过递归尝试所有选择并在不满足条件时回退，配合剪枝可大幅减少无效搜索。是排列、组合、子集、N皇后等枚举问题的基础范式。"
+      "description": "通过DFS/BFS等搜索策略系统地枚举或寻找最短路径。DFS+回溯是组合搜索的核心技术，通过递归尝试所有选择并在不满足条件时回退，配合剪枝可大幅减少无效搜索。BFS按层扩展保证无权图最短路，双向BFS从起点和终点同时扩展以减少搜索范围。是排列、组合、子集、迷宫最短路等问题的基础范式。"
     }
   },
   "knowledgePoints": {
@@ -823,7 +823,8 @@
       "prerequisites": [],
       "related": [
         "basic-combination-dfs",
-        "basic-meet-in-middle-binary-search"
+        "basic-meet-in-middle-binary-search",
+        "basic-bfs-bidirectional"
       ]
     },
     "basic-combination-dfs": {
@@ -847,6 +848,14 @@
       ],
       "related": [
         "basic-meet-in-middle-binary-search"
+      ]
+    },
+    "basic-bfs-bidirectional": {
+      "prerequisites": [],
+      "related": [
+        "basic-permutation-dfs",
+        "basic-combination-dfs",
+        "graph-dijkstra-heap"
       ]
     },
     "str-hash": {
@@ -947,6 +956,14 @@
       ],
       "related": [
         "basic-quickselect-kth",
+        "basic-divide-conquer-merge-inversion",
+        "basic-shell-sort"
+      ]
+    },
+    "basic-shell-sort": {
+      "prerequisites": [],
+      "related": [
+        "basic-radix-sort-k",
         "basic-divide-conquer-merge-inversion"
       ]
     }
