@@ -118,6 +118,9 @@
     "图论|强连通分量": {
       "description": "求有向图中极大的强连通子图（SCC）。每个SCC内的节点互相可达，缩点后原图变为DAG。Tarjan算法是最常用的SCC求解方法，一次DFS即可完成。"
     },
+    "图论|二分图": {
+      "description": "顶点可划分为两个不交集合的无向图，等价于图中无奇环。染色法（DFS/BFS）是最常用的判定方法，通过交替染色检测冲突。是最大匹配、最小顶点覆盖等问题的基础。"
+    },
     "字符串|字符串哈希": {
       "description": "将字符串映射为数值，通过多项式滚动哈希实现O(n+m)的子串匹配。注意双哈希防碰撞。"
     },
@@ -729,6 +732,25 @@
         "graph-tarjan-scc",
         "graph-dag-shortest-path",
         "graph-topo-sort"
+      ]
+    },
+    "graph-bipartite-dfs-coloring": {
+      "prerequisites": [],
+      "related": [
+        "graph-tarjan-scc",
+        "graph-tarjan-cut-vertex",
+        "basic-permutation-dfs",
+        "graph-bipartite-hungarian"
+      ]
+    },
+    "graph-bipartite-hungarian": {
+      "prerequisites": [
+        "graph-bipartite-dfs-coloring"
+      ],
+      "related": [
+        "graph-bipartite-dfs-coloring",
+        "graph-kruskal",
+        "basic-divide-conquer-merge-inversion"
       ]
     },
     "io-fast-io": {
