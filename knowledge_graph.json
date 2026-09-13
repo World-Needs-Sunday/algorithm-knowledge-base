@@ -708,7 +708,16 @@
       "prerequisites": [],
       "related": [
         "graph-tarjan-scc",
-        "graph-lca-tarjan"
+        "graph-lca-tarjan",
+        "graph-tarjan-bridge"
+      ]
+    },
+    "graph-tarjan-bridge": {
+      "prerequisites": [],
+      "related": [
+        "graph-tarjan-cut-vertex",
+        "graph-tarjan-scc",
+        "graph-scc-condensation"
       ]
     },
     "graph-tarjan-scc": {
