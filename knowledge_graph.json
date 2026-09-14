@@ -137,7 +137,7 @@
       "description": "利用指数的二进制分解，在O(log n)次乘法内完成幂运算，支持模意义下的高效计算。"
     },
     "数学|数论基础": {
-      "description": "数论的基础算法与核心概念，包括GCD/LCM（欧几里得算法）、埃氏筛（素数预处理）等。是数论计数、快速幂等高级数论算法的基石。"
+      "description": "数论的基础算法与核心概念，包括GCD/LCM（欧几里得算法）、埃氏筛（素数预处理）、欧拉函数（单次求值与线性筛批量预处理）、约数个数与约数和的线性筛、模逆元（费马小定理）、中国剩余定理（CRT）等。是数论计数、组合数取模等高级数论算法的基石。"
     },
     "数学|数论计数": {
       "description": "数论相关的计数问题，利用GCD、LCM等数论性质进行高效统计。"
@@ -876,6 +876,31 @@
         "math-linear-sieve-divisor-count",
         "math-sieve-eratosthenes",
         "math-euler-phi"
+      ]
+    },
+    "math-modular-inverse": {
+      "prerequisites": [
+        "math-quick-pow-basic",
+        "math-euler-phi",
+        "math-gcd-lcm"
+      ],
+      "related": [
+        "math-quick-pow-basic",
+        "math-euler-phi",
+        "math-linear-sieve-phi",
+        "math-crt"
+      ]
+    },
+    "math-crt": {
+      "prerequisites": [
+        "math-modular-inverse",
+        "math-gcd-lcm",
+        "math-quick-pow-basic"
+      ],
+      "related": [
+        "math-modular-inverse",
+        "math-gcd-lcm",
+        "math-quick-pow-basic"
       ]
     },
     "math-lcm-pair-count": {
