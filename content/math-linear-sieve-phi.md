@@ -69,9 +69,10 @@ $$\varphi(i \times p_j) = p_j \times \varphi(i)$$
 
 | 数组 | 含义 |
 |------|------|
-| `prime_vis[i]` | $i$ 是否可能为质数（未被筛掉为 `true`） |
+| `phi[i]` | 欧拉函数值 $\varphi(i)$；$\varphi(i) = 0$ 表示 $i$ 尚未被访问（即 $i$ 是质数） |
 | `prime` | 已发现的质数表，按升序存储 |
-| `phi[i]` | 欧拉函数值 $\varphi(i)$ |
+
+> **关键技巧**：不使用单独的标记数组 `prime_vis`，而是直接利用 `phi` 数组判质数——$\varphi(i) = 0$ 当且仅当 $i$ 尚未被任何更小的数筛到，即 $i$ 是质数。发现质数时立即赋值 $\varphi(p) = p - 1$（$\ge 1$），使后续访问时 `phi[i]` 非零。这种"一数多用"省去了整个 `prime_vis` 数组。
 
 ### 2.2 转移方程
 
@@ -95,7 +96,7 @@ $$
 
 线性筛一次运行可以同时得到：
 - **质数表** `prime`：所有 $\le n$ 的质数
-- **质数判定** `prime_vis[i]`：$O(1)$ 判断 $i$ 是否为质数
+- **质数判定**：$\varphi(i) = i - 1$ 当且仅当 $i$ 为质数，$O(1)$ 查询
 - **欧拉函数** `phi[i]`：所有 $\varphi(i)$ 的值
 - **最小质因子**（可扩展）：只需多开一个数组记录每个合数被哪个质数筛掉
 
@@ -109,69 +110,65 @@ using namespace std;
 vector<int> prime, phi;
 ```
 
-全局变量：`prime` 存质数表，`phi` 存欧拉函数值。
+全局变量：`prime` 存质数表，`phi` 存欧拉函数值（同时兼作质数标记）。
 
 ### 3.1 phi_sieve —— 线性筛求欧拉函数
 
 ```cpp
 void phi_sieve(int n)
 {
-    vector<bool> prime_vis(n + 1, true);
-    prime.clear();
-    prime.reserve(n + 1);
     phi.assign(n + 1, 0);
+    prime.clear();
     phi[1] = 1;
     for (int i = 2; i <= n; i++)
     {
-        if (prime_vis[i])
+        if (!phi[i])
         {
-            prime.emplace_back(i);
             phi[i] = i - 1;
+            prime.emplace_back(i);
         }
         for (int j = 0; prime[j] <= n / i; j++)
         {
-            prime_vis[i * prime[j]] = false;
-            if (i % prime[j] == 0)
+            if (i % prime[j]) phi[i * prime[j]] = (prime[j] - 1) * phi[i];
+            else
             {
                 phi[i * prime[j]] = prime[j] * phi[i];
                 break;
             }
-            else phi[i * prime[j]] = (prime[j] - 1) * phi[i];
         }
     }
-    prime.shrink_to_fit();
 }
 ```
 
 | 行 | 代码 | 解析 |
 |----|------|------|
-| 1 | `vector<bool> prime_vis(n + 1, true);` | 标记数组，初始全为 true（未被筛） |
-| 2-3 | `prime.clear(); prime.reserve(n + 1);` | 清空质数表，预留空间避免多次扩容 |
-| 4-5 | `phi.assign(n + 1, 0); phi[1] = 1;` | φ 数组初始化为 0，边界 φ(1) = 1 |
-| 6 | `for (int i = 2; i <= n; i++)` | 外层遍历每个数 |
-| 7-10 | `if (prime_vis[i]) { prime.push_back(i); phi[i] = i - 1; }` | $i$ 是质数 → 加入质数表，$\varphi(i) = i-1$ |
-| 11 | `for (int j = 0; prime[j] <= n / i; j++)` | 内层遍历质数，用 `n/i` 防止 `i*prime[j]` 越界 |
-| 12 | `prime_vis[i * prime[j]] = false;` | 标记 $i \times p_j$ 为合数 |
-| 13-16 | `if (i % prime[j] == 0) { phi[...] = p * phi[i]; break; }` | 情况二：$p_j$ 整除 $i$ → φ 乘 $p$；然后 break（保证线性） |
-| 17 | `else phi[...] = (p - 1) * phi[i];` | 情况一：$p_j$ 不整除 $i$ → 积性，φ 乘 $(p-1)$ |
-| 18 | `prime.shrink_to_fit();` | 释放质数表多余空间（可选优化） |
+| 1 | `phi.assign(n + 1, 0);` | φ 数组初始化为 0，0 同时表示"未访问" |
+| 2 | `prime.clear();` | 清空质数表 |
+| 3 | `phi[1] = 1;` | 边界 $\varphi(1) = 1$ |
+| 4 | `for (int i = 2; i <= n; i++)` | 外层遍历每个数 |
+| 5-8 | `if (!phi[i]) { phi[i] = i - 1; prime.emplace_back(i); }` | $\varphi(i) = 0$ 即未被筛过 → $i$ 是质数，赋值 $\varphi(i) = i-1$ 并加入质数表 |
+| 9 | `for (int j = 0; prime[j] <= n / i; j++)` | 内层遍历质数，用 `n/i` 防止 `i*prime[j]` 越界 |
+| 10 | `if (i % prime[j]) phi[...] = (p-1) * phi[i];` | 情况一：$p_j$ 不整除 $i$ → 积性，$\varphi(ip) = (p-1) \cdot \varphi(i)$ |
+| 11-14 | `else { phi[...] = p * phi[i]; break; }` | 情况二：$p_j$ 整除 $i$ → $\varphi(ip) = p \cdot \varphi(i)$；然后 `break`（保证线性） |
+
+**与旧写法的对比**：旧代码额外维护 `vector<bool> prime_vis` 标记数组，在内层循环中先执行 `prime_vis[i * prime[j]] = false` 再分支。新代码直接用 `!phi[i]` 判断质数——因为 $\varphi(i) = 0$ 当且仅当 $i$ 尚未被任何更小的数筛到（即 $i$ 是质数）。合数的 `phi` 值在内层循环中被直接赋值（非零），无需额外的标记数组。
 
 ### 3.2 手动模拟（n = 12）
 
-| $i$ | 操作 | 新增质数 | 标记的合数 | φ 值更新 |
-|-----|------|---------|-----------|---------|
-| 2 | `prime_vis[2]=true` → 质数 | 2 | — | $\varphi(2)=1$ |
-| 2 | `j=0, prime[0]=2, 2<=6` | — | 4 | $\varphi(4) = 2 \times \varphi(2) = 2$（2%2=0, break） |
-| 3 | `prime_vis[3]=true` → 质数 | 3 | — | $\varphi(3)=2$ |
-| 3 | `j=0, prime[0]=2, 2<=4` | — | 6 | $\varphi(6) = (2-1) \times \varphi(3) = 2$（3%2≠0） |
-| 3 | `j=1, prime[1]=3, 3<=4` | — | 9 | $\varphi(9) = 3 \times \varphi(3) = 6$（3%3=0, break） |
-| 4 | `prime_vis[4]=false` | — | — | — |
-| 4 | `j=0, prime[0]=2, 2<=3` | — | 8 | $\varphi(8) = 2 \times \varphi(4) = 4$（4%2=0, break） |
-| 5 | `prime_vis[5]=true` → 质数 | 5 | — | $\varphi(5)=4$ |
-| 5 | `j=0, prime[0]=2, 2<=2` | — | 10 | $\varphi(10) = (2-1) \times \varphi(5) = 4$（5%2≠0） |
-| 5 | `j=1, prime[1]=3, 3<=2` | — | — | （3 > 12/5=2，内层结束） |
-| 6 | `prime_vis[6]=false` | — | — | — |
-| 6 | `j=0, prime[0]=2, 2<=2` | — | 12 | $\varphi(12) = 2 \times \varphi(6) = 4$（6%2=0, break） |
+| $i$ | 操作 | 新增质数 | φ 值更新 |
+|-----|------|---------|---------|
+| 2 | `phi[2]==0` → 质数 | 2 | $\varphi(2)=1$ |
+| 2 | `j=0, prime[0]=2, 2<=6` | — | $\varphi(4) = 2 \times \varphi(2) = 2$（2%2=0, break） |
+| 3 | `phi[3]==0` → 质数 | 3 | $\varphi(3)=2$ |
+| 3 | `j=0, prime[0]=2, 2<=4` | — | $\varphi(6) = (2-1) \times \varphi(3) = 2$（3%2≠0） |
+| 3 | `j=1, prime[1]=3, 3<=4` | — | $\varphi(9) = 3 \times \varphi(3) = 6$（3%3=0, break） |
+| 4 | `phi[4]==2≠0` → 非质数 | — | — |
+| 4 | `j=0, prime[0]=2, 2<=3` | — | $\varphi(8) = 2 \times \varphi(4) = 4$（4%2=0, break） |
+| 5 | `phi[5]==0` → 质数 | 5 | $\varphi(5)=4$ |
+| 5 | `j=0, prime[0]=2, 2<=2` | — | $\varphi(10) = (2-1) \times \varphi(5) = 4$（5%2≠0） |
+| 5 | `j=1, prime[1]=3, 3<=2` | — | （3 > 12/5=2，内层结束） |
+| 6 | `phi[6]==2≠0` → 非质数 | — | — |
+| 6 | `j=0, prime[0]=2, 2<=2` | — | $\varphi(12) = 2 \times \varphi(6) = 4$（6%2=0, break） |
 
 **验证**：
 - $\varphi(4) = 2$ ✓ {1, 3}
@@ -237,7 +234,7 @@ int main()
 |------|--------|------|
 | 预处理时间 | $O(n)$ | 每个合数被最小质因子恰好筛一次 |
 | 单次查询 | $O(1)$ | 数组下标访问 |
-| 空间 | $O(n)$ | `prime_vis` + `phi` + `prime`（质数约 $n / \ln n$ 个） |
+| 空间 | $O(n)$ | `phi` + `prime`（质数约 $n / \ln n$ 个） |
 
 **与单次求值对比**：
 
@@ -280,9 +277,15 @@ $\varphi(p) = p - 1$ 在发现质数时赋值，而不是在内层循环中。�
 
 当 $n$ 较大时（如 $n \ge 10^6$），$\varphi(n)$ 可能接近 $n$，`int` 可能不够。建议用 `long long` 存储 `phi` 数组。质数表 `prime` 用 `int` 通常没问题（$10^7$ 以内质数约 66 万个，存下标完全够）。
 
-### 6.6 vector\<bool\> 的位压缩
+### 6.6 phi 数组兼作质数标记
 
-`prime_vis` 用 `vector<bool>` 位压缩节省内存，但访问速度略慢。若卡常可改用 `vector<char>`。
+本代码不使用单独的 `prime_vis` 标记数组，而是直接用 `!phi[i]`（即 $\varphi(i) = 0$）判断质数。这要求：
+
+- 初始化时 `phi` 全部赋 0，只有 $\varphi(1) = 1$ 手动设置
+- 质数在发现时赋值 $\varphi(p) = p - 1 \ge 1$，使后续 `phi[p]` 非零
+- 合数在内层循环中被直接赋值（两种情况的结果都 $\ge 1$），也不会保持为 0
+
+**注意**：$\varphi(1) = 1$ 必须在循环前手动赋值，否则 `!phi[1]` 为真会误判 1 为质数。
 
 ### 6.7 全局变量 vs 局部变量
 
@@ -298,7 +301,7 @@ $\varphi(p) = p - 1$ 在发现质数时赋值，而不是在内层循环中。�
 | 实现难度 | 简单（埃氏筛框架 + 每质数更新 φ） | 中等（需理解两种递推情况 + break 机制） |
 | 附带产物 | 质数判定 | 质数表 + 质数判定 + 可扩展最小质因子 |
 | 实际速度 | $n \le 10^7$ 时相近 | $n > 10^7$ 时更快 |
-| 空间 | 少（只有 prime_vis + phi） | 多一个质数表（约 $n / \ln n$ 个元素） |
+| 空间 | 少（只有 phi） | 多一个质数表（约 $n / \ln n$ 个元素） |
 
 ### 7.2 埃氏筛求 φ 的写法
 
@@ -339,4 +342,4 @@ mpf[i * prime[j]] = prime[j];
 
 ### 7.5 一句话总结
 
-线性筛求欧拉函数是"一次筛法、多个产出"的典范：在 $O(n)$ 时间内同时得到质数表、质数判定和所有 φ 值。核心在于利用 φ 的积性，对每个合数 $i \cdot p_j$ 分两种情况递推——$p_j$ 整除 $i$ 时 $\varphi(ip) = p \cdot \varphi(i)$，不整除时 $\varphi(ip) = (p-1) \cdot \varphi(i)$。配合 `break` 保证每个合数只被最小质因子筛一次，实现严格线性复杂度。当查询量大时，线性筛远优于单次试除求值。
+线性筛求欧拉函数是"一次筛法、多个产出"的典范：在 $O(n)$ 时间内同时得到质数表、质数判定和所有 φ 值。核心在于利用 φ 的积性，对每个合数 $i \cdot p_j$ 分两种情况递推——$p_j$ 整除 $i$ 时 $\varphi(ip) = p \cdot \varphi(i)$，不整除时 $\varphi(ip) = (p-1) \cdot \varphi(i)$。配合 `break` 保证每个合数只被最小质因子筛一次，实现严格线性复杂度。代码直接用 `!phi[i]` 判质数，省去单独的标记数组。当查询量大时，线性筛远优于单次试除求值。

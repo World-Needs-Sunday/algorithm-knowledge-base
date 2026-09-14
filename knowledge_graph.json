@@ -849,7 +849,33 @@
       "related": [
         "math-euler-phi",
         "math-sieve-eratosthenes",
-        "math-gcd-lcm"
+        "math-gcd-lcm",
+        "math-linear-sieve-divisor-count"
+      ]
+    },
+    "math-linear-sieve-divisor-count": {
+      "prerequisites": [
+        "math-sieve-eratosthenes",
+        "math-linear-sieve-phi"
+      ],
+      "related": [
+        "math-linear-sieve-phi",
+        "math-sieve-eratosthenes",
+        "math-euler-phi",
+        "math-linear-sieve-divisor-sum"
+      ]
+    },
+    "math-linear-sieve-divisor-sum": {
+      "prerequisites": [
+        "math-sieve-eratosthenes",
+        "math-linear-sieve-phi",
+        "math-linear-sieve-divisor-count"
+      ],
+      "related": [
+        "math-linear-sieve-phi",
+        "math-linear-sieve-divisor-count",
+        "math-sieve-eratosthenes",
+        "math-euler-phi"
       ]
     },
     "math-lcm-pair-count": {
