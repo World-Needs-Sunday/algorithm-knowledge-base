@@ -3,6 +3,7 @@ id: basic-combination-dfs
 title: 'DFS 生成组合（选/不选 + 剪枝）'
 category: '基础算法'
 subcategory: '搜索'
+subSubcategory: 'DFS'
 difficulty: '入门'
 tags: ['基础算法', '搜索', '组合', 'DFS', '回溯', '递归', '剪枝']
 timeComplexity: 'O(m × C(n, m))'

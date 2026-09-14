@@ -2,11 +2,12 @@
 id: graph-scc-condensation
 title: 'SCC 缩点（强连通分量缩点）'
 category: 图论
-subcategory: 强连通分量
+subcategory: 连通分量
+subSubcategory: 强连通分量
 tags: ["图论", "强连通分量", "缩点", "Tarjan", "DAG"]
 timeComplexity: 'O(n+m)'
 spaceComplexity: 'O(n+m)'
-codePath: '图论\强连通分量\缩点\源.cpp'
+codePath: '图论\连通分量\SCC缩点\源.cpp'
 ---
 
 ## 算法原理

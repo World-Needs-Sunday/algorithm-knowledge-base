@@ -3,6 +3,7 @@ id: basic-meet-in-middle-binary-search
 title: '折半搜索（Meet in the Middle）— 二分查找版'
 category: '基础算法'
 subcategory: '搜索'
+subSubcategory: '折半搜索'
 difficulty: '普及+'
 tags: ['基础算法', '搜索', '折半搜索', 'Meet in the Middle', 'DFS', '二分查找', '子集和']
 timeComplexity: 'O(n × 2^(n/2))'

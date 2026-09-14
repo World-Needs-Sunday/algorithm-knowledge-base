@@ -3,6 +3,7 @@ id: basic-bfs-bidirectional
 title: '双向 BFS（双向广度优先搜索）'
 category: 基础算法
 subcategory: 搜索
+subSubcategory: BFS
 tags: ["基础算法", "搜索", "BFS", "双向BFS", "最短路", "网格图"]
 timeComplexity: 'O(nm)'
 spaceComplexity: 'O(nm)'

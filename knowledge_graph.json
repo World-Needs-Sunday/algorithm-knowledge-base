@@ -115,8 +115,8 @@
     "图论|割点与桥": {
       "description": "求无向图中的割点（关节点）和桥（割边）。割点是删除后图的连通分量增加的点，桥是删除后连通分量增加的边。Tarjan算法通过一次DFS在线性时间内求解，是点双/边双连通分量的基础。"
     },
-    "图论|强连通分量": {
-      "description": "求有向图中极大的强连通子图（SCC）。每个SCC内的节点互相可达，缩点后原图变为DAG。Tarjan算法是最常用的SCC求解方法，一次DFS即可完成。"
+    "图论|连通分量": {
+      "description": "研究图的连通性结构，包括有向图的强连通分量（SCC）和无向图的边双连通分量（E-DCC）。缩点技术将每个分量压缩为超级点，使原图变为DAG或树，大幅简化路径、可达性、可靠性等问题。Tarjan算法是求解各类连通分量的核心方法。"
     },
     "图论|二分图": {
       "description": "顶点可划分为两个不交集合的无向图，等价于图中无奇环。染色法（DFS/BFS）是最常用的判定方法，通过交替染色检测冲突。是最大匹配、最小顶点覆盖等问题的基础。"
@@ -717,7 +717,8 @@
       "related": [
         "graph-tarjan-cut-vertex",
         "graph-tarjan-scc",
-        "graph-scc-condensation"
+        "graph-scc-condensation",
+        "graph-e-dcc-condensation"
       ]
     },
     "graph-tarjan-scc": {
@@ -740,7 +741,18 @@
       "related": [
         "graph-tarjan-scc",
         "graph-dag-shortest-path",
-        "graph-topo-sort"
+        "graph-topo-sort",
+        "graph-e-dcc-condensation"
+      ]
+    },
+    "graph-e-dcc-condensation": {
+      "prerequisites": [
+        "graph-tarjan-bridge"
+      ],
+      "related": [
+        "graph-tarjan-bridge",
+        "graph-scc-condensation",
+        "graph-tarjan-cut-vertex"
       ]
     },
     "graph-bipartite-dfs-coloring": {
@@ -1056,6 +1068,21 @@
     },
     "图论|最短路|DAG最短路": {
       "description": "在有向无环图上通过拓扑排序求最短路，时间复杂度O(n+m)，是所有最短路算法中最优的，且支持负权边。"
+    },
+    "图论|连通分量|强连通分量": {
+      "description": "有向图中极大的强连通子图（SCC），分量内任意两点互相可达。Tarjan算法通过一次DFS即可求解，缩点后原图变为DAG，是处理有向图环结构的核心工具。"
+    },
+    "图论|连通分量|边双连通分量": {
+      "description": "无向图中极大的边双连通子图（E-DCC），分量内没有桥（割边），任意两点至少有两条边不相交的路径。删去所有桥后各连通块即为E-DCC，缩点后得到一棵树。"
+    },
+    "基础算法|搜索|DFS": {
+      "description": "深度优先搜索（DFS）是最基础的搜索算法，沿着一条路径深入直到无法继续再回溯。常用于排列生成、组合生成、回溯等问题，是图论搜索和动态规划状态转移的基础。"
+    },
+    "基础算法|搜索|BFS": {
+      "description": "广度优先搜索（BFS）按层遍历，常用于最短路径、层次遍历等问题。双向BFS从起点和终点同时搜索，大幅减少搜索空间。"
+    },
+    "基础算法|搜索|折半搜索": {
+      "description": "Meet in the Middle（折半搜索）将搜索空间分成两半分别枚举，再合并结果，将指数级复杂度从O(2^n)降至O(n·2^(n/2))，是解决中等规模子集类问题的核心技巧。"
     }
   }
 }

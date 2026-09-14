@@ -2,34 +2,39 @@
 using namespace std;
 vector<vector<int>> edges;
 vector<int> dfn, low;
-vector<pair<int, int>> is_cut;
-int cnt;
-void init(int n,int m)
+vector<pair<int, int>> is_bridge;
+int tim;
+void init(int n, int m)
 {
 	dfn.assign(n + 1, 0);
 	low.assign(n + 1, 0);
 	edges.assign(n + 1, vector<int>());
-	is_cut.clear();
-	cnt = 0;
+	is_bridge.clear();
+	tim = 0;
 }
-void add(int u,int v)
+void add(int u, int v)
 {
 	edges[u].emplace_back(v);
 	edges[v].emplace_back(u);
 }
-void tarjan(int rt,int fa)
+void tarjan(int rt, int fa)
 {
-	dfn[rt] = low[rt] = ++cnt;
+	int cnt = 0;
+	dfn[rt] = low[rt] = ++tim;
 	for (int i : edges[rt])
 	{
-		if (fa == i) continue;
+		if (fa == i && !cnt)
+		{
+			++cnt;
+			continue;
+		}
 		if (!dfn[i])
 		{
 			tarjan(i, rt);
 			low[rt] = min(low[i], low[rt]);
-			if (low[i] > dfn[rt]) is_cut.emplace_back(rt, i);
+			if (low[i] > dfn[rt]) is_bridge.emplace_back(rt, i);
 		}
-		else low[rt] = min(dfn[rt], low[i]);
+		else low[rt] = min(dfn[i], low[rt]);
 	}
 }
 int main()
@@ -49,7 +54,7 @@ int main()
 	{
 		if (!dfn[i]) tarjan(i, -1);
 	}
-	cout << is_cut.size() << '\n';
-	for (pair<int, int> i : is_cut) cout << i.first << ' ' << i.second << '\n';
+	cout << is_bridge.size() << '\n';
+	for (pair<int, int> i : is_bridge) cout << i.first << ' ' << i.second << '\n';
 	return 0;
 }

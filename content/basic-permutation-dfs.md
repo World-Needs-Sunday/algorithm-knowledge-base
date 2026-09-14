@@ -3,6 +3,7 @@ id: basic-permutation-dfs
 title: 'DFS 生成全排列（回溯法）'
 category: '基础算法'
 subcategory: '搜索'
+subSubcategory: 'DFS'
 difficulty: '入门'
 tags: ['基础算法', '搜索', '排列', 'DFS', '回溯', '递归']
 timeComplexity: 'O(n × n!)'

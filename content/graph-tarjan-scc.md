@@ -2,11 +2,12 @@
 id: graph-tarjan-scc
 title: 'Tarjan 强连通分量'
 category: 图论
-subcategory: 强连通分量
+subcategory: 连通分量
+subSubcategory: 强连通分量
 tags: ["图论", "强连通分量", "Tarjan", "DFS", "缩点"]
 timeComplexity: 'O(n+m)'
 spaceComplexity: 'O(n+m)'
-codePath: '图论\强连通分量\Untitled1.cpp'
+codePath: '图论\连通分量\Tarjan强连通分量\Untitled1.cpp'
 ---
 
 ## 算法原理
