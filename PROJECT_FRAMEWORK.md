@@ -55,15 +55,16 @@
 
 ## 2. 知识点分类体系
 
-当前已有 102 个知识点，分 8 个大类：
+当前已有 102 个知识点，分 7 个大类：
 
 | 大类 (category) | 子分类 (subcategory) | 知识点 ID |
 |---|---|---|
-| 基础算法 | 贪心 | `basic-interval-scheduling`, `basic-interval-merge` |
-| 基础算法 | 双指针 | `basic-two-pointer-cycle` |
-| 基础算法 | 分治 | `basic-divide-conquer-merge-inversion`, `basic-quickselect-kth` |
-| 基础算法 | 数位提升 | `basic-digit-power-cycle-self` |
-| 基础算法 | 排序 | `basic-radix-sort-k`（k进制基数排序） |
+| 基础算法 | 贪心 | `basic-interval-scheduling`（区间调度）, `basic-interval-merge`（区间合并） |
+| 基础算法 | 双指针 | `basic-two-pointer-cycle`（链表环检测） |
+| 基础算法 | 分治 | `basic-divide-conquer-merge-inversion`（归并排序求逆序对）, `basic-quickselect-kth`（快速选择）, `basic-divide-conquer-closest-pair`（最近点对） |
+| 基础算法 | 数位提升 | `basic-digit-power-cycle-self`（按数位分层扩张幂周期） |
+| 基础算法 | 排序 | `basic-radix-sort-k`（k进制基数排序）, `basic-shell-sort`（希尔排序） |
+| 基础算法 | 搜索 | `basic-permutation-dfs`（DFS生成全排列）, `basic-combination-dfs`（DFS生成组合）, `basic-bfs-bidirectional`（双向BFS）, `basic-meet-in-middle-binary-search`（折半搜索·二分查找版）, `basic-meet-in-middle-two-pointer`（折半搜索·双指针合并版） |
 | 动态规划 | 背包问题 | 01背包: `dp-01bag-standard`, `dp-01bag-2d`, `dp-01bag-record`, `dp-count-01bag`; 完全背包: `dp-complete-bag`; 多重背包: `dp-multi-bag-binary`, `dp-multi-bag-monotone`; 分组背包: `dp-group-bag` |
 | 动态规划 | 线性DP | LCS: `dp-linear-lcs-length`, `dp-linear-lcs-output`, `dp-linear-lcs-substring`; LIS: `dp-linear-lis-binary`, `dp-linear-lis-bit-count`; 经典模型: `dp-linear-edit-distance`, `dp-linear-maxsub`, `dp-linear-triangle` |
 | 动态规划 | 树形DP | `dp-tree-01bag`, `dp-tree-dance` |
@@ -85,16 +86,17 @@
 | 图论 | 最近公共祖先 | `graph-lca-doubling`, `graph-lca-tarjan`, `graph-lca-hld` |
 | 图论 | 拓扑排序 | `graph-topo-sort` |
 | 图论 | 树链剖分 | `graph-hld-segtree` |
-| 图论 | 割点与桥 | `graph-tarjan-cut-vertex`（Tarjan求割点） |
-| 图论 | 强连通分量 | `graph-tarjan-scc`（Tarjan求SCC）, `graph-scc-condensation`（SCC缩点） |
-| 输入输出 | IO优化 | `io-fast-io` |
-| 数学 | 数论基础 | `math-gcd-lcm`（GCD与LCM·欧几里得算法）, `math-sieve-eratosthenes`（埃氏筛）, `math-euler-phi`（欧拉函数）, `math-linear-sieve-phi`（线性筛求欧拉函数）, `math-linear-sieve-divisor-count`（线性筛求约数个数）, `math-linear-sieve-divisor-sum`（线性筛求约数和）, `math-modular-inverse`（模逆元·费马小定理）, `math-crt`（中国剩余定理CRT） |
+| 图论 | 割点与桥 | `graph-tarjan-cut-vertex`（Tarjan求割点）, `graph-tarjan-bridge`（Tarjan求桥） |
+| 图论 | 连通分量 | 强连通分量: `graph-tarjan-scc`（Tarjan求SCC）, `graph-scc-condensation`（SCC缩点）; 边双连通分量: `graph-e-dcc-condensation`（E-DCC缩点） |
+| 图论 | 二分图 | `graph-bipartite-dfs-coloring`（DFS染色判定）, `graph-bipartite-hungarian`（匈牙利算法·最大匹配） |
+| 数学 | 数论基础 | `math-gcd-lcm`（GCD与LCM）, `math-sieve-eratosthenes`（埃氏筛）, `math-euler-phi`（欧拉函数）, `math-linear-sieve-phi`（线性筛求欧拉函数）, `math-linear-sieve-divisor-count`（线性筛求约数个数）, `math-linear-sieve-divisor-sum`（线性筛求约数和）, `math-modular-inverse`（模逆元·费马小定理）, `math-crt`（中国剩余定理CRT） |
 | 数学 | 数论计数 | `math-lcm-pair-count` |
 | 数学 | 矩阵 | `math-matrix-multiplication`（矩阵乘法）, `math-matrix-quick-pow`（矩阵快速幂）, `math-matrix-linear-recurrence`（矩阵加速线性递推） |
 | 数学 | 快速幂 | `math-quick-pow-basic`, `math-quick-pow-highprecision` |
 | 字符串 | 字符串哈希 | `str-hash` |
 | 字符串 | 最小表示法 | `str-minimal-representation` |
 | 字符串 | 字符串匹配 | `str-kmp`（KMP算法）, `str-sunday`（Sunday算法） |
+| 输入输出 | IO优化 | `io-fast-io` |
 
 ### ID 命名规范
 
@@ -369,12 +371,25 @@ marked.js 会破坏 LaTeX 语法（转义反斜杠、拆分 `$` 分隔符）。i
 
 ### 4.3 页面布局
 
-- **左侧栏**：暗色侧边栏，按 category → subcategory → 知识点 三级树展示，带搜索框。点击分类名或子分类名可跳转到分类概览页
+- **顶部切换栏**：「📖 知识点」/「📝 题目专辑」双模式切换，默认进入知识点模式。点击按钮切换侧边栏和主内容区的数据
+- **左侧栏**：暗色侧边栏，按 category → subcategory → 知识点/题目 三级树展示，顶部有搜索框（支持实时搜索过滤）。点击分类名或子分类名可跳转到分类概览页
+- **标签筛选区**：位于侧边栏搜索框下方，支持按标签筛选知识点/题目
+  - 侧边栏显示常用标签（最多10个），点击标签切换选中状态
+  - 点击「更多 ▼」打开**标签选择弹窗**，所有标签按大类分组展示，可批量选择
+  - 支持**交集/并集**两种筛选模式，点击模式按钮切换：
+    - **交集（默认）**：知识点必须同时包含所有选中的标签才显示（AND 逻辑）
+    - **并集**：知识点只要包含任意一个选中的标签就显示（OR 逻辑）
+  - 筛选后，匹配的分类默认自动展开，方便直接查看结果
+  - 点击「清除」一键清空所有选中的标签
 - **分类概览页**：展示分类性质、描述、问题领域，以及所有子分类的描述和知识点卡片
 - **知识点详情页**：显示 title → 标签/复杂度徽章 → 前置知识点（可点击跳转）→ Markdown 正文 → 代码区块 → 相关知识点（可点击跳转）→ 前后导航按钮
+- **题目详情页**：显示 title → OJ/难度/标签徽章 → 题目描述 → 输入输出格式 → 样例 → 解题思路 → 代码解析 → 复杂度分析 → 陷阱与注意事项
 - **总目录页**：全局概览所有知识点，按分类和子分类组织。分类卡片默认收起，点击展开/收起知识点列表，右侧"查看详情 →"跳转分类概览页
 - **主题**：支持亮/暗主题切换（localStorage 存储）
-- **响应式**：侧边栏可折叠
+- **响应式设计**：
+  - **桌面端（>768px）**：侧边栏始终展开，固定在左侧
+  - **移动端（≤768px）**：侧边栏默认收起，通过左上角 ☰ 菜单按钮展开/收起；点击知识点后自动收起侧边栏
+  - 标签选择弹窗在移动端自适应全屏显示
 
 ---
 
@@ -527,6 +542,57 @@ node build.js
 - 检查 LaTeX 公式和代码高亮是否正常
 
 > **说明**：题目专辑不需要修改 `knowledge_graph.json`，所有信息从 .md 的 frontmatter 读取。
+
+### 5.5 网站功能使用指南
+
+#### 5.5.1 知识点 / 题目模式切换
+
+- 页面顶部有「📖 知识点」和「📝 题目专辑」两个按钮
+- **默认进入知识点模式**，点击按钮可切换模式
+- 切换模式后，侧边栏、搜索框、标签筛选都会同步切换到对应的数据
+- 搜索框占位符会随模式变化："搜索知识点..." / "搜索题目..."
+
+#### 5.5.2 标签筛选
+
+标签筛选是快速定位知识点/题目的重要工具，支持两种筛选模式：
+
+**快速筛选（侧边栏）**：
+1. 侧边栏标签区显示常用标签（最多 10 个，优先显示已选中的）
+2. 点击标签切换选中/取消选中
+3. 点击「清除」按钮一键清空所有选中的标签
+
+**弹窗批量选择**：
+1. 点击「更多 ▼」打开标签选择弹窗
+2. 标签按**大类分组**展示，方便按领域查找
+3. 可逐个点击或批量选择标签
+4. 弹窗底部显示当前已选标签数量，可快速移除
+
+**交集 / 并集模式切换**：
+- 点击「交集 ⇄」按钮切换筛选逻辑
+- **交集模式（默认）**：知识点必须**同时包含所有**选中的标签才会显示（AND 逻辑）
+  - 适用场景：缩小范围，精确查找（如同时选"图论"和"最短路"）
+- **并集模式**：知识点只要**包含任意一个**选中的标签就会显示（OR 逻辑）
+  - 适用场景：扩大范围，浏览多个主题（如同时看"动态规划"和"贪心"）
+- 模式按钮在侧边栏和弹窗中都有，两边状态同步
+
+**筛选效果**：
+- 筛选后，有匹配结果的分类会**自动展开**，方便直接查看
+- 无匹配结果的分类会隐藏
+- 清空标签筛选后，侧边栏恢复默认收起状态
+
+#### 5.5.3 搜索功能
+
+- 在侧边栏顶部搜索框输入关键词，实时过滤知识点/题目
+- 搜索范围包括标题、ID、标签等字段
+- 搜索结果的分类自动展开
+- 搜索与标签筛选可叠加使用（同时生效）
+
+#### 5.5.4 移动端使用
+
+- 屏幕宽度 ≤ 768px 时自动进入移动端布局
+- 侧边栏默认收起，点击左上角 ☰ 按钮展开
+- 点击知识点/题目后，侧边栏自动收起
+- 标签选择弹窗在移动端全屏显示，便于操作
 
 ---
 
