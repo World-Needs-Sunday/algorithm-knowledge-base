@@ -83,7 +83,6 @@ void init(int n)
     edges.assign(n + 1, vector<int>());
     sk.assign(n + 5, 0);
     in_sk.assign(n + 1, false);
-    in_rt.assign(n + 1, false);
     col_arr.emplace_back();       // col_arr[0] 占位
     col.assign(n + 1, 0);
     tim = 1;
@@ -266,7 +265,7 @@ int fn(int n)
 ## 常见陷阱与注意事项
 
 1. **tarjan 调用位置**：代码在 `fn()` 中调用 tarjan，而不是在 `init` 后立即调用。确保 `SCC()` 在 tarjan 之后调用（依赖 `col` 和 `col_arr`）
-2. **`in_rt` 数组复用**：`in_rt` 在 `init` 中初始化为全 false，在 `SCC()` 中重新 `assign` 为缩点图入度。不要混淆这两个阶段
+2. **`in_rt` 数组**：`in_rt` 不在 `init` 中初始化，而是在 `SCC()` 中才 `assign` 为缩点图入度。不要在 tarjan 阶段使用 `in_rt`
 3. **手写队列大小**：`deq` 开 `col_cnt + 2`，确保不会越界
 4. **未连通图**：代码在 `fn` 中对所有未访问节点调用 tarjan，正确处理了森林（多个不连通分量）
 5. **自环处理**：`SCC()` 中 `u == v` 跳过自环，确保缩点图是严格 DAG

@@ -25,7 +25,6 @@ void init(int n)
     edges.assign(n + 1, vector<int>());
     sk.assign(n + 5, 0);
     in_sk.assign(n + 1, false);
-    in_rt.assign(n + 1, false);
     col_arr.emplace_back();
     col.assign(n + 1, 0);
     tim = 1;
