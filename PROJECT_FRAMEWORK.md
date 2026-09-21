@@ -55,7 +55,7 @@
 
 ## 2. 知识点分类体系
 
-当前已有 102 个知识点，分 7 个大类：
+当前已有 104 个知识点，分 8 个大类：
 
 | 大类 (category) | 子分类 (subcategory) | 知识点 ID |
 |---|---|---|
@@ -87,7 +87,7 @@
 | 图论 | 拓扑排序 | `graph-topo-sort` |
 | 图论 | 树链剖分 | `graph-hld-segtree` |
 | 图论 | 割点与桥 | `graph-tarjan-cut-vertex`（Tarjan求割点）, `graph-tarjan-bridge`（Tarjan求桥） |
-| 图论 | 连通分量 | 强连通分量: `graph-tarjan-scc`（Tarjan求SCC）, `graph-scc-condensation`（SCC缩点）; 边双连通分量: `graph-e-dcc-condensation`（E-DCC缩点） |
+| 图论 | 连通分量 | 强连通分量: `graph-tarjan-scc`（Tarjan求SCC）, `graph-scc-condensation`（SCC缩点）, `graph-scc-dag-dp`（SCC缩点+DAG上拓扑DP·最大权值路径）; 边双连通分量: `graph-e-dcc-condensation`（E-DCC缩点） |
 | 图论 | 二分图 | `graph-bipartite-dfs-coloring`（DFS染色判定）, `graph-bipartite-hungarian`（匈牙利算法·最大匹配） |
 | 数学 | 数论基础 | `math-gcd-lcm`（GCD与LCM）, `math-sieve-eratosthenes`（埃氏筛）, `math-euler-phi`（欧拉函数）, `math-linear-sieve-phi`（线性筛求欧拉函数）, `math-linear-sieve-divisor-count`（线性筛求约数个数）, `math-linear-sieve-divisor-sum`（线性筛求约数和）, `math-modular-inverse`（模逆元·费马小定理）, `math-crt`（中国剩余定理CRT） |
 | 数学 | 数论计数 | `math-lcm-pair-count` |
@@ -97,6 +97,7 @@
 | 字符串 | 最小表示法 | `str-minimal-representation` |
 | 字符串 | 字符串匹配 | `str-kmp`（KMP算法）, `str-sunday`（Sunday算法） |
 | 输入输出 | IO优化 | `io-fast-io` |
+| 初赛笔记 | 位运算 | `exam-bit-operation`（CSP初赛位运算完全笔记） |
 
 ### ID 命名规范
 
@@ -109,6 +110,7 @@
 | `ds-` | 数据结构 | `ds-segtree-basic` |
 | `graph-` | 图论 | `graph-johnson` |
 | `io-` | 输入输出 | `io-fast-io` |
+| `exam-` | 初赛笔记 | `exam-bit-operation` |
 | `math-` | 数学 | `math-quick-pow-basic` |
 | `str-` | 字符串 | `str-hash` |
 
@@ -154,7 +156,7 @@ codePath: '图论\最短路\Johnson\Untitled1.cpp'
 | `tags` | 否 | 标签数组 | `["图论", "最短路", "Johnson"]` |
 | `timeComplexity` | 否 | 时间复杂度 | `'O(nm log n)'` |
 | `spaceComplexity` | 否 | 空间复杂度 | `'O(n^2 + n + m)'` |
-| `codePath` | 是 | C++ 代码文件相对路径（反斜杠） | `'图论\最短路\Johnson\Untitled1.cpp'` |
+| `codePath` | 否 | C++ 代码文件相对路径（反斜杠）。初赛笔记等无代码知识点可省略 | `'图论\最短路\Johnson\Untitled1.cpp'` |
 
 > **前置/相关知识点**：`prerequisites` 和 `related` 不在 .md frontmatter 中定义，而是在 `knowledge_graph.json` 中统一管理。build.js 读取后自动合并到 `KNOWLEDGE_DATA`。
 
@@ -189,6 +191,15 @@ codePath: '图论\最短路\Johnson\Untitled1.cpp'
 
 - **禁止自我修正式表述**：正文中不得出现"等等"、"不对"、"再想想"、"纠正一下"等类似推翻前文、自我辩论的表述。知识点文档是结论性的教学材料，不是思考过程记录。如有需要说明易混淆的点，统一放在「常见陷阱与注意事项」章节中，以正面陈述的方式给出正确结论。
 - **禁止分步试错推导**：不得将中间错误的推导过程写入正文。最终呈现的推导路径应当是正确且连贯的。
+
+**初赛笔记类知识点**（无固定章节数，无代码）：
+
+初赛笔记类知识点不遵循上述 7/8 章结构，其特点：
+- **无 codePath**：不关联 C++ 代码文件，纯理论/应试知识
+- **章节自由**：按考点主题自由组织（如"补码 → 恒等式 → 异或 → 移位 → 速记卡"）
+- **侧重记忆**：公式、口诀、陷阱总结、速记卡等应试导向内容
+- **可用代码块**：展示 C++ 语法片段（如 `x & (x-1)`）但不关联完整代码文件
+- `timeComplexity` 和 `spaceComplexity` 可省略（非算法实现，无复杂度分析）
 
 ### 3.4 C++ 代码文件
 
@@ -543,16 +554,49 @@ node build.js
 
 > **说明**：题目专辑不需要修改 `knowledge_graph.json`，所有信息从 .md 的 frontmatter 读取。
 
-### 5.5 网站功能使用指南
+### 5.5 添加初赛笔记（无代码知识点）
 
-#### 5.5.1 知识点 / 题目模式切换
+**Step 1：创建 Markdown 知识点文件**
+
+```
+路径：{项目根}\content\{id}.md
+```
+
+按 3.1 节格式编写 frontmatter + 正文。**与普通知识点的区别**：
+- **不设 codePath**：frontmatter 中省略 `codePath` 字段（build.js 已支持可选）
+- **不设 timeComplexity / spaceComplexity**：非算法实现，无需复杂度分析
+- **章节自由**：不遵循 7/8 章结构，按考点主题自由组织（见 3.3 节「初赛笔记类知识点」）
+- `category` 填 `初赛笔记`，`subcategory` 按主题填（如 `位运算`）
+
+**Step 2：更新知识图谱**
+
+在 `knowledge_graph.json` 中：
+1. 在 `knowledgePoints` 中添加新知识点的 `prerequisites` 和 `related`
+2. 如果新增了子分类，在 `subcategories` 中添加描述
+
+**Step 3：运行构建**
+
+```bash
+node build.js
+```
+
+**Step 4：验证**
+
+- 浏览器打开 `index.html`，Ctrl+F5 强制刷新
+- 在左侧栏「初赛笔记」分类下找到新知识点
+- 检查内容渲染（公式、代码块、表格）
+- 确认不显示代码区（无 codePath 时前端自动隐藏）
+
+### 5.6 网站功能使用指南
+
+#### 5.6.1 知识点 / 题目模式切换
 
 - 页面顶部有「📖 知识点」和「📝 题目专辑」两个按钮
 - **默认进入知识点模式**，点击按钮可切换模式
 - 切换模式后，侧边栏、搜索框、标签筛选都会同步切换到对应的数据
 - 搜索框占位符会随模式变化："搜索知识点..." / "搜索题目..."
 
-#### 5.5.2 标签筛选
+#### 5.6.2 标签筛选
 
 标签筛选是快速定位知识点/题目的重要工具，支持两种筛选模式：
 
@@ -580,14 +624,14 @@ node build.js
 - 无匹配结果的分类会隐藏
 - 清空标签筛选后，侧边栏恢复默认收起状态
 
-#### 5.5.3 搜索功能
+#### 5.6.3 搜索功能
 
 - 在侧边栏顶部搜索框输入关键词，实时过滤知识点/题目
 - 搜索范围包括标题、ID、标签等字段
 - 搜索结果的分类自动展开
 - 搜索与标签筛选可叠加使用（同时生效）
 
-#### 5.5.4 移动端使用
+#### 5.6.4 移动端使用
 
 - 屏幕宽度 ≤ 768px 时自动进入移动端布局
 - 侧边栏默认收起，点击左上角 ☰ 按钮展开
@@ -652,7 +696,7 @@ node build.js
 | 读取知识图谱 | `JSON.parse(fs.readFileSync(GRAPH_FILE, 'utf8'))` |
 | 输出 data.js | `KNOWLEDGE_DATA` + `CATEGORY_META` + `SUBCATEGORY_META` 三个变量 |
 | 输出 code_data.js | `const CODE_DATA = ${JSON.stringify(codeData, null, 4)}` |
-| 必填字段校验 | `['id', 'title', 'category', 'subcategory', 'codePath']` |
+| 必填字段校验 | `['id', 'title', 'category', 'subcategory']`（codePath 可选，初赛笔记等无代码知识点可省略） |
 
 ---
 
@@ -671,6 +715,12 @@ node build.js
   2. 写文档   → problems\{id}.md（frontmatter + 题目描述 + 解题思路）
   3. 构建     → node build.js
   4. 验证     → 浏览器 Ctrl+F5（切换到「📝 题目专辑」模式）
+
+添加初赛笔记（无代码）：
+  1. 写文档   → content\{id}.md（frontmatter 无 codePath，章节自由）
+  2. 更新图谱 → knowledge_graph.json（prerequisites + related）
+  3. 构建     → node build.js
+  4. 验证     → 浏览器 Ctrl+F5（在「初赛笔记」分类下查看）
 
 修改知识点：
   1. 改 .md 或 .cpp

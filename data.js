@@ -1616,6 +1616,32 @@ const KNOWLEDGE_DATA = [
         ]
     },
     {
+        "id": "exam-bit-operation",
+        "category": "初赛笔记",
+        "subcategory": "位运算",
+        "subSubcategory": "",
+        "title": "CSP 初赛位运算完全笔记（详解 + 扩充版）",
+        "content": "## 〇、地基：补码（看懂一切负数位运算的钥匙）\n\n初赛爱直接考\"写出某负数的补码\"，先把地基打牢。\n\n**核心三条：**\n\n- `-x = ~x + 1`（取反加一）\n- `~x = -x - 1`\n- `~0 = -1`（-1 的二进制是全 1；`~1 = -2`）\n\n**手算负数补码（例：8 位表示 -12）：**\n\n```\n12      = 0000 1100\n按位取反 = 1111 0011\n加一     = 1111 0100    ← 这就是 -12 的补码\n```\n\n**反向读补码**：最高位权值取负，直接算数值：\n\n```\n1111 0100 = -128 + 64 + 32 + 16 + 4 = -12 ✓\n```\n\n**范围**：$n$ 位补码范围 $[-2^{n-1},\\; 2^{n-1}-1]$，int 是 $[-2^{31},\\; 2^{31}-1]$。\n\n> ⚠️ **坑**：`-INT_MIN` 溢出（INT_MIN 的相反数还是它自己），`abs(INT_MIN)` 同理，判断题常设陷阱。\n\n## 一、三大恒等式（逐位证明）\n\n**原理**：二进制每一位独立分析。单看某一位：\n\n每一位都满足：\n\n```\na位 + b位 = (a|b位) + (a&b位)\na位 + b位 = (a^b位) + 2×(a&b位)    （1&1 时异或丢掉的 1 变成进位 ×2）\n```\n\n按位加权求和，得到全局恒等式：\n\n```\na | b = a + b - (a & b)\na ^ b = (a | b) - (a & b)\na + b = (a ^ b) + 2 * (a & b)\n```\n\n**验证**：`a=6(110)`，`b=3(011)` → `a&b=2`，`a|b=7`，`a^b=5`，`a+b=9`\n\n```\n9 = 5 + 2×2 ✓    7 = 9−2 ✓    5 = 7−2 ✓\n```\n\n**记忆钩子：**\n\n- 异或 = 无进位加法\n- `a&b` = 同时为 1 的位（这些位相加会进位，所以 ×2）\n- `a|b` = a+b 去掉重复的部分\n\n> **考场用法**：题目给 `a&b` 和 `a|b`，直接 `a+b = (a|b) + (a&b)`，不用求出 a 和 b。\n\n## 二、异或 ^（初赛出题率最高）\n\n### 性质\n\n```\nx ^ x = 0            （自己消自己）\nx ^ 0 = x            （0 是单位元）\n交换律、结合律成立\nx ^ x ^ x = x        （奇数次保持，偶数次抵消）\nx ^ (~x) = 全1 = -1\nx ^ (-1) = ~x        （异或全1 = 取反）\nx ^ y = 0  ⟺  x = y\n```\n\n**为什么 `a^b=c` 能推出 `a=b^c`？** 两边同时异或 b：\n\n```\na^b^b = c^b → a^0 = b^c → a = b^c\n```\n\n（靠的就是结合律 + `x^x=0` + `x^0=x`）\n\n### 应用一：找只出现一次的数\n\n其余数都出现偶数次，全部异或后成对抵消为 0，剩下那个单独的数。\n\n```cpp\nans = 0;\nfor (每个数 x) ans ^= x;\n```\n\n### 应用二：1^2^3^…^n 的公式（超高频！）\n\n设 $f(n) = 1 \\oplus 2 \\oplus \\dots \\oplus n$，只看 $n \\bmod 4$：\n\n| $n \\bmod 4$ | $f(n)$ |\n|---|---|\n| 0 | $n$ |\n| 1 | $1$ |\n| 2 | $n + 1$ |\n| 3 | $0$ |\n\n**原理**：任意连续 4 个数异或为 0（如 `4^5^6^7=0`），周期为 4。\n\n自测：$f(1)=1$，$f(2)=3$，$f(3)=0$，$f(4)=4$，$f(5)=1$ ✓\n\n### 应用三：无临时变量交换（含大坑）\n\n```cpp\na ^= b;\nb ^= a;\na ^= b;\n```\n\n> ⚠️ **坑**：若 a、b 是同一块内存（如 `swap(a[i], a[j])` 且 `i==j`），第一步就变 0。判断题陷阱。\n\n### 应用四：Nim 博弈（与博弈论结合的选择题）\n\n$n$ 堆石子，每次任选一堆取任意多个。先手必胜 $\\iff$ 所有堆大小的异或和 $\\neq 0$；异或和 $= 0$ 则先手必败。\n\n## 三、与 &、或 |、非 ~ 的代数定律\n\n**幂等律：**\n\n```\nx & x = x        x | x = x\n```\n\n**零元 / 单位元：**\n\n```\nx & 0 = 0        x | 0 = x          （0 是 | 的单位元）\nx & ~0 = x       x | ~0 = ~0        （全1 是 & 的单位元）\n```\n\n**互补：**\n\n```\nx & ~x = 0       x | ~x = ~0(全1)\n```\n\n**还原律：**\n\n```\n~~x = x\n```\n\n**分配律（双向！这和普通算术不同，两边都能展开）：**\n\n```\na & (b | c) = (a & b) | (a & c)\na | (b & c) = (a | b) & (a | c)\n```\n\n**吸收律（补充，选择题用来化简）：**\n\n```\na & (a | b) = a\na | (a & b) = a\n```\n\n**德摩根律（补充）：**\n\n```\n~(a & b) = ~a | ~b\n~(a | b) = ~a & ~b\n```\n\n**结合律**：`&`、`|`、`^` 都满足；不满足消去律：`a&b = a&c` 推不出 `b=c`（但 `a|b = a|c` 且 `a&b = a&c` 可以推出 `b=c`）。\n\n## 四、移位 << >>\n\n### 左移\n\n`x << k` = $x \\times 2^k$（不溢出的前提下！），低位补 0。\n\n> ⚠️ **坑**：\n> - int 溢出后不再等于乘 $2^k$，`1 << 31` 对 32 位 int 是移入符号位（UB/结果常为 INT_MIN）。要表示 $2^{31}$ 就写 `1LL << 31` 或 `1u << 31`。\n> - 移位数 ≥ 类型位宽也是 UB：`x << 32` ≠ `x << 0`，读程序题挖过坑。\n\n### 右移\n\n- 无符号数 / 非负数：`x >> k` = $\\lfloor x / 2^k \\rfloor$，高位补 0（逻辑右移）\n- 有符号负数：高位补 1（算术右移）\n\n> ⚠️ **超级考点——负数右移 ≠ C++ 除法**：\n> - `-7 >> 1 = -4`（算术右移 = 向下取整，数学意义 $\\lfloor -3.5 \\rfloor$）\n> - `-7 / 2 = -3`（C++ 除法 = 向零截断）\n>\n> 另外：`-1 >> k = -1`（全1右移还是全1）。\n\n### 移位取模（补充）\n\n非负 $x \\bmod 2^k = $ `x & ((1 << k) - 1)`\n\n例：`x & 0xF` = x 的低 4 位\n\n> ⚠️ 负数时 `&` 给的是数学模（结果非负），`%` 给的是截断（可为负），如 `-7 & 3 = 1` 而 `-7 % 3 = -1`。\n\n## 五、两大神器：x&(x-1) 和 x&(-x)\n\n### x & (x-1)：清除最低位的 1\n\n**原理**：设 `x = …A 1 00…0`（最低的 1 后面跟 k 个 0）\n\n```\n减 1 借位 → x-1 = …A 0 11…1 （最低的 1 变 0，后面的 0 全变 1）\n相与     → …A 00…0          （那个 1 消失，高位原封不动）\n```\n\n例：`x=10100`, `x-1=10011`, `x&(x-1)=10000`\n\n**两大衍生：**\n\n**判断 2 的幂**：\n\n```cpp\nx > 0 && (x & (x-1)) == 0\n```\n\n（2 的幂二进制只有一个 1，消掉就变 0）\n\n**数 1 的个数**：每次至少消一个 1，循环几次就有几个 1（比逐位判快）\n\n```cpp\nint cnt = 0;\nwhile (x) { x &= x-1; cnt++; }\n```\n\n（GCC 内建：`__builtin_popcount(x)`）\n\n### x & (-x)：取出最低位的 1\n\n**原理**：`-x = ~x + 1`。设 `x = …B 1 00…0`\n\n```\n~x = …~B 0 11…1\n加 1 的进位链恰好停在原最低 1 的位置，把它重新置 1：\n-x = …~B 1 00…0\nx 与 -x 相与：高位 B & ~B = 0，低位全 0，只剩那个 1。\n```\n\n例：`x = 10100`，`-x = …11101100`，`x & -x = 00100` ✓\n\n> 📌 **澄清一个常见误解**：它对任意整数（含正数）都有效，前提是\"负数用补码表示\"——C++ 恰好就是补码，所以放心用。它也叫 **lowbit**，是树状数组（复赛）的核心操作。\n\n### 姊妹公式（补充，判断题会考）\n\n```\nx & (x+1) == 0   ⟺  x 是 2^k - 1（二进制全1，如 0,1,3,7,15,255）\n~x & (x+1)        ：取出最低位的 0\n```\n\n## 六、位操作四件套 + 状压集合（复赛也常用）\n\n**单个位的操作**（i 从 0 开始，最低位是第 0 位）：\n\n| 操作 | 代码 |\n|---|---|\n| 取第 i 位 | `(x >> i) & 1` → 0 或 1 |\n| 第 i 位置 1 | `x \\| (1 << i)` |\n| 第 i 位清 0 | `x & ~(1 << i)` |\n| 第 i 位翻转 | `x ^ (1 << i)` |\n\n**状压 DP / 集合运算**（把集合塞进一个 int）：\n\n```\n全集 = (1 << n) - 1        空集 = 0\n加入元素 i：s | (1 << i)\n删除元素 i：s & ~(1 << i)\n判断 i ∈ s：(s >> i) & 1 → 非 0\nA ⊆ B：(A & B) == A\n```\n\n**枚举 s 的所有非空子集：**\n\n```cpp\nfor (int t = s; t; t = (t - 1) & s) { /* ... */ }\n```\n\n**格雷码**（偶尔考概念）：`gray(x) = x ^ (x >> 1)`\n\n## 七、运算符优先级——初赛第一大坑！\n\n从高到低完整链条：\n\n```\n~（一元） >  * / %  >  + -  >  << >>  >  < <= > >=  >  == !=  >  &  >  ^  >  |  >  &&  >  ||  >  赋值\n```\n\n**关键结论**：`&`、`^`、`|` 的优先级比 `==` 还低！由此产生两大经典陷阱：\n\n**陷阱 1**：\n\n```cpp\nif (x & 1 == 0)        // 实际是 if (x & (1 == 0)) = if (x & 0) = 恒假！\nif ((x & 1) == 0)      // 正确\n```\n\n**陷阱 2**：\n\n```cpp\n1 << 2 + 3             // 实际是 1 << (2+3) = 1 << 5 = 32（加减高于移位）\n```\n\n> ⚠️ **附加坑**：`&&` 有短路求值，`&` 没有——`if (p != NULL & p->x)` 可能崩，`&&` 不会。\n\n**口诀**：位运算表达式一律手动加括号，永不失手。\n\n## 八、有符号 / 无符号坑\n\n混比 / 混算时有符号自动转无符号：\n\n- `-1 < 1u` 结果是 `false`（-1 变成 4294967295）。\n- `unsigned` 永远 ≥ 0：`for (unsigned i = 5; i >= 0; i--)` 死循环。\n- `v.size()` 返回 unsigned：`for (int i = 0; i < v.size() - 1; i++)` 在 v 为空时，`size()-1` 变成巨大数——读程序题常客。\n\n## 九、大小关系不等式链（选择题排除神器）\n\n对非负整数 $a$、$b$：\n\n$$a \\mathbin{\\&} b \\;\\leq\\; \\min(a,b) \\;\\leq\\; \\max(a,b) \\;\\leq\\; a \\mathbin{|} b \\;\\leq\\; a + b$$\n\n$$且 \\quad a \\oplus b \\;\\leq\\; a \\mathbin{|} b$$\n\n**原理**：`a&b` 每一位 ≤ a 对应位；`a|b = a+b−(a&b)` ≤ a+b。\n\n**验证**：`a=6`, `b=3`：$2 \\leq 3 \\leq 6 \\leq 7 \\leq 9$，$5 \\leq 7$ ✓\n\n**配套判断：**\n\n- `a + b == a | b` $\\iff$ `a & b == 0`（无公共 1，加法无进位）\n- `a ^ b == a | b` $\\iff$ `a & b == 0`（同一个条件）\n- `a ^ b == a + b` $\\iff$ 同上\n\n## 十、必背常数 + 进制转换基本功\n\n**2 的幂表：**\n\n| 幂次 | 值 | 幂次 | 值 |\n|---|---|---|---|\n| $2^0$ | 1 | $2^6$ | 64 |\n| $2^1$ | 2 | $2^7$ | 128 |\n| $2^2$ | 4 | $2^8$ | 256 |\n| $2^3$ | 8 | $2^{10}$ | 1024 |\n| $2^4$ | 16 | $2^{16}$ | 65536 |\n| $2^5$ | 32 | $2^{20}$ | $\\approx 10^6$ |\n\n| 常数 | 值 |\n|---|---|\n| $2^{30}$ | $\\approx 10^9$ |\n| $2^{31}$ | 2147483648 |\n| INT_MAX ($2^{31}-1$) | 2147483647 |\n| INT_MIN ($-2^{31}$) | -2147483648 |\n| UINT_MAX ($2^{32}-1$) | 4294967295 |\n\n**估算口诀**：$2^{10} \\approx 10^3$，$2^k \\approx 10^{0.3k}$\n\n**常用十六进制：**\n\n```\n0xFF = 255\n0x7FFFFFFF = INT_MAX\n0xFFFFFFFF = -1(int) = 4294967295(unsigned)\n0x3F3F3F3F ≈ 1.06×10^9（memset 设\"无穷大\"，两倍不爆 int）\n```\n\n**进制转换**（初赛第一大题就是它）：\n\n- 十→二：除 2 取余，逆序写；小数部分乘 2 取整\n- 二→十六：从右往左 4 位一组；二→八：3 位一组\n- $2^k$ 的二进制 = 1 后 k 个 0；$2^k - 1$ = k 个 1\n\n## 十一、终极速记卡（考场默写版）\n\n**【补码】** `~x+1`、`~x = -x-1`、`~0 = -1`（全1）\n\n**【三大恒等式】**\n\n```\na | b = a + b - (a & b)\na ^ b = (a | b) - (a & b)\na + b = (a ^ b) + 2*(a & b)      （异或=无进位加法）\n```\n\n**【异或】** `x^x=0`、`x^0=x`、`a^b=c ⟹ a=b^c`\n\n$1 \\oplus \\dots \\oplus n$：$n \\bmod 4 = 0 \\to n$，$1 \\to 1$，$2 \\to n+1$，$3 \\to 0$\n\n找单独数 / Nim（异或和 0 必败）\n\n**【定律】** 分配（双向）、吸收 `a&(a|b)=a`、德摩根 `~(a&b)=~a|~b`\n\n**【移位】** `x<<k` = $x \\times 2^k$（防溢出写 `1LL<<k`）\n\n负数右移是 floor，C++ 除法是向零截断：`-7>>1=-4` ≠ `-7/2=-3`\n\n$x \\bmod 2^k =$ `x & (2^k - 1)`\n\n**【神器】** `x&(x-1)` 去掉最低位 1（判 2 幂 / 数 1 个数）\n\n`x&(-x)` 取出最低位 1（lowbit，树状数组）\n\n`x&(x+1)==0` $\\iff$ x 是 $2^k - 1$\n\n**【四件套】** 取：`>>i & 1`　置：`| 1<<i`　清：`& ~(1<<i)`　翻：`^ 1<<i`\n\n**【大小链】** `a&b ≤ min ≤ max ≤ a|b ≤ a+b`；`a^b ≤ a|b`\n\n**【优先级】** `~ > */% > +- > <<>> > 关系 > == > & > ^ > | > &&`\n\n大坑：`x & 1 == 0` 实为 `x & (1==0)` 恒假；`1<<2+3 = 32`\n\n铁律：位运算一律加括号！\n\n**【无符号坑】** `-1 < 1u` 为假；`unsigned i≥0` 恒真；空容器 `size()-1` 爆炸\n\n**【常数】** $2^{31}=2147483648$　INT_MAX $= 2147483647$　$2^{10} \\approx 10^3$\n\n> **使用建议**：每天默写一遍速记卡；做题时优先用\"逐位分析\"和\"大小关系链\"两条思路排除选项；遇到负数、unsigned、优先级三类题先警觉三分——初赛的坑 90% 藏在这三处。",
+        "timeComplexity": "未知",
+        "spaceComplexity": "未知",
+        "tags": [
+            "位运算",
+            "补码",
+            "异或",
+            "移位",
+            "状压",
+            "运算符优先级",
+            "CSP初赛"
+        ],
+        "codePath": "",
+        "prerequisites": [],
+        "related": [
+            "math-quick-pow-basic",
+            "ds-bit-point-range",
+            "basic-digit-power-cycle-self"
+        ]
+    },
+    {
         "id": "graph-bellman-ford",
         "category": "图论",
         "subcategory": "最短路",
@@ -2017,6 +2043,37 @@ const KNOWLEDGE_DATA = [
             "graph-dag-shortest-path",
             "graph-topo-sort",
             "graph-e-dcc-condensation"
+        ]
+    },
+    {
+        "id": "graph-scc-dag-dp",
+        "category": "图论",
+        "subcategory": "连通分量",
+        "subSubcategory": "强连通分量",
+        "title": "SCC缩点 + DAG上拓扑DP（最大权值路径）",
+        "content": "## 算法原理\n\n### 核心问题\n\n给定一个有向图，每个节点有权值 $W_i$。求一条路径，使得路径上经过的所有节点权值之和最大。**路径可以经过环上的所有节点**（因为一旦进入一个环，就可以走完整个环再出来）。\n\n### 为什么不能直接 DP\n\n在一般有向图中，环的存在导致无法定义拓扑序，直接 DP 会产生状态依赖环（无限递归）。但如果把每个强连通分量（SCC）缩成一个\"超级点\"，环就消失了——因为同一个 SCC 内的所有节点互相可达，一旦进入就可以走遍整个 SCC。\n\n### 解决方案：SCC缩点 + DAG上DP\n\n分三步：\n\n1. **Tarjan 求 SCC**：找出所有强连通分量，每个 SCC 的权值 = 内部所有节点权值之和\n2. **构建缩点图**：跨 SCC 的边变成超级点之间的边，缩点图是 DAG\n3. **拓扑排序 + DP**：在 DAG 上按拓扑序做最大权值路径 DP\n\n### 状态定义\n\n$$A[u] = \\text{以超级点 } u \\text{ 为终点的最大权值路径和}$$\n\n### 状态转移方程\n\n对于超级点 $u$，其所有前驱 $v$（即缩点图中 $v \\to u$ 的 $v$）：\n\n$$A[u] = \\max_{v \\to u} \\left( A[v] + SCC\\_w[u] \\right)$$\n\n入度为 0 的超级点（没有前驱）初始化为：\n\n$$A[u] = SCC\\_w[u]$$\n\n最终答案：\n\n$$\\text{ans} = \\max_{u=1}^{cnt} A[u]$$\n\n## 逐行代码解析\n\n### 全局变量\n\n```cpp\nint tim, col_cnt, sk_top;        // DFS时间戳、SCC数量、栈顶指针\nvector<bool> in_sk;               // 是否在栈中\nvector<int> dfn, low, sk, col;    // 时间戳、low值、栈、SCC编号\nvector<int> in_rt, W;            // 入度、节点权值\nvector<int> SCC_w;               // 每个SCC的权值之和\nvector<vector<int>> edges;        // 原图邻接表\nvector<vector<int>> col_arr;     // 每个SCC包含的节点列表\nvector<vector<int>> SCC_edges;   // 缩点图邻接表\n```\n\n| 变量 | 含义 |\n|------|------|\n| `tim` | DFS 时间戳计数器，从 1 开始递增 |\n| `col_cnt` | SCC 总数 |\n| `sk` / `sk_top` | Tarjan 算法中的栈及栈顶指针 |\n| `col[u]` | 节点 u 所属的 SCC 编号 |\n| `SCC_w[i]` | 第 i 个 SCC 的权值（内部所有节点权值之和） |\n| `in_rt[u]` | 超级点 u 在缩点图中的入度 |\n| `col_arr[i]` | 第 i 个 SCC 包含的所有原图节点 |\n\n### init 函数：初始化\n\n```cpp\nvoid init(int n)\n{\n    W.assign(n + 1, 0);\n    SCC_w.assign(1, 0);          // SCC_w[0] 占位，从1开始\n    dfn.assign(n + 1, 0);\n    low.assign(n + 1, 0);\n    edges.assign(n + 1, vector<int>());\n    sk.assign(n + 5, 0);\n    in_sk.assign(n + 1, false);\n    in_rt.assign(n + 1, false);\n    col_arr.emplace_back();       // col_arr[0] 占位\n    col.assign(n + 1, 0);\n    tim = 1;\n    col_cnt = 0;\n    sk_top = 0;\n}\n```\n\n**关键点**：\n- `SCC_w` 和 `col_arr` 从下标 1 开始存（下标 0 占位），后续每发现一个 SCC 就 `emplace_back` 追加\n- `sk` 开 $n+5$ 防越界（最坏情况所有节点入栈）\n- `tim` 从 1 开始，这样 `dfn[u] == 0` 可以表示\"未访问\"\n\n### mark 函数：标记节点入栈\n\n```cpp\nvoid mark(int rt)\n{\n    dfn[rt] = low[rt] = tim++;    // 分配时间戳\n    sk[sk_top++] = rt;            // 压栈\n    in_sk[rt] = true;             // 标记在栈中\n}\n```\n\n与标准 Tarjan 一致：新访问的节点初始化 `dfn = low`，压入栈中。\n\n### tarjan 函数：求SCC + 计算SCC权值\n\n```cpp\nvoid tarjan(int rt)\n{\n    mark(rt);\n    for (int i : edges[rt])\n    {\n        if (!dfn[i])                      // 未访问：继续DFS\n        {\n            tarjan(i);\n            low[rt] = min(low[rt], low[i]);\n        }\n        else if (in_sk[i])                // 在栈中：回边\n            low[rt] = min(low[rt], dfn[i]);\n    }\n    if (dfn[rt] == low[rt])               // rt 是 SCC 的根\n    {\n        col_arr.emplace_back();           // 新建 SCC 节点列表\n        SCC_w.emplace_back();             // 新建 SCC 权值\n        ++col_cnt;\n        while (in_sk[rt])                 // 弹栈直到 rt 自己弹出\n        {\n            int tmp = sk[sk_top - 1];\n            col_arr[col_cnt].emplace_back(tmp);\n            col[tmp] = col_cnt;           // 标记 SCC 编号\n            in_sk[tmp] = false;\n            SCC_w[col_cnt] += W[tmp];     // 累加节点权值\n            sk_top--;\n        }\n    }\n}\n```\n\n**与标准 Tarjan 的区别**：在弹栈时多了一行 `SCC_w[col_cnt] += W[tmp]`，将同一 SCC 内所有节点的权值求和，作为超级点的权值。\n\n| 步骤 | 代码 | 含义 |\n|------|------|------|\n| 分配时间戳 | `dfn[rt] = low[rt] = tim++` | 标记访问顺序 |\n| 树边递归 | `tarjan(i)` 后 `low[rt] = min(low[rt], low[i])` | 用子节点 low 更新自己 |\n| 回边更新 | `in_sk[i]` 为真时 `low[rt] = min(low[rt], dfn[i])` | 用栈中祖先的 dfn 更新 |\n| 判定 SCC 根 | `dfn[rt] == low[rt]` | rt 无法到达更早的节点 |\n| 弹栈建分量 | `while (in_sk[rt])` | 弹出 rt 及其上方所有节点 |\n\n### SCC 函数：构建缩点图\n\n```cpp\nvoid SCC()\n{\n    in_rt.assign(col_cnt + 1, 0);\n    SCC_edges.assign(col_cnt + 1, vector<int>());\n    vector<int> vis(col_cnt + 1, 0);      // 去重标记\n    for (int u = 1; u <= col_cnt; u++)     // 枚举每个 SCC\n    {\n        for (int i : col_arr[u])           // 枚举 SCC 中的原图节点\n        {\n            for (int j : edges[i])         // 枚举该节点的出边\n            {\n                int v = col[j];            // 终点所属的 SCC\n                if (vis[v] == u || u == v) continue;  // 去重 + 跳过自环\n                vis[v] = u;\n                SCC_edges[u].emplace_back(v);\n                in_rt[v]++;               // 终点 SCC 入度+1\n            }\n        }\n    }\n}\n```\n\n**去重技巧**：`vis[v] = u` 表示\"当前处理 SCC u 时已向 v 连过边\"。因为 u 递增，无需清空 vis 数组。\n\n### fn 函数：拓扑排序 + DP\n\n```cpp\nint fn(int n)\n{\n    // 第一步：对每个未访问节点跑 Tarjan\n    int head = 0, tail = 0;\n    for (int i = 1; i <= n; i++)\n    {\n        if (!dfn[i]) tarjan(i);\n    }\n    vector<int> deq(col_cnt + 2, 0);   // 拓扑排序队列（手写双指针队列）\n    vector<int> A(col_cnt + 2, 0);     // DP 数组\n    SCC();                             // 构建缩点图\n\n    // 第二步：入度为0的超级点入队，初始化 DP\n    int ans = 0;\n    for (int i = 1; i <= col_cnt; i++)\n    {\n        if (!in_rt[i])                 // 入度为0：DAG的起点\n        {\n            deq[tail++] = i;\n            A[i] = SCC_w[i];           // 初始化：起点路径权值 = 自身权值\n            ans = max(ans, SCC_w[i]);\n        }\n    }\n\n    // 第三步：拓扑序 DP\n    while (head < tail)\n    {\n        int i = deq[head++];           // 取出队首\n        for (int j : SCC_edges[i])    // 枚举缩点图出边 i→j\n        {\n            in_rt[j]--;                // 终点入度-1\n            A[j] = max(A[i] + SCC_w[j], A[j]);  // 转移：前驱+自身 vs 当前最大\n            if (!in_rt[j])             // 入度归零：所有前驱已处理\n            {\n                deq[tail++] = j;\n                ans = max(ans, A[j]);  // 更新全局答案\n            }\n        }\n    }\n    return ans;\n}\n```\n\n| 阶段 | 代码 | 作用 |\n|------|------|------|\n| 初始化 | `A[i] = SCC_w[i]` | 入度为 0 的超级点，路径权值 = 自身权值 |\n| 转移 | `A[j] = max(A[i] + SCC_w[j], A[j])` | 从前驱 i 走到 j，路径和 = A[i] + SCC_w[j] |\n| 答案 | `ans = max(ans, A[j])` | 每个超级点入队时更新全局最大值 |\n\n> **注意**：DP 转移在拓扑序上进行，保证处理 j 时其所有前驱 i 的 A[i] 已经是最终值。\n\n### 手写队列 vs std::queue\n\n代码用 `deq` 数组 + `head/tail` 指针模拟队列，而不是 `queue<int>`：\n\n| 方式 | 优点 | 缺点 |\n|------|------|------|\n| 手写数组队列 | 无动态分配开销，常数小 | 需手动管理大小 |\n| `std::queue` | 安全，无需关心容量 | 内部用 deque，常数略大 |\n\n在竞赛中两者均可，手写队列是追求极限常数时的选择。\n\n## 复杂度分析\n\n- **时间复杂度**：$O(n + m)$\n  - Tarjan 求 SCC：每个节点和边各访问一次，$O(n + m)$\n  - 构建缩点图：遍历所有节点和边，$O(n + m)$\n  - 拓扑排序 + DP：每个超级点和缩点图边各处理一次，$O(cnt + m') \\leq O(n + m)$\n- **空间复杂度**：$O(n + m)$\n  - 原图邻接表 $O(n + m)$，缩点图邻接表 $O(cnt + m') \\leq O(n + m)$\n  - 各种辅助数组合计 $O(n)$\n\n## 适用场景\n\n1. **最大权值路径**：有向图上节点带权，求权值和最大的路径（可经过环）\n2. **最长路问题**：有向图上的最长路（边权为正时，先缩点消除环，再 DAG 上 DP）\n3. **连通性 + 优化结合**：需要同时利用连通性（缩点）和最优性（DP）的问题\n4. **游戏/博弈问题**：有向图上的博弈，环代表循环状态，缩点后在 DAG 上做博弈 DP\n\n## 常见陷阱与注意事项\n\n1. **tarjan 调用位置**：代码在 `fn()` 中调用 tarjan，而不是在 `init` 后立即调用。确保 `SCC()` 在 tarjan 之后调用（依赖 `col` 和 `col_arr`）\n2. **`in_rt` 数组复用**：`in_rt` 在 `init` 中初始化为全 false，在 `SCC()` 中重新 `assign` 为缩点图入度。不要混淆这两个阶段\n3. **手写队列大小**：`deq` 开 `col_cnt + 2`，确保不会越界\n4. **未连通图**：代码在 `fn` 中对所有未访问节点调用 tarjan，正确处理了森林（多个不连通分量）\n5. **自环处理**：`SCC()` 中 `u == v` 跳过自环，确保缩点图是严格 DAG\n6. **负权值**：代码用 `ans` 初始化为 0，如果所有权值都为负，答案会错误地返回 0。应初始化为 `INT_MIN` 或第一个 `SCC_w` 值\n\n## 对比与扩展\n\n### 与 SCC 缩点模板的关系\n\n| 知识点 | 区别 |\n|--------|------|\n| `graph-tarjan-scc` | 仅求 SCC，不做缩点 |\n| `graph-scc-condensation` | 求 SCC + 构建缩点图，不做 DP |\n| **本知识点** | 求 SCC + 构建缩点图 + 拓扑 DP，完整流水线 |\n\n本知识点是前两者的完整应用：将缩点技术应用到具体的优化问题上。\n\n### DAG 上 DP 的其他变体\n\n| 变体 | 转移方程 | 区别 |\n|------|---------|------|\n| 最大权值路径 | $A[u] = \\max(A[v] + w[u])$ | 求最大和 |\n| 最长路（边权） | $A[u] = \\max(A[v] + w_{v \\to u})$ | 边带权，不是点带权 |\n| 方案数 | $C[u] = \\sum C[v]$ | 统计路径数量，注意取模 |\n| 最短路（DAG） | $D[u] = \\min(D[v] + w_{v \\to u})$ | 拓扑序松弛 |\n\n### 进阶：传递闭包\n\n缩点后还可在 DAG 上求传递闭包（可达性）。用 bitset 优化可达 $O(n^2 / 64)$，适合 $n \\leq 2000$ 的场景。",
+        "timeComplexity": "O(n+m)",
+        "spaceComplexity": "O(n+m)",
+        "tags": [
+            "图论",
+            "强连通分量",
+            "缩点",
+            "Tarjan",
+            "拓扑排序",
+            "DAG DP",
+            "最长路"
+        ],
+        "codePath": "图论\\连通分量\\SCC缩点DAG DP\\源.cpp",
+        "prerequisites": [
+            "graph-tarjan-scc",
+            "graph-scc-condensation",
+            "graph-topo-sort"
+        ],
+        "related": [
+            "graph-scc-condensation",
+            "graph-tarjan-scc",
+            "graph-dag-shortest-path",
+            "graph-topo-sort"
         ]
     },
     {
@@ -2678,6 +2735,11 @@ const CATEGORY_META = {
         "nature": "I/O优化技术",
         "description": "通过自定义读写函数替代标准I/O，在处理大规模数据时显著提升程序效率。",
         "problemDomain": "竞赛中大量数据的快速读写场景"
+    },
+    "初赛笔记": {
+        "nature": "竞赛理论知识",
+        "description": "CSP 初赛涉及的理论知识与考点总结，不包含代码实现，侧重概念理解、公式记忆和应试技巧。涵盖位运算、数据类型、运算符优先级、进制转换等初赛高频考点。",
+        "problemDomain": "CSP 初赛的选择题、判断题、程序阅读题等理论考核场景"
     }
 };
 
@@ -2798,6 +2860,9 @@ const SUBCATEGORY_META = {
     },
     "基础算法|搜索": {
         "description": "通过DFS/BFS等搜索策略系统地枚举或寻找最短路径。DFS+回溯是组合搜索的核心技术，通过递归尝试所有选择并在不满足条件时回退，配合剪枝可大幅减少无效搜索。BFS按层扩展保证无权图最短路，双向BFS从起点和终点同时扩展以减少搜索范围。是排列、组合、子集、迷宫最短路等问题的基础范式。"
+    },
+    "初赛笔记|位运算": {
+        "description": "CSP 初赛位运算核心考点：补码表示、三大恒等式、异或性质与应用、代数定律、移位运算、lowbit操作、状压集合、运算符优先级、有符号/无符号坑、大小关系不等式链、常数与进制转换。不涉及代码实现，侧重公式记忆与考场速算。"
     }
 };
 

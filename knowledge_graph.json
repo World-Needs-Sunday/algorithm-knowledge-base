@@ -34,6 +34,11 @@
       "nature": "I/O优化技术",
       "description": "通过自定义读写函数替代标准I/O，在处理大规模数据时显著提升程序效率。",
       "problemDomain": "竞赛中大量数据的快速读写场景"
+    },
+    "初赛笔记": {
+      "nature": "竞赛理论知识",
+      "description": "CSP 初赛涉及的理论知识与考点总结，不包含代码实现，侧重概念理解、公式记忆和应试技巧。涵盖位运算、数据类型、运算符优先级、进制转换等初赛高频考点。",
+      "problemDomain": "CSP 初赛的选择题、判断题、程序阅读题等理论考核场景"
     }
   },
   "subcategories": {
@@ -153,6 +158,9 @@
     },
     "基础算法|搜索": {
       "description": "通过DFS/BFS等搜索策略系统地枚举或寻找最短路径。DFS+回溯是组合搜索的核心技术，通过递归尝试所有选择并在不满足条件时回退，配合剪枝可大幅减少无效搜索。BFS按层扩展保证无权图最短路，双向BFS从起点和终点同时扩展以减少搜索范围。是排列、组合、子集、迷宫最短路等问题的基础范式。"
+    },
+    "初赛笔记|位运算": {
+      "description": "CSP 初赛位运算核心考点：补码表示、三大恒等式、异或性质与应用、代数定律、移位运算、lowbit操作、状压集合、运算符优先级、有符号/无符号坑、大小关系不等式链、常数与进制转换。不涉及代码实现，侧重公式记忆与考场速算。"
     }
   },
   "knowledgePoints": {
@@ -1059,6 +1067,27 @@
       "related": [
         "basic-radix-sort-k",
         "basic-divide-conquer-merge-inversion"
+      ]
+    },
+    "exam-bit-operation": {
+      "prerequisites": [],
+      "related": [
+        "math-quick-pow-basic",
+        "ds-bit-point-range",
+        "basic-digit-power-cycle-self"
+      ]
+    },
+    "graph-scc-dag-dp": {
+      "prerequisites": [
+        "graph-tarjan-scc",
+        "graph-scc-condensation",
+        "graph-topo-sort"
+      ],
+      "related": [
+        "graph-scc-condensation",
+        "graph-tarjan-scc",
+        "graph-dag-shortest-path",
+        "graph-topo-sort"
       ]
     }
   },

@@ -159,8 +159,8 @@ function build() {
         const raw = fs.readFileSync(filepath, 'utf8');
         const { meta, body } = parseFrontmatter(raw);
 
-        // 校验必填字段
-        const required = ['id', 'title', 'category', 'subcategory', 'codePath'];
+        // 校验必填字段（codePath 对初赛笔记等无代码知识点为可选）
+        const required = ['id', 'title', 'category', 'subcategory'];
         for (const field of required) {
             if (!meta[field]) {
                 warnings.push(`⚠️  ${filename}: 缺少字段 "${field}"`);
