@@ -3,7 +3,7 @@ id: prob-array-replacement
 title: 'D. Array Replacement（差分数组上交换相邻同奇偶项）'
 oj: ''
 problemId: ''
-difficulty: '困难'
+difficulty: '中等'
 category: '基础题'
 tags: ["差分数组", "排序", "贪心", "字典序最小", "奇偶性", "构造"]
 timeComplexity: 'O(n log n)'

@@ -5,7 +5,7 @@ const PROBLEMS_DATA = [
         "title": "D. Array Replacement（差分数组上交换相邻同奇偶项）",
         "oj": "",
         "problemId": "",
-        "difficulty": "困难",
+        "difficulty": "中等",
         "category": "基础题",
         "tags": [
             "差分数组",
@@ -249,7 +249,7 @@ const PROBLEMS_DATA = [
         "title": "D1. XOR 排序（简单版）— 对齐块分段判定",
         "oj": "",
         "problemId": "",
-        "difficulty": "困难",
+        "difficulty": "中等",
         "category": "基础题",
         "tags": [
             "位运算",

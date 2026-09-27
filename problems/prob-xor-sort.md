@@ -3,7 +3,7 @@ id: prob-xor-sort
 title: 'D1. XOR 排序（简单版）— 对齐块分段判定'
 oj: ''
 problemId: ''
-difficulty: '困难'
+difficulty: '中等'
 category: '基础题'
 tags: ["位运算", "XOR", "分块", "排序判定", "贪心", "二进制"]
 timeComplexity: 'O(n log n)'
