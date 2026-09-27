@@ -55,7 +55,7 @@
 
 ## 2. 知识点分类体系
 
-当前已有 104 个知识点，分 8 个大类：
+当前已有 105 个知识点，分 8 个大类：
 
 | 大类 (category) | 子分类 (subcategory) | 知识点 ID |
 |---|---|---|
@@ -91,6 +91,7 @@
 | 图论 | 二分图 | `graph-bipartite-dfs-coloring`（DFS染色判定）, `graph-bipartite-hungarian`（匈牙利算法·最大匹配） |
 | 数学 | 数论基础 | `math-gcd-lcm`（GCD与LCM）, `math-sieve-eratosthenes`（埃氏筛）, `math-euler-phi`（欧拉函数）, `math-linear-sieve-phi`（线性筛求欧拉函数）, `math-linear-sieve-divisor-count`（线性筛求约数个数）, `math-linear-sieve-divisor-sum`（线性筛求约数和）, `math-modular-inverse`（模逆元·费马小定理）, `math-crt`（中国剩余定理CRT） |
 | 数学 | 数论计数 | `math-lcm-pair-count` |
+| 数学 | 组合数学 | `math-stars-and-bars`（隔板法·Stars and Bars） |
 | 数学 | 矩阵 | `math-matrix-multiplication`（矩阵乘法）, `math-matrix-quick-pow`（矩阵快速幂）, `math-matrix-linear-recurrence`（矩阵加速线性递推） |
 | 数学 | 快速幂 | `math-quick-pow-basic`, `math-quick-pow-highprecision` |
 | 字符串 | 字符串哈希 | `str-hash` |

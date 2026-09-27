@@ -27,8 +27,8 @@
     },
     "数学": {
       "nature": "数论与组合数学",
-      "description": "数论相关的算法与计数问题，包括快速幂运算和数论计数。",
-      "problemDomain": "模运算、高精度计算、数论计数等数学问题"
+      "description": "数论与组合数学相关的算法与计数问题，包括数论基础、组合计数、快速幂、矩阵运算等。",
+      "problemDomain": "模运算、组合计数、高精度计算、数论计数等数学问题"
     },
     "输入输出": {
       "nature": "I/O优化技术",
@@ -146,6 +146,9 @@
     },
     "数学|数论计数": {
       "description": "数论相关的计数问题，利用GCD、LCM等数论性质进行高效统计。"
+    },
+    "数学|组合数学": {
+      "description": "组合数学的核心计数方法与技巧，包括隔板法（Stars and Bars）、容斥原理、排列组合等。是各类计数问题的基础工具。"
     },
     "输入输出|IO优化": {
       "description": "通过自定义读写函数替代scanf/printf，在大量I/O时提升数倍效率。竞赛必备基础技能。"
@@ -919,6 +922,13 @@
       "related": [
         "math-gcd-lcm",
         "math-quick-pow-basic"
+      ]
+    },
+    "math-stars-and-bars": {
+      "prerequisites": [],
+      "related": [
+        "basic-combination-dfs",
+        "math-lcm-pair-count"
       ]
     },
     "basic-permutation-dfs": {
