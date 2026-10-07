@@ -48,6 +48,9 @@
     "基础算法|双指针": {
       "description": "利用两个指针的协作（同向、对撞、快慢）在线性时间内解决问题。核心在于指针移动策略所维护的不变量。"
     },
+    "基础算法|高精度": {
+      "description": "用数组或字符串存储超出内置类型范围的大整数，模拟人工列竖式进行加减乘除运算。是处理阶乘、组合数、大幂等大数问题的基础工具。"
+    },
     "基础算法|数位提升": {
       "description": "按数位逐层处理数字的周期性和幂次问题，将大数运算分解为数位级别的迭代。"
     },
@@ -114,6 +117,9 @@
     "图论|拓扑排序": {
       "description": "对DAG进行线性排序，使得每条边的起点在终点之前。基于BFS的Kahn算法是最常用实现。"
     },
+    "图论|树的重心": {
+      "description": "树中删除后各连通块大小均不超过 n/2 的节点。是点分治的核心，保证分治深度为 O(log n)。一次 DFS 回溯即可找到所有重心，时间复杂度 O(n)。"
+    },
     "图论|树链剖分": {
       "description": "将树拆分为若干条重链，使任意路径最多跨越O(log n)条链。配合线段树实现O(log²n)路径修改/查询和O(log n)子树修改/查询，是静态树上操作的核心工具。"
     },
@@ -167,6 +173,12 @@
     }
   },
   "knowledgePoints": {
+    "basic-high-precision": {
+      "prerequisites": [],
+      "related": [
+        "math-quick-pow-highprecision"
+      ]
+    },
     "basic-interval-scheduling": {
       "prerequisites": [],
       "related": [
@@ -677,6 +689,15 @@
       "related": [
         "graph-kruskal",
         "graph-dijkstra-heap"
+      ]
+    },
+    "graph-centroid": {
+      "prerequisites": [
+        "graph-topo-sort"
+      ],
+      "related": [
+        "graph-hld-segtree",
+        "graph-lca-doubling"
       ]
     },
     "graph-lca-doubling": {

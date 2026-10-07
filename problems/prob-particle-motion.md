@@ -4,11 +4,11 @@ title: '粒子运动（动量守恒模拟优化）'
 oj: ''
 problemId: ''
 difficulty: '中等'
-category: '基础题'
+category: '数学'
 tags: ["模拟", "贪心", "动量守恒", "物理类比", "优化"]
 timeComplexity: 'O(n)'
 spaceComplexity: 'O(1)'
-codePath: '题目专辑\基础题\粒子运动\新建 文本文档.cpp'
+codePath: '题目专辑\数学\粒子运动\代码.cpp'
 ---
 
 ## 题目描述

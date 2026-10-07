@@ -4,11 +4,11 @@ title: 'D. 两位数字符串（前缀和取模 + LCS）'
 oj: ''
 problemId: ''
 difficulty: '困难'
-category: '基础题'
+category: '动态规划'
 tags: ["字符串", "前缀和", "取模", "LCS", "动态规划", "贪心转DP", "构造"]
 timeComplexity: 'O(nm)'
 spaceComplexity: 'O(nm)（可滚动优化至 O(min(n,m))）'
-codePath: '题目专辑\基础题\两位数字符串\代码.cpp'
+codePath: '题目专辑\动态规划\两位数字符串\代码.cpp'
 ---
 
 ## 题目描述

@@ -4,11 +4,11 @@ title: 'E. 时停滞（Chronostasis）— 差分排列贪心还原'
 oj: ''
 problemId: ''
 difficulty: '困难'
-category: '基础题'
+category: '数据结构'
 tags: ["差分数组", "贪心", "字典序最小", "multiset", "排列", "前缀和", "构造"]
 timeComplexity: 'O(n log n)'
 spaceComplexity: 'O(n)'
-codePath: '题目专辑\基础题\时停滞Chronostasis\代码.cpp'
+codePath: '题目专辑\数据结构\时停滞Chronostasis\代码.cpp'
 ---
 
 ## 题目描述

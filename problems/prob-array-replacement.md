@@ -4,11 +4,11 @@ title: 'D. Array Replacement（差分数组上交换相邻同奇偶项）'
 oj: ''
 problemId: ''
 difficulty: '中等'
-category: '基础题'
+category: '数据结构'
 tags: ["差分数组", "排序", "贪心", "字典序最小", "奇偶性", "构造"]
 timeComplexity: 'O(n log n)'
 spaceComplexity: 'O(n)'
-codePath: '题目专辑\基础题\ArrayReplacement\代码.cpp'
+codePath: '题目专辑\数据结构\ArrayReplacement\代码.cpp'
 ---
 
 ## 题目描述

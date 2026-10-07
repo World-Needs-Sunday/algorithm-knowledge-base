@@ -4,11 +4,11 @@ title: 'D1. XOR 排序（简单版）— 对齐块分段判定'
 oj: ''
 problemId: ''
 difficulty: '中等'
-category: '基础题'
+category: '数学'
 tags: ["位运算", "XOR", "分块", "排序判定", "贪心", "二进制"]
 timeComplexity: 'O(n log n)'
 spaceComplexity: 'O(n)'
-codePath: '题目专辑\基础题\XOR排序\代码.cpp'
+codePath: '题目专辑\数学\XOR排序\代码.cpp'
 ---
 
 ## 题目描述
