@@ -1,4 +1,5 @@
 ---
+id: math-matrix-multiplication
 title: '矩阵乘法'
 category: '数学'
 subcategory: '矩阵'

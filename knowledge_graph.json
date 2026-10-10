@@ -66,6 +66,12 @@
     "动态规划|状态压缩DP": {
       "description": "用二进制位表示集合状态的动态规划技巧，将集合决策压缩为整数。适用于n较小的排列、路径、集合覆盖等问题，是TSP等NP问题的常用解法。"
     },
+    "动态规划|数位DP": {
+      "description": "按数位逐位处理的动态规划，用于统计区间内满足特定条件的数字个数或数码出现次数。核心思想是将大问题拆解为数位级别的子问题，通过记忆化搜索或公式推导高效求解。"
+    },
+    "动态规划|区间DP": {
+      "description": "在区间[l,r]上定义状态的动态规划，大区间的最优解由小区间合并而来。典型问题包括石子合并、能量项链、括号匹配、加分二叉树等，是DP的重要分支。"
+    },
     "数据结构|前缀和与差分": {
       "description": "通过预处理前缀和实现O(1)区间求和，差分支持O(1)区间修改。是最基础也是最高效的数据结构工具。"
     },
@@ -377,6 +383,20 @@
       "related": [
         "dp-tree-dance",
         "dp-01bag-standard"
+      ]
+    },
+    "dp-digit-count": {
+      "prerequisites": [],
+      "related": [
+        "basic-high-precision"
+      ]
+    },
+    "dp-interval-stone-merge": {
+      "prerequisites": [
+        "dp-linear-triangle"
+      ],
+      "related": [
+        "dp-digit-count"
       ]
     },
     "ds-prefix-sum-1d": {

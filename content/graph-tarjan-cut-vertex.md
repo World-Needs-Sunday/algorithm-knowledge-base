@@ -1,4 +1,5 @@
 ---
+id: graph-tarjan-cut-vertex
 title: 'Tarjan 求割点'
 category: '图论'
 subcategory: '割点与桥'

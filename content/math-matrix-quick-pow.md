@@ -1,4 +1,5 @@
 ---
+id: math-matrix-quick-pow
 title: '矩阵快速幂'
 category: '数学'
 subcategory: '矩阵'
