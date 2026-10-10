@@ -11,7 +11,7 @@ spaceComplexity: 'O(n²)'
 codePath: '题目专辑\动态规划\P5664 Emiya家今天的饭\代码.cpp'
 ---
 
-# P5664 Emiya 家今天的饭
+## P5664 Emiya 家今天的饭
 
 ## 一、题目描述
 

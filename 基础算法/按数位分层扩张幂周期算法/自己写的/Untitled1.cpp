@@ -53,9 +53,6 @@ void add(int j)
 }
 int main()
 {
-	//开始计时 
-	clock_t start = clock();
-	
 	int k;
 	num A;
 	read(A);
@@ -95,10 +92,5 @@ int main()
 		putchar(ans[n] + 48);
 		--n;
 	}
-	
-	//结束计时 
-	clock_t end = clock();
-	double avg = (double)(end-start)/CLOCKS_PER_SEC*1000 / 1000;
-	printf("单次平均耗时：%.3f 毫秒\n",avg);
 	return 0;
 }

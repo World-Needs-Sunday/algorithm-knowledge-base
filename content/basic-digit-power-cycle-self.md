@@ -1,6 +1,6 @@
 ---
 id: basic-digit-power-cycle-self
-title: '按数位分层扩张幂周期算法（自己写的 P1050循环）'
+title: '按数位分层扩张幂周期算法（洛谷 P1050）'
 category: 基础算法
 subcategory: 数位提升
 tags: ["基础算法", "数位提升", "Hensel提升", "大整数", "幂周期", "P1050"]
@@ -41,49 +41,52 @@ $$\text{ans} \leftarrow \text{ans} \times j, \quad \text{tg} \leftarrow \text{tg
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
+/*洛谷P1050*/
 struct num
 {
 	int v[105];                    // 低位在前存储十进制位
-	num() { memset(v, 0, sizeof(v)); }
+	num() { memset(v, 0, sizeof(v));}
 };
-
 // 读入大整数，逆序存储（低位在前）
 void read(num& tmp)
 {
 	char ch = getchar();
 	int idx = 0;
-	while (ch <= '9' && ch >= '0') {
+	while (ch <= '9' && ch >= '0')
+	{
 		tmp.v[idx++] = ch - 48;
 		ch = getchar();
 	}
 	reverse(tmp.v, tmp.v + idx);   // 逆序：低位在前
 }
-
 // 截断到末 k 位的高精度乘法（等价于模 10^k）
 struct num mul(num& a, num& b, int k)
 {
 	num ans;
 	for (int i = 0; i < k; i++)
+	{
 		for (int j = 0; j < k; j++)
-			if (i + j < k) ans.v[i + j] += a.v[i] * b.v[j];
-	for (int i = 0; i < k; i++) {   // 统一进位
+		{
+			if(i + j < k) ans.v[i + j] += a.v[i] * b.v[j];
+		}
+	}
+	for (int i = 0; i < k; i++)
+	{
 		ans.v[i + 1] += ans.v[i] / 10;
 		ans.v[i] %= 10;
 	}
 	return ans;
 }
-
-int ans[200];  // 循环节长度（大整数，低位在前）
-int n = 1;     // ans 的有效位数
-
-// ans = ans * j（大数乘小整数，全精度不截断）
+int ans[200];
+int n = 1;
 void add(int j)
 {
 	int tmp[200];
 	memset(tmp, 0, sizeof(tmp));
 	for (int i = 0; i < n; i++) tmp[i] = ans[i] * j;
 	int i = 0;
-	while (i < n || tmp[i] != 0) {  // 进位直到无残留
+	while (i < n || tmp[i] != 0)
+	{
 		tmp[i + 1] += tmp[i] / 10;
 		tmp[i] %= 10;
 		++i;
@@ -91,7 +94,6 @@ void add(int j)
 	n = i;
 	for (int i = 0; i < n; i++) ans[i] = tmp[i];
 }
-
 int main()
 {
 	int k;
@@ -99,33 +101,40 @@ int main()
 	read(A);
 	scanf("%d", &k);
 
-	num tg = A;        // tg = A^ans，初始 ans=1 时 tg=A
-	ans[0] = 1;        // ans 初始为 1
-
-	for (int i = 0; i < k; i++)      // 逐位提升
+	num tg = A;
+	ans[0] = 1;
+	for (int i = 0; i < k; i++)
 	{
 		bool fg = false;
-		num tmp = mul(A, tg, k);     // A * tg，检查 j=1 情形
-		if (tmp.v[i] == A.v[i]) continue;  // 该位已匹配，无需累乘
-
-		num newtg = tg;
-		for (int j = 2; j <= 10; j++)
+		num tmp = mul(A,tg,k);
+		if (tmp.v[i] == A.v[i]) continue;
+		else
 		{
-			newtg = mul(newtg, tg, k);    // newtg = tg^j
-			if (mul(A, newtg, k).v[i] == A.v[i])  // A * tg^j 第 i 位匹配
+			num newtg = tg;
+			for (int j = 2; j <= 10; j++)
 			{
-				add(j);            // ans *= j
-				fg = true;
-				tg = newtg;        // tg = tg^j
-				break;
+				newtg = mul(newtg, tg, k);
+				if (mul(A, newtg, k).v[i] == A.v[i])
+				{
+					add(j);
+					fg = true;
+					tg = newtg;
+					break;
+				}
+			}
+			if (!fg)
+			{
+				printf("-1");
+				return 0;
 			}
 		}
-		if (!fg) { printf("-1"); return 0; }  // 无解
 	}
-
-	// 输出 ans（逆序：高位在前）
 	n -= 1;
-	while (n >= 0) { putchar(ans[n] + 48); --n; }
+	while (n >= 0)
+	{
+		putchar(ans[n] + 48);
+		--n;
+	}
 	return 0;
 }
 ```

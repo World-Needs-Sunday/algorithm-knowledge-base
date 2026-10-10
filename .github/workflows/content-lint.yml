@@ -1,0 +1,54 @@
+name: 内容质检 (content lint)
+
+# 在每次推送/PR 时跑内容门禁，把"元数据缺失、代码与讲解不同步、乱码、行尾"等问题拦在发布前。
+#
+# 分两个阶段使用：
+#   · 现在（仓库还有历史遗留 error）：默认不阻塞，只产出报告，去 Actions 页面看 summary / 下载 artifact。
+#   · 清理完 error 之后：在仓库 Settings → Secrets and variables → Actions → Variables
+#     新建变量 LINT_STRICT = true，此 workflow 就会在有 error 时直接失败（真正的门禁）。
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: 运行内容质检
+        id: lint
+        continue-on-error: ${{ vars.LINT_STRICT != 'true' }}
+        run: |
+          node tools/lint.js --report --quiet || echo "lint 返回非零（存在 error），详见报告"
+          echo "---- 报告摘要 ----"
+          sed -n '1,40p' tools/lint-report.md || true
+
+      - name: 把报告写入 Job Summary
+        if: always()
+        run: |
+          {
+            echo "## 内容质检报告"
+            echo ""
+            echo '```'
+            sed -n '1,60p' tools/lint-report.md 2>/dev/null || echo "(没有生成报告)"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 上传完整报告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: content-lint-report
+          path: tools/lint-report.md
+          if-no-files-found: warn

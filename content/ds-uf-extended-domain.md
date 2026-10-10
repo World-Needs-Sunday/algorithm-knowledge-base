@@ -108,7 +108,7 @@ codePath: '数据结构\并查集\并查集(扩展域并查集)\Untitled1.cpp'
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-/*代紅1892*/
+/*洛谷1892*/
 vector<int> A;
 void init(int n)
 {

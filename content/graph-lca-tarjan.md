@@ -3,7 +3,7 @@ id: graph-lca-tarjan
 title: '最近公共祖先 LCA（Tarjan 离线·并查集）'
 category: 图论
 subcategory: 最近公共祖先
-tags: ["图论", "树", "LCA", "最近公共祖先", "Tarjan", "离线算法", "并查集", "DFS", "Union-Find"]
+tags: ["图论", "树", "LCA", "最近公共祖先", "Tarjan", "离线算法", "并查集"]
 timeComplexity: 'O(n + m·α(n))'
 spaceComplexity: 'O(n + m)'
 codePath: '图论\最近公共祖先\Tarjan\Untitled1.cpp'

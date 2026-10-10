@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="算法知识点查询系统">
+  <rect width="64" height="64" rx="14" fill="#1e293b"/>
+  <!-- 知识图谱：节点 + 连边 -->
+  <g stroke="#3b82f6" stroke-width="3" stroke-linecap="round" opacity="0.85">
+    <line x1="20" y1="20" x2="20" y2="44"/>
+    <line x1="20" y1="20" x2="44" y2="20"/>
+    <line x1="44" y1="20" x2="44" y2="44"/>
+    <line x1="20" y1="44" x2="44" y2="44"/>
+    <line x1="20" y1="20" x2="44" y2="44"/>
+  </g>
+  <g fill="#60a5fa">
+    <circle cx="20" cy="20" r="6"/>
+    <circle cx="44" cy="20" r="6"/>
+    <circle cx="20" cy="44" r="6"/>
+    <circle cx="44" cy="44" r="6"/>
+  </g>
+</svg>

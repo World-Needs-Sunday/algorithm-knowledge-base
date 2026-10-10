@@ -6,13 +6,15 @@ subcategory: '矩阵'
 difficulty: '基础'
 tags: ['数学', '矩阵', '矩阵乘法', '线性代数']
 prerequisites: ['二维数组']
+timeComplexity: 'O(n × m × k)'
+spaceComplexity: 'O(n × m)'
 codePath: '数学\矩阵\源.cpp'
 description: '两个矩阵相乘的朴素实现，先判断可乘条件（A的列数等于B的行数），再通过三重循环按行乘列的点积方式计算结果矩阵，时间复杂度O(n·m·k)。'
 ---
 
-# 矩阵乘法
+## 矩阵乘法
 
-## 一、问题定义
+## 一、算法原理与问题定义
 
 读入两个矩阵 $A$ 和 $B$，计算它们的乘积 $C = A \times B$；如果维度不满足相乘条件，则输出错误提示。
 
@@ -45,7 +47,7 @@ mat.assign(n + 1, vector<long long>(m + 1, 0));
 - 代价是第 0 行、第 0 列的空间闲置，开销可忽略。
 - 这个约定会统一约束后面所有函数的循环边界——全程序保持同一套下标语义是正确性的基础。
 
-## 三、模块一：read_mat —— 读入
+## 三、逐行代码解析 1/4：read_mat —— 读入
 
 ```cpp
 void read_mat(vector<vector<long long>>& mat, int n, int m)
@@ -70,7 +72,7 @@ void read_mat(vector<vector<long long>>& mat, int n, int m)
 | `assign` 一石二鸟 | 既分配空间，又把所有元素初始化为 0——后续累加所需的"清零"在此一并完成 |
 | 行优先读入 | 外层扫行、内层扫列，与输入格式"每行 m 个数"一致 |
 
-## 四、模块二：mul_mat —— 判维与计算（核心）
+## 四、逐行代码解析 2/4：mul_mat —— 判维与计算（核心）
 
 ### 1. 判维：失败信号的设计
 
@@ -127,7 +129,7 @@ for (int i = 1; i < n; i++)
 
 `mul_mat` 的签名 `const vector<vector<long long>>& A, const vector<vector<long long>>& B` 用 `const&` 接收两个乘数——既避免了值拷贝的开销，又在编译期防止函数体内误改 A、B。
 
-## 五、模块三：write_mat —— 输出
+## 五、逐行代码解析 3/4：write_mat —— 输出
 
 ```cpp
 void write_mat(const vector<vector<long long>>& mat)
@@ -164,7 +166,7 @@ void write_mat(const vector<vector<long long>>& mat)
 
 每行末尾会多打一个空格（`cout << mat[i][j] << ' '` 无差别打印）。多数判题器可容忍；若题目对格式要求严格，可改为"元素间以空格分隔、行末不留空格"的写法，例如先输出第一个元素，其余元素前各补一个空格。
 
-## 六、main 函数：串联三段式
+## 六、逐行代码解析 4/4：main 函数串联三段式
 
 ```cpp
 int main()
@@ -210,6 +212,12 @@ $$C = \begin{bmatrix} 19 & 22 \\ 43 & 50 \end{bmatrix}$$
 | 空间 | $O(n \times m)$ | 三个矩阵，总计 $O(nm)$ |
 
 这是朴素矩阵乘法的标准复杂度；更大规模需借助分块或 Strassen 类算法，常规题目无此需求。
+
+## 适用场景
+
+- **矩阵乘法模板题**：给定两个矩阵求乘积，直接三重循环即可
+- **作为矩阵快速幂 / 线性递推加速的基座**：矩阵乘法是 $A^k$ 的 $O(n^3 \log k)$ 计算与斐波那契类 $O(\log n)$ 递推的基础（见「十、扩展与延伸」）
+- **不适用**：$n$ 很大的稠密矩阵相乘时，朴素 $O(n^3)$ 会超时，需要分块、Strassen 类算法，或利用矩阵的稀疏性
 
 ## 九、常见陷阱
 

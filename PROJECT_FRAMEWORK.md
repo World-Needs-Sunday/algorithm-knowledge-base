@@ -1,767 +1,322 @@
-# 项目框架与操作指南
+# 框架文件 · 算法知识点知识库
 
-> **用途**：本文件是项目的结构地图和操作手册。每次需要添加/修改/删除知识点时，直接查阅本文件即可，无需重新遍历整个项目。
+> **这份文件给谁看**：任何要维护本站的 AI（Trae / Claude Code / Codex / Cursor / 对话式 AI）。
+> **读完它能干什么**：快速理解整个网页的结构与数据流，并正确执行四个操作——**添加知识点 / 添加题目 / 修改内容 / 构建上传 GitHub**。
+> **配套**：[`README.md`](README.md)（项目说明）、[`AGENTS.md`](AGENTS.md)（铁律入口）、[`docs/内容质量标准.md`](docs/内容质量标准.md)（A/B/C 级底线）、[`docs/让AI了解本站-提示词.md`](docs/让AI了解本站-提示词.md)（新会话入项提示词）、`.trae/skills/`（四个能力的逐步流程）。
 
 ---
 
-## 1. 项目整体结构
+## 0. 30 秒速览
+
+| 问题 | 答案 |
+|---|---|
+| 网站是什么 | 纯静态算法/知识点查询站（单文件 `index.html` + 三个构建产物），GitHub Pages 托管 |
+| 内容从哪来 | `content/*.md`（知识点 109 篇）、`problems/*.md`（题目 20 道）、各分类目录下的 `.cpp`（你本人写的代码） |
+| 怎么生成网页数据 | `node build.js` → `data.js` + `problems_data.js` + `code_data.js` |
+| 改了内容怎么验证 | `node tools/lint.js`（**error 必须为 0**）→ `node build.js` → 浏览器 Ctrl+F5 |
+| 什么绝对不能做 | ① 代写 `.cpp` 实现 ② 手改三个产物 ③ 不过门禁就交付 |
+| 四个能力在哪 | `.trae/skills/add-knowledge`、`add-problem`、`edit-content`、`release-github` |
+
+---
+
+## 1. 三条铁律（最高优先级）
+
+1. **不代写解题代码。**
+   所有 `.cpp`（知识点示例、题目正解、暴力程序、造数据程序）由用户本人编写。
+   **允许**：讲思路、指出 bug 与修复方向、列边界清单、写对拍脚本框架、review 代码、删除调试输出。
+   **禁止**：生成或补全这些 `.cpp` 的实现，或在正文里写出完整可提交代码。
+   例外：用户明确说"破例帮我写"时，回复首行标注 `⚠️ 已按你的破例要求代写代码`。
+2. **改完必须过门禁。** `node tools/lint.js`（error 必须 0）→ `node build.js`。
+3. **内容源是唯一真相。** `data.js` / `code_data.js` / `problems_data.js` 是构建产物，永不手改。
+
+---
+
+## 2. 目录结构与数据流
 
 ```
 算法 - 副本/
-├── index.html          # 前端页面（单文件，含 CSS + JS）
-├── build.js            # 构建脚本（扫描 content/ + problems/ + knowledge_graph.json 生成 data.js + problems_data.js + code_data.js）
-├── knowledge_graph.json # 知识图谱（分类描述 + 前置/相关知识点关系）
-├── data.js             # [自动生成] 知识点元数据 + Markdown 正文 + 知识图谱数据（勿手动编辑）
-├── problems_data.js   # [自动生成] 题目专辑数据（勿手动编辑）
-├── code_data.js        # [自动生成] C++ 代码内容（知识点 + 题目共用，勿手动编辑）
-├── content/            # 知识点 Markdown 源文件（每篇一个 .md）
-├── problems/           # 题目专辑 Markdown 源文件（每题一个 .md）
-├── 题目专辑/            # 题目 C++ 代码目录（按分类/题名 组织）
-├── vendor/             # 本地前端依赖（KaTeX、marked、highlight.js）
-│   ├── katex.min.js / katex.min.css / auto-render.min.js
-│   ├── marked.min.js
-│   ├── highlight.min.js / github-dark.min.css
-│   └── fonts/
-├── 动态规划/            # C++ 代码目录（按分类/子分类/具体算法 组织）
-├── 数据结构/
-├── 图论/
-├── 数学/
-├── 字符串/
-├── 基础算法(有价值的题目集)/
-└── 输入,输出/
+├── index.html              # 前端单文件（布局 + KaTeX 三步法 + 搜索 + 标签筛选 + hash 路由）
+├── build.js                # 构建脚本（唯一需要的"构建系统"）
+├── knowledge_graph.json    # 分类描述 + prerequisites/related
+├── README.md               # 项目说明（人/AI 入口）
+├── AGENTS.md               # 三条铁律 + 入口指引
+├── PROJECT_FRAMEWORK.md    # 本文件
+├── content/                # 知识点源文件（109 篇，平铺）
+├── problems/               # 题目源文件（20 道，平铺）
+├── 动态规划/ 数据结构/ 图论/ 数学/ 字符串/ 基础算法/ 输入,输出/   # 知识点 .cpp
+├── 题目专辑/                # 题目 .cpp
+├── templates/              # kp-template.md / problem-template.md
+├── tools/                  # lint.js（门禁）+ new-kp.js + new-problem.js + stress.*（对拍）
+├── docs/                   # 内容质量标准.md / 网页版总结提示词.md
+├── .trae/skills/           # 四个能力技能
+├── vendor/                 # 本地前端依赖（KaTeX / marked / highlight.js + 字体）
+├── data.js problems_data.js code_data.js   # 【产物】不要手改
+└── .github/workflows/      # 内容质检 CI（可选）
 ```
 
-**核心数据流**：
-- 知识点：`content/*.md` + `各分类目录/*.cpp` + `knowledge_graph.json` → `node build.js` → `data.js` + `code_data.js`
-- 题目专辑：`problems/*.md` + `题目专辑/*.cpp` → `node build.js` → `problems_data.js`（代码合并到 `code_data.js`）
-- `index.html` 加载 `data.js` + `problems_data.js` + `code_data.js` 渲染
+**数据流**：
 
-### data.js 输出结构
-
-| 变量名 | 内容 | 来源 |
-|---|---|---|
-| `KNOWLEDGE_DATA` | 知识点数组（含 id/title/category/content/prerequisites/related 等） | content/*.md + knowledge_graph.json |
-| `CATEGORY_META` | 大类元数据（nature/description/problemDomain） | knowledge_graph.json |
-| `SUBCATEGORY_META` | 子分类描述（key: "大类\|子分类"） | knowledge_graph.json |
-| `SUBSUBCATEGORY_META` | 小分类描述（key: "大类\|子分类\|小分类"） | knowledge_graph.json |
-
-### problems_data.js 输出结构
-
-| 变量名 | 内容 | 来源 |
-|---|---|---|
-| `PROBLEMS_DATA` | 题目数组（含 id/title/oj/problemId/difficulty/category/tags/content 等） | problems/*.md |
-
----
-
-## 2. 知识点分类体系
-
-当前已有 105 个知识点，分 8 个大类：
-
-| 大类 (category) | 子分类 (subcategory) | 知识点 ID |
-|---|---|---|
-| 基础算法 | 贪心 | `basic-interval-scheduling`（区间调度）, `basic-interval-merge`（区间合并） |
-| 基础算法 | 双指针 | `basic-two-pointer-cycle`（链表环检测） |
-| 基础算法 | 分治 | `basic-divide-conquer-merge-inversion`（归并排序求逆序对）, `basic-quickselect-kth`（快速选择）, `basic-divide-conquer-closest-pair`（最近点对） |
-| 基础算法 | 数位提升 | `basic-digit-power-cycle-self`（按数位分层扩张幂周期） |
-| 基础算法 | 排序 | `basic-radix-sort-k`（k进制基数排序）, `basic-shell-sort`（希尔排序） |
-| 基础算法 | 搜索 | `basic-permutation-dfs`（DFS生成全排列）, `basic-combination-dfs`（DFS生成组合）, `basic-bfs-bidirectional`（双向BFS）, `basic-meet-in-middle-binary-search`（折半搜索·二分查找版）, `basic-meet-in-middle-two-pointer`（折半搜索·双指针合并版） |
-| 动态规划 | 背包问题 | 01背包: `dp-01bag-standard`, `dp-01bag-2d`, `dp-01bag-record`, `dp-count-01bag`; 完全背包: `dp-complete-bag`; 多重背包: `dp-multi-bag-binary`, `dp-multi-bag-monotone`; 分组背包: `dp-group-bag` |
-| 动态规划 | 线性DP | LCS: `dp-linear-lcs-length`, `dp-linear-lcs-output`, `dp-linear-lcs-substring`; LIS: `dp-linear-lis-binary`, `dp-linear-lis-bit-count`; 经典模型: `dp-linear-edit-distance`, `dp-linear-maxsub`, `dp-linear-triangle` |
-| 动态规划 | 树形DP | `dp-tree-01bag`, `dp-tree-dance` |
-| 动态规划 | 状态压缩DP | 路径问题: `dp-bitmask-hamilton` |
-| 数据结构 | 树状数组 | `ds-bit-point-range`, `ds-bit-range-point` |
-| 数据结构 | 分块 | `ds-block-decomposition` |
-| 数据结构 | 莫队 | `ds-mo-team` |
-| 数据结构 | 单调队列 | `ds-monoqueue-1d`, `ds-monoqueue-2d` |
-| 数据结构 | 前缀和与差分 | 一维: `ds-prefix-sum-1d`, `ds-diff-1d`; 二维: `ds-prefix-sum-2d`, `ds-diff-2d`; 树上: `ds-prefix-sum-tree`, `ds-diff-tree` |
-| 数据结构 | 可持久化线段树 | `ds-persistent-segtree-3919`, `ds-persistent-segtree-template` |
-| 数据结构 | 线段树 | `ds-segtree-basic`, `ds-segtree-discretize`, `ds-segtree-mul` |
-| 数据结构 | 平衡树 | `ds-splay` |
-| 数据结构 | 堆 | `ds-dual-heap` |
-| 数据结构 | 栈 | `ds-stack-prefix-max`（前缀最值）, `ds-monostack-histogram`（单调栈） |
-| 数据结构 | ST表 | `ds-st-table-1`, `ds-st-table-2` |
-| 数据结构 | 并查集 | 基础: `ds-uf-basic`, `ds-uf-rank`; 带权: `ds-uf-weighted-old`, `ds-uf-weighted-food`; 扩展域: `ds-uf-extended-domain` |
-| 图论 | 最短路 | 单源最短路: `graph-dijkstra-heap`, `graph-bellman-ford`, `graph-spfa`; 全源最短路: `graph-floyd`, `graph-johnson`; DAG最短路: `graph-dag-shortest-path` |
-| 图论 | 最小生成树 | `graph-kruskal`, `graph-prim` |
-| 图论 | 最近公共祖先 | `graph-lca-doubling`, `graph-lca-tarjan`, `graph-lca-hld` |
-| 图论 | 拓扑排序 | `graph-topo-sort` |
-| 图论 | 树链剖分 | `graph-hld-segtree` |
-| 图论 | 割点与桥 | `graph-tarjan-cut-vertex`（Tarjan求割点）, `graph-tarjan-bridge`（Tarjan求桥） |
-| 图论 | 连通分量 | 强连通分量: `graph-tarjan-scc`（Tarjan求SCC）, `graph-scc-condensation`（SCC缩点）, `graph-scc-dag-dp`（SCC缩点+DAG上拓扑DP·最大权值路径）; 边双连通分量: `graph-e-dcc-condensation`（E-DCC缩点） |
-| 图论 | 二分图 | `graph-bipartite-dfs-coloring`（DFS染色判定）, `graph-bipartite-hungarian`（匈牙利算法·最大匹配） |
-| 数学 | 数论基础 | `math-gcd-lcm`（GCD与LCM）, `math-sieve-eratosthenes`（埃氏筛）, `math-euler-phi`（欧拉函数）, `math-linear-sieve-phi`（线性筛求欧拉函数）, `math-linear-sieve-divisor-count`（线性筛求约数个数）, `math-linear-sieve-divisor-sum`（线性筛求约数和）, `math-modular-inverse`（模逆元·费马小定理）, `math-crt`（中国剩余定理CRT） |
-| 数学 | 数论计数 | `math-lcm-pair-count` |
-| 数学 | 组合数学 | `math-stars-and-bars`（隔板法·Stars and Bars） |
-| 数学 | 矩阵 | `math-matrix-multiplication`（矩阵乘法）, `math-matrix-quick-pow`（矩阵快速幂）, `math-matrix-linear-recurrence`（矩阵加速线性递推） |
-| 数学 | 快速幂 | `math-quick-pow-basic`, `math-quick-pow-highprecision` |
-| 字符串 | 字符串哈希 | `str-hash` |
-| 字符串 | 最小表示法 | `str-minimal-representation` |
-| 字符串 | 字符串匹配 | `str-kmp`（KMP算法）, `str-sunday`（Sunday算法） |
-| 输入输出 | IO优化 | `io-fast-io` |
-| 初赛笔记 | 位运算 | `exam-bit-operation`（CSP初赛位运算完全笔记） |
-
-### ID 命名规范
-
-格式：`{分类前缀}-{子分类缩写}-{具体算法名}`
-
-| 分类前缀 | 对应大类 | 示例 |
-|---|---|---|
-| `basic-` | 基础算法 | `basic-palindrome-stack` |
-| `dp-` | 动态规划 | `dp-01bag-standard` |
-| `ds-` | 数据结构 | `ds-segtree-basic` |
-| `graph-` | 图论 | `graph-johnson` |
-| `io-` | 输入输出 | `io-fast-io` |
-| `exam-` | 初赛笔记 | `exam-bit-operation` |
-| `math-` | 数学 | `math-quick-pow-basic` |
-| `str-` | 字符串 | `str-hash` |
-
-同一算法有多个版本时，用后缀区分：`-standard`、`-2d`、`-binary`、`-monotone`、`-template`、`-self`（自己写的）、`-old`（旧版）等。
-
----
-
-## 3. 文件格式规范
-
-### 3.1 Markdown 知识点文件 (`content/*.md`)
-
-**文件名**：`{id}.md`，如 `graph-johnson.md`
-
-**文件结构**：
-
-```markdown
----
-id: graph-johnson
-title: 'Johnson 全源最短路（负权图）'
-category: 图论
-subcategory: 最短路
-tags: ["图论", "最短路", "Johnson", "全源最短路", "负权边"]
-timeComplexity: 'O(nm log n)'
-spaceComplexity: 'O(n^2 + n + m)'
-codePath: '图论\最短路\Johnson\Untitled1.cpp'
----
-
-## 算法原理
-（正文内容...）
-
-## 后续各章节...
+```
+content/*.md ─┐
+problems/*.md ─┼─► build.js ─┬─► data.js          KNOWLEDGE_DATA + CATEGORY_META + SUBCATEGORY_META
+knowledge_graph.json ─┘       ├─► problems_data.js PROBLEMS_DATA
+各分类/*.cpp ─────────────────┴─► code_data.js     CODE_DATA（key = codePath）
+                                     ↓
+                          index.html 渲染（公式走 KaTeX 三步法，代码走 highlight.js）
 ```
 
-### 3.2 Frontmatter 字段说明
+**build.js 的关键行为**（写内容时要顺着它）：
 
-| 字段 | 必填 | 说明 | 示例 |
-|---|---|---|---|
-| `id` | 是 | 知识点唯一标识，与文件名（去 .md）一致 | `graph-johnson` |
-| `title` | 是 | 显示标题，用单引号包裹 | `'Johnson 全源最短路（负权图）'` |
-| `category` | 是 | 大类（见分类体系表） | `图论` |
-| `subcategory` | 是 | 子分类 | `最短路` |
-| `subSubcategory` | 否 | 小分类（子分类内的进一步分组，如"栈"下设"前缀最值""单调栈"） | `单调栈` |
-| `tags` | 否 | 标签数组 | `["图论", "最短路", "Johnson"]` |
-| `timeComplexity` | 否 | 时间复杂度 | `'O(nm log n)'` |
-| `spaceComplexity` | 否 | 空间复杂度 | `'O(n^2 + n + m)'` |
-| `codePath` | 否 | C++ 代码文件相对路径（反斜杠）。初赛笔记等无代码知识点可省略 | `'图论\最短路\Johnson\Untitled1.cpp'` |
-
-> **前置/相关知识点**：`prerequisites` 和 `related` 不在 .md frontmatter 中定义，而是在 `knowledge_graph.json` 中统一管理。build.js 读取后自动合并到 `KNOWLEDGE_DATA`。
-
-### 3.3 正文章节规范
-
-**数据结构类知识点**（8 个章节）：
-
-1. `## 算法原理` — 核心思想、数据结构定义
-2. `## 核心公式/状态定义` — 数学公式（LaTeX）+ 结构定义（偏数学型数据结构用）
-   或 `## 数据结构图示` — ASCII 图示例，展示结构布局（偏结构型数据结构用）
-3. `## 数据结构图示` — ASCII 图示例，操作过程示意图（若第 2 章是公式，则本章为图示）
-   或 `## 核心操作详解` — 逐个操作分小节讲解（若第 2 章是图示，则本章为操作）
-4. `## 逐行代码解析` — 代码分块 + 逐行注释
-5. `## 复杂度分析` — 时间/空间复杂度推导
-6. `## 适用场景` — 适用与不适用场景
-7. `## 常见陷阱与注意事项` — 易错点列表
-8. `## 对比与扩展` — 与同类数据结构/算法的表格对比
-
-> **说明**：数据结构类必须包含「数据结构图示」章节。偏结构型（如线段树、并查集）用「图示 + 核心操作」组合；偏数学推导型（如前缀和、差分、ST表）用「核心公式 + 数据结构图示」组合。两种均为 8 章。
-
-**算法类知识点**（7 个章节）：
-
-1. `## 算法原理` — 核心思想、算法框架
-2. `## 核心公式/状态定义与转移方程` — 数学公式（LaTeX）+ 状态转移
-3. `## 逐行代码解析` — 代码分块 + 逐行注释
-4. `## 复杂度分析` — 时间/空间复杂度推导
-5. `## 适用场景` — 适用与不适用场景
-6. `## 常见陷阱与注意事项` — 易错点列表
-7. `## 对比与扩展` — 与同类算法的表格对比
-
-#### 写作禁忌
-
-- **禁止自我修正式表述**：正文中不得出现"等等"、"不对"、"再想想"、"纠正一下"等类似推翻前文、自我辩论的表述。知识点文档是结论性的教学材料，不是思考过程记录。如有需要说明易混淆的点，统一放在「常见陷阱与注意事项」章节中，以正面陈述的方式给出正确结论。
-- **禁止分步试错推导**：不得将中间错误的推导过程写入正文。最终呈现的推导路径应当是正确且连贯的。
-
-**初赛笔记类知识点**（无固定章节数，无代码）：
-
-初赛笔记类知识点不遵循上述 7/8 章结构，其特点：
-- **无 codePath**：不关联 C++ 代码文件，纯理论/应试知识
-- **章节自由**：按考点主题自由组织（如"补码 → 恒等式 → 异或 → 移位 → 速记卡"）
-- **侧重记忆**：公式、口诀、陷阱总结、速记卡等应试导向内容
-- **可用代码块**：展示 C++ 语法片段（如 `x & (x-1)`）但不关联完整代码文件
-- `timeComplexity` 和 `spaceComplexity` 可省略（非算法实现，无复杂度分析）
-
-### 3.4 C++ 代码文件
-
-- **文件名**：统一用 `Untitled1.cpp`（Dev-C++ 默认名，用户习惯）
-- **放置路径**：`{大类}\{子分类}\{具体算法名}\Untitled1.cpp`
-- **编码**：UTF-8（build.js 用 Node.js 自动检测 UTF-8/GBK 编码读取）
-- **示例路径**：`图论\最短路\Johnson\Untitled1.cpp`
-
-### 3.5 codePath 路径映射
-
-`codePath`（frontmatter）→ 项目根目录下的相对路径：
-
-| codePath | 实际文件位置 |
+| 行为 | 说明 |
 |---|---|
-| `图论\最短路\Johnson\Untitled1.cpp` | `算法 - 副本\图论\最短路\Johnson\Untitled1.cpp` |
-| `数据结构\普通线段树\基础模板\Untitled1.cpp` | `算法 - 副本\数据结构\普通线段树\基础模板\Untitled1.cpp` |
-| `动态规划\背包问题模板\01背包\Untitled1.cpp` | `算法 - 副本\动态规划\背包问题模板\01背包\Untitled1.cpp` |
+| 扫描范围 | `content/*.md`、`problems/*.md`（平铺，不递归子目录） |
+| frontmatter 解析 | 正则匹配 `^---\r?\n([\s\S]*?)\r?\n---\r?\n`；逐行 `^(\w+):\s*(.*)$`；数组只支持单行 `[a, b]` |
+| 必填字段 | 知识点 `id/title/category/subcategory`；题目 `id/title/difficulty/category`（缺了只警告不中断） |
+| 代码编码 | 先检测是否合法 UTF-8，否则按 GBK 解码（所以 UTF-8 / GBK 都能读） |
+| 代码缺失 | `codePath` 指向的文件不存在 → 产物里写入 `// 代码文件未找到: xxx` 并告警 |
+| 图谱合并 | `prerequisites` / `related` 只从 `knowledge_graph.json` 读，**不读 .md frontmatter** |
 
-目录结构不需要与 category/subcategory 完全对应，但通常保持一致以便维护。
+---
 
-### 3.6 知识图谱文件 (`knowledge_graph.json`)
+## 3. 内容规范
 
-定义分类描述、子分类描述和知识点间的前置/相关关系。build.js 读取此文件并合并到 data.js。
+### 3.1 知识点 frontmatter（`content/<id>.md`）
 
-**结构**：
+| 字段 | 必填 | 说明 |
+|---|---|---|
+| `id` | ✅ | **必须等于文件名（去 .md）**，小写字母/数字/连字符 |
+| `title` | ✅ | 正式名称，单引号包裹；**禁止**"自己写的""以前没学过""D. xxx"这类字样 |
+| `category` | ✅ | 8 个之一：基础算法 / 动态规划 / 数据结构 / 图论 / 数学 / 字符串 / 输入输出 / 初赛笔记 |
+| `subcategory` | ✅ | 子分类，需在 `knowledge_graph.json` 的 `subcategories` 里登记 |
+| `subSubcategory` | ❌ | 小分类（需在 `subSubcategories` 登记） |
+| `tags` | ❌ | 3–6 个最佳，**最多 8 个** |
+| `timeComplexity` / `spaceComplexity` | ❌ | **不要写"未知"**；数值要与正文、与实现三者一致 |
+| `codePath` | ❌ | 反斜杠相对路径，指向真实存在的 `.cpp`；初赛笔记类可省略 |
+| `level` | ❌ | `A` / `B` / `C`（见 `docs/内容质量标准.md`；缺省按 A 处理） |
+| `verified` | ❌ | 最近人工复核日期 `YYYY-MM-DD` |
 
-```json
+### 3.2 题目 frontmatter（`problems/<id>.md`）
+
+| 字段 | 必填 | 说明 |
+|---|---|---|
+| `id` | ✅ | 等于文件名；建议 `prob-<oj缩写>-<题号>`，如 `prob-luogu-p1050`、`prob-cf-2252d` |
+| `title` | ✅ | 题名；**去掉 `D.`/`C1.` 这类场次编号前缀** |
+| `oj` | ✅ | 洛谷 / Codeforces / AtCoder / ICPC / CSP-S …；查不到就写 `来源未考证`，**不许编** |
+| `problemId` | ✅ | `P1050` / `CF2252D` …；查不到写 `-` |
+| `difficulty` | ✅ | 入门 / 简单 / 中等 / 困难 / 提高 |
+| `category` | ✅ | 侧边栏分组用（按考点大类填） |
+| `tags` / 复杂度 / `codePath` / `level` | ❌ | 同知识点 |
+
+### 3.3 正文章节
+
+**算法类知识点（7 章，标题逐字用）**
+
+```
+## 算法原理
+## 核心公式 / 状态定义与转移方程
+## 逐行代码解析
+## 复杂度分析
+## 适用场景
+## 常见陷阱与注意事项
+## 对比与扩展
+```
+
+**数据结构类知识点（在「核心公式」后插入两章，共 8–9 章）**
+
+```
+## 数据结构图示        ← ASCII 图，展示结构布局与操作过程（数据结构类必须）
+## 核心操作详解        ← 逐个操作分小节（偏结构型；偏数学型可并入公式章）
+```
+
+**题目（章节名同样逐字用）**
+
+```
+## 题目描述 → ### 输入格式 / ### 输出格式 / ### 数据范围   ← 数据范围必须写
+## 样例           ← 必须有（`### 样例 1` + 输入/输出/解释）
+## 解题思路       ← 核心章节：从"看到题想到什么"讲到"为什么这个做法对"
+## 逐行代码解析
+## 复杂度分析
+## 常见陷阱与注意事项
+## 对比与扩展
+```
+
+**初赛笔记类**：章节自由（按考点组织），无 `codePath`、可无复杂度。
+
+### 3.4 代码文件约定
+
+| 项 | 约定 |
+|---|---|
+| 知识点代码路径 | `{大类}\{子分类}\{算法名}\Untitled1.cpp` |
+| 题目代码路径 | `题目专辑\{分类}\{题名}\代码.cpp` |
+| `codePath` 写法 | **反斜杠**、相对项目根、不加前导 `\`，例：`'图论\最短路\Johnson\Untitled1.cpp'` |
+| 编码 | UTF-8 推荐（GBK 也能读） |
+| 正文与代码 | 「逐行代码解析」里的**整段代码必须与 `.cpp` 逐字一致**（lint W028）；只放关键片段 + 逐行说明同样合格 |
+| 提交前 | 搜一遍 `printf` / `cout`，确认没有调试/计时输出（lint W030；残留会 WA） |
+
+### 3.5 知识图谱（`knowledge_graph.json`）
+
+```jsonc
 {
-  "categories": {
-    "数据结构": {
-      "nature": "数据组织与查询",
-      "description": "通过组织数据存储方式实现...",
-      "problemDomain": "区间查询、单点修改..."
-    }
-  },
-  "subcategories": {
-    "数据结构|并查集": {
-      "description": "维护不相交集合的数据结构..."
-    }
-  },
-  "subSubcategories": {
-    "数据结构|并查集|基础": {
-      "description": "基础并查集，仅路径压缩或按秩合并..."
-    },
-    "数据结构|并查集|带权": {
-      "description": "带权并查集，在路径压缩时维护权值关系..."
-    }
-  },
+  "categories":      { "图论": { "nature": "…", "description": "…", "problemDomain": "…" } },
+  "subcategories":   { "图论|最短路": { "description": "…" } },
+  "subSubcategories":{ "图论|最短路|单源最短路": { "description": "…" } },
   "knowledgePoints": {
-    "ds-uf-basic": {
-      "prerequisites": [],
-      "related": ["ds-uf-rank", "graph-kruskal"]
-    }
+    "graph-dijkstra-heap": { "prerequisites": ["ds-uf-basic"], "related": ["graph-floyd", "graph-spfa"] }
   }
 }
 ```
 
-**字段说明**：
+- 新增知识点：必须在 `knowledgePoints` 加条目（否则 lint W013）；新增子分类/小分类要同时补 `subcategories` / `subSubcategories` 描述。
+- `related` **保持双向**（A 指向 B，B 也指向 A），否则 lint W033 会提示不对称。
+- `prerequisites` / `related` 只能用**已存在的知识点 id**（否则 E011）。
 
-| 字段 | 位置 | 说明 |
+### 3.6 命名约定
+
+| 前缀 | 大类 | 例 |
 |---|---|---|
-| `nature` | categories | 分类性质标签（如"最优化方法"） |
-| `description` | categories/subcategories/subSubcategories | 分类/子分类/小分类的详细描述 |
-| `problemDomain` | categories | 该分类处理的问题领域 |
-| `prerequisites` | knowledgePoints | 前置知识点 ID 数组（学习本知识点前应掌握的内容） |
-| `related` | knowledgePoints | 相关知识点 ID 数组（延伸阅读） |
-
-**维护规则**：
-- 添加新知识点时，在 `knowledgePoints` 中添加对应条目
-- 新增子分类时，在 `subcategories` 中添加描述（key: `"大类|子分类"`）
-- 新增小分类时，在 `subSubcategories` 中添加描述（key: `"大类|子分类|小分类"`），同时在对应 .md 文件的 frontmatter 中设置 `subSubcategory` 字段
-- 新增大类时，在 `categories` 中添加描述
-- 前置/相关关系使用知识点 ID 引用，build.js 会在构建时自动关联标题
-
-### 3.7 题目专辑 Markdown 文件 (`problems/*.md`)
-
-**文件名**：`{id}.md`，如 `prob-luogu-p1001.md`
-
-**文件结构**：
-
-```markdown
----
-id: prob-luogu-p1001
-title: 'A+B Problem'
-oj: '洛谷'
-problemId: 'P1001'
-difficulty: '简单'
-category: '基础题'
-tags: ["输入输出", "基础"]
-timeComplexity: 'O(1)'
-spaceComplexity: 'O(1)'
-codePath: '题目专辑\基础题\A+BProblem\Untitled1.cpp'
----
-
-## 题目描述
-（题目正文...）
-
-## 输入格式
-...
-
-## 输出格式
-...
-
-## 样例
-
-### 样例输入
-```
-1 2
-```
-
-### 样例输出
-```
-3
-```
-
-## 解题思路
-（总结细化的思路...）
-
-## 逐行代码解析
-...
-
-## 复杂度分析
-...
-
-## 常见陷阱与注意事项
-...
-```
-
-### 题目 Frontmatter 字段说明
-
-| 字段 | 必填 | 说明 | 示例 |
-|---|---|---|---|
-| `id` | 是 | 题目唯一标识，与文件名（去 .md）一致 | `prob-luogu-p1001` |
-| `title` | 是 | 题目标题 | `'A+B Problem'` |
-| `oj` | 否 | 来源 OJ 平台 | `'洛谷'`、`'Codeforces'`、`'LeetCode'` |
-| `problemId` | 否 | 题目编号 | `'P1001'`、`'CF1234A'` |
-| `difficulty` | 否 | 难度（入门/中等/困难/提高） | `'中等'` |
-| `category` | 是 | 题目分类（用于侧边栏分组） | `'基础题'`、`'贪心'`、`'DP'` |
-| `tags` | 否 | 标签数组 | `["输入输出", "基础"]` |
-| `timeComplexity` | 否 | 时间复杂度 | `'O(n log n)'` |
-| `spaceComplexity` | 否 | 空间复杂度 | `'O(n)'` |
-| `codePath` | 否 | C++ 代码文件相对路径（反斜杠） | `'题目专辑\贪心\xxx\Untitled1.cpp'` |
-
-### 题目正文章节规范
-
-题目正文通常包含以下章节（可根据题目调整）：
-
-1. `## 题目描述` — 题目原文描述
-2. `## 输入格式` — 输入说明
-3. `## 输出格式` — 输出说明
-4. `## 样例` — 样例输入/输出
-5. `## 解题思路` — 总结细化的思路分析（核心部分）
-6. `## 逐行代码解析` — 代码分块 + 逐行注释
-7. `## 复杂度分析` — 时间/空间复杂度
-8. `## 常见陷阱与注意事项` — 易错点
-
-> **说明**：题目文件不需要 knowledge_graph.json 条目，build.js 直接从 frontmatter 读取所有信息。
-
-### 题目难度评定标准
-
-难度分四档，按三维度量化评定：
-
-| 维度 | 权重 | 说明 |
-|---|---|---|
-| 思维层次 | 50% | 需要几次思维跳跃？是否需要反直觉的转化（如降维、逆序、反向标记）？ |
-| 算法数量 | 30% | 涉及几个算法/数据结构？能否直接套模板？是否需要非标准模型？ |
-| 实现复杂度 | 20% | 代码量和细节坑多少？边界条件是否容易出错？ |
-
-| 难度 | 标准 | 典型特征 |
-|---|---|---|
-| 入门 | 单一标准算法，思维直白 | 直接套模板，1 个算法，无思维跳跃 |
-| 中等 | 1-2 个算法组合，1 次关键思维跳跃 | 如降维、逆序、反向标记等，实现不算复杂 |
-| 困难 | 多算法深度结合 / 非标准模型 / 多次思维跳跃 | 细节多有坑，或需要创造性构造 |
-| 提高 | 非标准编程题：程序阅读、程序填空、选择填空等 | 不是直接写代码解题，而是分析完整程序后回答问题 |
-
-> **规则**：标准编程题（写出完整代码解题）按思维层次和算法数量评定「入门/中等/困难」；程序阅读/填空/选择等非标准编程题标「提高」。
-
----
-
-## 4. 前端渲染机制（index.html）
-
-### 4.1 技术栈
-
-| 库 | 用途 | 来源 |
-|---|---|---|
-| KaTeX | 渲染 LaTeX 数学公式 | `vendor/katex.min.js` + `vendor/katex.min.css` |
-| marked.js | Markdown → HTML | `vendor/marked.min.js` |
-| highlight.js | 代码高亮 | `vendor/highlight.min.js` + `vendor/github-dark.min.css` |
-| auto-render | 自动扫描 `$`/`$$` 并渲染 | `vendor/auto-render.min.js` |
-
-### 4.2 三步法 LaTeX 保护（重要！）
-
-marked.js 会破坏 LaTeX 语法（转义反斜杠、拆分 `$` 分隔符）。index.html 用**提取-解析-恢复**三步法保护公式：
-
-1. **提取块级公式** `$$...$$` → 替换为占位符 `@@KATEX0@@`、`@@KATEX1@@`...
-2. **提取行内公式** `$...$` → 同样替换为占位符
-3. **解析 Markdown**（占位符是纯文本，marked.js 不会破坏）
-4. **恢复公式**：将占位符替换为 KaTeX 渲染后的 HTML
-
-### 4.3 页面布局
-
-- **顶部切换栏**：「📖 知识点」/「📝 题目专辑」双模式切换，默认进入知识点模式。点击按钮切换侧边栏和主内容区的数据
-- **左侧栏**：暗色侧边栏，按 category → subcategory → 知识点/题目 三级树展示，顶部有搜索框（支持实时搜索过滤）。点击分类名或子分类名可跳转到分类概览页
-- **标签筛选区**：位于侧边栏搜索框下方，支持按标签筛选知识点/题目
-  - 侧边栏显示常用标签（最多10个），点击标签切换选中状态
-  - 点击「更多 ▼」打开**标签选择弹窗**，所有标签按大类分组展示，可批量选择
-  - 支持**交集/并集**两种筛选模式，点击模式按钮切换：
-    - **交集（默认）**：知识点必须同时包含所有选中的标签才显示（AND 逻辑）
-    - **并集**：知识点只要包含任意一个选中的标签就显示（OR 逻辑）
-  - 筛选后，匹配的分类默认自动展开，方便直接查看结果
-  - 点击「清除」一键清空所有选中的标签
-- **分类概览页**：展示分类性质、描述、问题领域，以及所有子分类的描述和知识点卡片
-- **知识点详情页**：显示 title → 标签/复杂度徽章 → 前置知识点（可点击跳转）→ Markdown 正文 → 代码区块 → 相关知识点（可点击跳转）→ 前后导航按钮
-- **题目详情页**：显示 title → OJ/难度/标签徽章 → 题目描述 → 输入输出格式 → 样例 → 解题思路 → 代码解析 → 复杂度分析 → 陷阱与注意事项
-- **总目录页**：全局概览所有知识点，按分类和子分类组织。分类卡片默认收起，点击展开/收起知识点列表，右侧"查看详情 →"跳转分类概览页
-- **主题**：支持亮/暗主题切换（localStorage 存储）
-- **响应式设计**：
-  - **桌面端（>768px）**：侧边栏始终展开，固定在左侧
-  - **移动端（≤768px）**：侧边栏默认收起，通过左上角 ☰ 菜单按钮展开/收起；点击知识点后自动收起侧边栏
-  - 标签选择弹窗在移动端自适应全屏显示
-
----
-
-## 5. 操作手册
-
-### 5.1 添加新知识点（完整步骤）
-
-**前置确认**：
-- 确定 category（大类）和 subcategory（子分类）
-- 确定 id（按命名规范）
-- 确认是否已有同类知识点可参考
-
-**Step 1：创建 C++ 代码文件**
-
-```
-路径：{项目根}\{大类}\{子分类}\{具体算法名}\Untitled1.cpp
-```
-
-- 如果目录不存在，先创建
-- 代码文件编码推荐 UTF-8，GBK 也可（build.js 自动检测编码）
-
-**Step 2：创建 Markdown 知识点文件**
-
-```
-路径：{项目根}\content\{id}.md
-```
-
-按 3.1 节格式编写 frontmatter + 正文。**注意**：
-- `codePath` 使用反斜杠 `\`，路径与 Step 1 的实际路径一致
-- 数据结构类写 8 个章节，算法类写 7 个章节（见 3.3 节）
-- 参考已有同类知识点的 .md 文件结构和深度
-
-**Step 3：更新知识图谱**
-
-在 `knowledge_graph.json` 中：
-1. 在 `knowledgePoints` 中添加新知识点的 `prerequisites` 和 `related`（见 3.6 节）
-2. 如果新增了子分类，在 `subcategories` 中添加描述
-3. 如果新增了大类，在 `categories` 中添加描述
-
-**Step 4：运行构建**
-
-```bash
-cd "c:\Users\penti\Desktop\算法 - 副本"
-node build.js
-```
-
-构建脚本会：
-1. 扫描 `content/` 下所有 `.md` 文件
-2. 解析 frontmatter 获取元数据
-3. 读取每个 `codePath` 指向的 `.cpp` 文件（自动检测 UTF-8/GBK 编码）
-4. 读取 `knowledge_graph.json` 合并前置/相关知识点和分类描述
-5. 生成 `data.js`（知识点数据 + 知识图谱）和 `code_data.js`（代码内容）
-6. 输出统计信息和警告
-
-**Step 5：验证**
-
-- 构建输出中确认新知识点出现在列表中且无警告
-- 浏览器打开 `index.html`，Ctrl+F5 强制刷新
-- 在左侧栏找到新知识点，检查内容渲染（公式、代码高亮）
-- **重点检查 LaTeX 公式**：确认所有 `$...$` 和 `$$...$$` 公式正确渲染，无红色报错；特别检查 `\text{}` 内是否有未转义的下划线 `_`（须写成 `\_`，见 6.1 节）；同时检查反引号代码段内是否混入了 LaTeX 语法（如 `` `fac[i] = 2^i \bmod \text{mod}` ``），应将代码引用与数学公式分开（见 6.1 节）
-- **检查示例计算**：确认数据结构图示和代码解析中的数值计算正确，不得包含推导过程中的错误尝试或自我纠正步骤；如发现推导有误，应先验证正确结果，再只写入正确的最终版本
-- 检查前置知识点和相关知识点链接是否正确跳转
-
-### 5.2 修改已有知识点
-
-#### 5.2.1 修改正文/元数据
-
-1. 编辑 `content/{id}.md`
-2. 运行 `node build.js`
-3. Ctrl+F5 刷新
-
-#### 5.2.2 修改代码文件（仅改 .cpp，不改文档）
-
-当代码做了小幅修改（如修 bug、改类型、优化循环顺序），但文档中的讲解仍然适用时：
-
-1. **直接编辑** 对应的 `.cpp` 文件
-2. 运行 `node build.js`（codePath 不变则无需改 .md）
-3. Ctrl+F5 刷新
-
-#### 5.2.3 修改代码文件（同步更新文档）
-
-当代码修改影响了文档中的代码片段或讲解内容时，必须同步更新文档：
-
-1. **更新 .cpp 文件** — 替换为最新代码
-2. **更新 content/{id}.md 中的代码块** — 找到文档中所有引用旧代码的 ```cpp 代码段，逐个替换为新代码
-3. **更新文档中的讲解文字** — 如果代码改动涉及函数签名、循环顺序、数据类型等，文档中的逐行解析、要点表、常见陷阱等文字描述也需同步修改
-4. **检查文档中的旧注意事项** — 如果文档中有"本代码用 XXX，应改为 YYY"之类的提醒，改完代码后该提醒已过时，需删除或更新为"已使用 YYY"
-5. 运行 `node build.js`
-6. Ctrl+F5 刷新
-
-**常见场景**：
-
-| 改动类型 | 需更新的文档内容 |
-|---------|----------------|
-| 变量类型变更（如 int→long long） | 代码块 + 陷阱条目 + 注意事项 |
-| 循环顺序变更（如 i-j-k→i-k-j） | 代码块 + 循环变量表 + 细节说明 |
-| 函数签名变更（加 const&、参数化） | 代码块 + 要点表 + 规范性建议 |
-| 新增/删除辅助函数 | 代码块 + 逐行解析章节 |
-| 算法逻辑变更 | 几乎全部章节需重写 |
-
-#### 5.2.4 修改分类/子分类
-
-1. 编辑 .md 的 frontmatter 中 `category`/`subcategory`
-2. 运行 `node build.js`
-3. Ctrl+F5 刷新（侧边栏树会自动重组）
-
-### 5.3 删除知识点
-
-1. 删除 `content/{id}.md` 文件
-2. （可选）删除对应的 `.cpp` 代码目录
-3. 运行 `node build.js`
-4. Ctrl+F5 刷新
-
-### 5.4 添加新题目到题目专辑
-
-**Step 1：创建 C++ 代码文件**
-
-```
-路径：{项目根}\题目专辑\{分类}\{题名}\Untitled1.cpp
-```
-
-- 如果目录不存在，先创建
-- 代码文件编码推荐 UTF-8，GBK 也可
-
-**Step 2：创建题目 Markdown 文件**
-
-```
-路径：{项目根}\problems\{id}.md
-```
-
-按 3.7 节格式编写 frontmatter + 正文。注意：
-- `codePath` 使用反斜杠 `\`，路径与 Step 1 的实际路径一致
-- `category` 决定题目在侧边栏中的分组
-- `difficulty` 填写"简单"/"中等"/"困难"（影响显示颜色）
-- 正文至少包含「题目描述」和「解题思路」
-
-**Step 3：运行构建**
-
-```bash
-node build.js
-```
-
-构建脚本会自动扫描 `problems/` 目录，生成 `problems_data.js`。
-
-**Step 4：验证**
-
-- 浏览器打开 `index.html`，Ctrl+F5 强制刷新
-- 点击侧边栏顶部「📝 题目专辑」切换到题目模式
-- 在侧边栏找到新题目，检查内容渲染
-- 检查 LaTeX 公式和代码高亮是否正常
-
-> **说明**：题目专辑不需要修改 `knowledge_graph.json`，所有信息从 .md 的 frontmatter 读取。
-
-### 5.5 添加初赛笔记（无代码知识点）
-
-**Step 1：创建 Markdown 知识点文件**
-
-```
-路径：{项目根}\content\{id}.md
-```
-
-按 3.1 节格式编写 frontmatter + 正文。**与普通知识点的区别**：
-- **不设 codePath**：frontmatter 中省略 `codePath` 字段（build.js 已支持可选）
-- **不设 timeComplexity / spaceComplexity**：非算法实现，无需复杂度分析
-- **章节自由**：不遵循 7/8 章结构，按考点主题自由组织（见 3.3 节「初赛笔记类知识点」）
-- `category` 填 `初赛笔记`，`subcategory` 按主题填（如 `位运算`）
-
-**Step 2：更新知识图谱**
-
-在 `knowledge_graph.json` 中：
-1. 在 `knowledgePoints` 中添加新知识点的 `prerequisites` 和 `related`
-2. 如果新增了子分类，在 `subcategories` 中添加描述
-
-**Step 3：运行构建**
-
-```bash
-node build.js
-```
-
-**Step 4：验证**
-
-- 浏览器打开 `index.html`，Ctrl+F5 强制刷新
-- 在左侧栏「初赛笔记」分类下找到新知识点
-- 检查内容渲染（公式、代码块、表格）
-- 确认不显示代码区（无 codePath 时前端自动隐藏）
-
-### 5.6 网站功能使用指南
-
-#### 5.6.1 知识点 / 题目模式切换
-
-- 页面顶部有「📖 知识点」和「📝 题目专辑」两个按钮
-- **默认进入知识点模式**，点击按钮可切换模式
-- 切换模式后，侧边栏、搜索框、标签筛选都会同步切换到对应的数据
-- 搜索框占位符会随模式变化："搜索知识点..." / "搜索题目..."
-
-#### 5.6.2 标签筛选
-
-标签筛选是快速定位知识点/题目的重要工具，支持两种筛选模式：
-
-**快速筛选（侧边栏）**：
-1. 侧边栏标签区显示常用标签（最多 10 个，优先显示已选中的）
-2. 点击标签切换选中/取消选中
-3. 点击「清除」按钮一键清空所有选中的标签
-
-**弹窗批量选择**：
-1. 点击「更多 ▼」打开标签选择弹窗
-2. 标签按**大类分组**展示，方便按领域查找
-3. 可逐个点击或批量选择标签
-4. 弹窗底部显示当前已选标签数量，可快速移除
-
-**交集 / 并集模式切换**：
-- 点击「交集 ⇄」按钮切换筛选逻辑
-- **交集模式（默认）**：知识点必须**同时包含所有**选中的标签才会显示（AND 逻辑）
-  - 适用场景：缩小范围，精确查找（如同时选"图论"和"最短路"）
-- **并集模式**：知识点只要**包含任意一个**选中的标签就会显示（OR 逻辑）
-  - 适用场景：扩大范围，浏览多个主题（如同时看"动态规划"和"贪心"）
-- 模式按钮在侧边栏和弹窗中都有，两边状态同步
-
-**筛选效果**：
-- 筛选后，有匹配结果的分类会**自动展开**，方便直接查看
-- 无匹配结果的分类会隐藏
-- 清空标签筛选后，侧边栏恢复默认收起状态
-
-#### 5.6.3 搜索功能
-
-- 在侧边栏顶部搜索框输入关键词，实时过滤知识点/题目
-- 搜索范围包括标题、ID、标签等字段
-- 搜索结果的分类自动展开
-- 搜索与标签筛选可叠加使用（同时生效）
-
-#### 5.6.4 移动端使用
-
-- 屏幕宽度 ≤ 768px 时自动进入移动端布局
-- 侧边栏默认收起，点击左上角 ☰ 按钮展开
-- 点击知识点/题目后，侧边栏自动收起
-- 标签选择弹窗在移动端全屏显示，便于操作
-
----
-
-## 6. 常见陷阱与注意事项
-
-### 6.1 KaTeX 公式转义（高频问题）
-
-| 问题 | 原因 | 解决 |
-|---|---|---|
-| `\text{__builtin_clz}` 报错 | KaTeX 将 `__` 解析为下标 | 写成 `\text{\_builtin\_clz}` 或用 `\text{\_\_builtin\_clz}` |
-| `\text{}` 内含下划线 | `_` 是 KaTeX 下标操作符 | 所有 `\text{}` 内的下划线必须转义为 `\_` |
-| `\text{\_}` 反斜杠被吞 | marked.js 可能剥离 `\_` 中的反斜杠 | **最佳方案：避免在 `\text{}` 内使用下划线**，改用其他符号（如用 `0` 代替占位下划线） |
-| 公式中 `\le` 不显示 | marked.js 转义了反斜杠 | 三步法已处理，确保公式用 `$...$` 或 `$$...$$` 包裹 |
-| 行内公式被 marked.js 破坏 | `$` 被 marked.js 当普通文本 | 三步法提取保护，确保 `$` 两侧无多余空格干扰匹配 |
-| 整个公式显示为原始文本 | 公式内有 KaTeX 无法解析的内容 | 检查 `\text{}` 内特殊字符，一个错误会导致整个公式不渲染 |
-
-**核心原则**：
-- `\text{}` 块内所有 `_` 必须写成 `\_`
-- **若 `\_` 仍不生效，直接避免使用下划线**，用替代符号（如 `0`、`\ast`、`\cdot`）
-
-### 6.2 代码文件编码
-
-- build.js 使用 Node.js 内置的 `TextDecoder('gbk')` 自动检测编码读取 `.cpp` 文件
-- 先检测字节流是否为合法 UTF-8，是则按 UTF-8 读取，否则按 GBK 解码
-- 不再依赖 PowerShell，无执行策略限制
-- 推荐统一保存为 UTF-8 编码，避免编码混乱
-
-### 6.3 路径注意事项
-
-- `codePath` 使用**反斜杠** `\`（Windows 风格）
-- 路径不需要以 `\` 开头，是相对项目根目录的路径
-- build.js 用 `path.join(ROOT, codePath)` 拼接完整路径读取代码文件
-- 如果 codePath 路径与实际文件路径不匹配，build.js 会输出 `// 代码文件未找到: xxx`
-
-### 6.4 构建后必须刷新
-
-- `data.js` 和 `code_data.js` 是静态文件，浏览器会缓存
-- 修改后必须 **Ctrl+F5**（强制刷新）才能看到更新
-- 普通刷新（F5）可能加载缓存的旧版本
-
-### 6.5 data.js / code_data.js 勿手动编辑
-
-- 这两个文件由 build.js 自动生成
-- 手动修改会在下次构建时被覆盖
-- 所有内容修改应在 `content/*.md` 和 `.cpp` 文件中进行
-
----
-
-## 7. build.js 关键逻辑速查
-
-| 功能 | 实现方式 |
+| `basic-` | 基础算法 | `basic-quickselect-kth` |
+| `dp-` | 动态规划 | `dp-01bag-standard` |
+| `ds-` | 数据结构 | `ds-segtree-basic` |
+| `graph-` | 图论 | `graph-johnson` |
+| `math-` | 数学 | `math-quick-pow-basic` |
+| `str-` | 字符串 | `str-kmp` |
+| `io-` | 输入输出 | `io-fast-io` |
+| `exam-` | 初赛笔记 | `exam-bit-operation` |
+| `prob-` | 题目 | `prob-luogu-p1050` |
+
+同算法多版本用后缀区分：`-standard` / `-2d` / `-binary` / `-monotone` / `-template` / `-self`（自己写的）/ `-old`（旧版）。
+
+### 3.7 写作禁忌与渲染陷阱
+
+**禁忌**（lint 会报）：
+
+- 禁止草稿式自我修正：「等等，」「不对，」「纠正一下」「？不，等一下」「我再想想」。
+- 禁止标题自述：「自己写的」「以前没有学的时候写的」「未完成」。
+- 禁止写"我们重新算一下"式推导过程——思路要用**复盘口吻**（"容易先想到 X，但 X 不行，因为…"）。
+- 复杂度不许写"未知"/"待定"。
+- 表格里的 `|`：数学公式内必须转义或改写（见下）。
+- 不出现 `代紅`（"洛谷"的错误编码）、`锟斤拷`、U+FFFD、`\r\r\n`。
+
+**KaTeX 陷阱**（写公式前必看）：
+
+| 陷阱 | 正确写法 |
 |---|---|
-| 扫描 .md 文件 | `fs.readdirSync(CONTENT_DIR).filter(f => f.endsWith('.md')).sort()` |
-| 解析 frontmatter | 正则匹配 `^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$` |
-| 解析 YAML 字段 | 逐行正则 `^(\w+):\s*(.*)$`，数组格式 `[a, b, c]` 单独处理 |
-| 读取代码文件 | Node.js `TextDecoder` 自动检测 UTF-8/GBK 编码读取 |
-| 读取知识图谱 | `JSON.parse(fs.readFileSync(GRAPH_FILE, 'utf8'))` |
-| 输出 data.js | `KNOWLEDGE_DATA` + `CATEGORY_META` + `SUBCATEGORY_META` 三个变量 |
-| 输出 code_data.js | `const CODE_DATA = ${JSON.stringify(codeData, null, 4)}` |
-| 必填字段校验 | `['id', 'title', 'category', 'subcategory']`（codePath 可选，初赛笔记等无代码知识点可省略） |
+| `\text{}` 里的下划线被当成下标 | `\text{\_\_builtin\_clz}`，或干脆避免在 `\text{}` 内用下划线 |
+| 表格里公式含 `|` 会把表格拆成多余单元格 | 写成 `\lvert x \rvert`（不要写 `\|`，那是双竖线范数符号） |
+| `$` 不成对（如正文里的货币符号） | 成对使用；行内公式 `$` 两侧不要留空格 |
+| 反引号代码段里混进 LaTeX | 代码引用与公式分开：`` `fac[i]` ``（即 $2^i \bmod \text{mod}$） |
 
 ---
 
-## 8. 快速参考卡
+## 4. 四个能力（总览；逐步流程在 `.trae/skills/`）
+
+### 4.1 添加知识点 → `.trae/skills/add-knowledge/SKILL.md`
+
+- **触发**："这是新知识点，帮我入库""把这份总结整理成知识点""文件夹里是代码和思路"
+- **输入**：一个文件夹，含 `代码.cpp` + `思路.md`（知识点**没有**题目文件）
+- **产出**：`content/<id>.md` + `{大类}\{子分类}\{算法名}\Untitled1.cpp` + 图谱条目
+- **验收**：`lint` error 0、`build` 正常、浏览器能看到且公式/代码正常渲染
+
+### 4.2 添加题目 → `.trae/skills/add-problem/SKILL.md`
+
+- **触发**："这题加进题目专辑""文件夹里是题目+代码+思路"
+- **输入**：一个文件夹，含 `题目.md` + `代码.cpp` + `思路.md`
+- **产出**：`problems/<id>.md` + `题目专辑\{分类}\{题名}\代码.cpp`
+- **验收**：同 4.1，另外校验 `oj`/`problemId`/`difficulty`/`数据范围`/`样例` 齐全
+
+### 4.3 修改知识点 / 题目 → `.trae/skills/edit-content/SKILL.md`
+
+- **触发**："XX 那条写错了""这里的复杂度不对""样例输出应该是 -1""代码改了，正文也改一下"
+- **输入**：用户的错误描述（可能带截图/原话）
+- **产出**：最小改动的 `.md` 和/或 `.cpp` + 同步的正文代码块
+- **验收**：lint error 0、build 正常、改动前后 diff 清楚、**没有顺手改别的东西**
+
+### 4.4 构建并上传 GitHub → `.trae/skills/release-github/SKILL.md`
+
+- **触发**："更新网站""上传""提交到 GitHub""发布"
+- **步骤**：`lint` → `build` → 前端一致性自检 → `git add/commit/push` → 线上验证（Pages 缓存约 10 分钟）
+- **验收**：推送成功、线上四个产物与本地一致、回滚方法已知
+
+---
+
+## 5. 输入约定：用户上传的文件夹
 
 ```
-添加知识点：
-  1. 写代码   → {大类}\{子分类}\{算法名}\Untitled1.cpp
-  2. 写文档   → content\{id}.md（frontmatter + 章节）
-  3. 更新图谱 → knowledge_graph.json（prerequisites + related）
-  4. 构建     → node build.js
-  5. 验证     → 浏览器 Ctrl+F5
-
-添加题目：
-  1. 写代码   → 题目专辑\{分类}\{题名}\Untitled1.cpp
-  2. 写文档   → problems\{id}.md（frontmatter + 题目描述 + 解题思路）
-  3. 构建     → node build.js
-  4. 验证     → 浏览器 Ctrl+F5（切换到「📝 题目专辑」模式）
-
-添加初赛笔记（无代码）：
-  1. 写文档   → content\{id}.md（frontmatter 无 codePath，章节自由）
-  2. 更新图谱 → knowledge_graph.json（prerequisites + related）
-  3. 构建     → node build.js
-  4. 验证     → 浏览器 Ctrl+F5（在「初赛笔记」分类下查看）
-
-修改知识点：
-  1. 改 .md 或 .cpp
-  2. 改 knowledge_graph.json（如果前置/相关有变化）
-  3. node build.js
-  4. Ctrl+F5
-
-关键路径：
-  知识点文档 → content\{id}.md
-  题目文档   → problems\{id}.md
-  知识点代码 → {大类}\{子分类}\{算法名}\Untitled1.cpp
-  题目代码   → 题目专辑\{分类}\{题名}\Untitled1.cpp
-  知识图谱   → knowledge_graph.json
-  构建脚本   → build.js
-  前端页面   → index.html
-  生成产物   → data.js + problems_data.js + code_data.js
-  依赖库     → vendor\
-
-LaTeX 注意：
-  \text{} 内的下划线必须转义为 \_
-  公式用 $...$ 或 $$...$$ 包裹
-  反引号代码段内不要混入 LaTeX 语法（如 \bmod、\text{}），marked.js 会将反引号内容视为纯文本不渲染公式，且可能干扰 $ 分隔符的解析
-  正确做法：将代码引用与数学公式分开，如 `fac[i]`（即 $2^i \bmod \text{mod}$）
+任意文件夹名/
+├── 题目.md 或 题目.txt      ← 只有题目才有；知识点没有这个文件
+├── 代码.cpp                 ← 用户本人写的实现（初赛笔记类知识点可以没有）
+└── 思路.md 或 思路.txt      ← 用户的思路总结（通常是网页版 AI 总结出的笔记）
 ```
+
+**处理规则**：
+
+1. **文件名不固定**（`题目.md`/`题面.md`/`statement.*`、`代码.cpp`/`Untitled1.cpp`/`源.cpp` 都见过）——按**内容**判断哪个是题面、哪个是代码、哪个是思路（代码看 `#include`/`main`；题面看"题目描述/输入格式/数据范围"；思路看小标题与讲解口吻）。
+2. **代码只搬运、不修改实现**：把用户的 `.cpp` 原样复制到约定路径；只有用户明确要求时才删除调试代码。
+3. **题面必须忠实转述**，不许补写数据范围或样例；查不到来源就写 `来源未考证` / `-`。
+4. **思路文件 → 规范章节**：把 `## 思路是怎么想出来的` 归入 `## 算法原理`，其余映射到「核心公式/复杂度分析/常见陷阱/对比与扩展」；小标题改成第 3.3 节的规范名。
+5. 缺什么就问，不要猜（尤其是 `category` / `subcategory` / `id` / 题号）。
+
+---
+
+## 6. 门禁：`node tools/lint.js`
+
+- 退出码：`0` = 无 error；`1` = 有 error；`2` = 脚本异常。**error 必须清零**，warning 建议修。
+- 常用参数：`--quiet` 只打汇总、`--json` 结构化输出、`--report` 额外写 `tools/lint-report.md`、`node tools/lint.js content/xxx.md` 只查单个文件、`--only=E011,W028` 只跑指定规则。
+
+**最常踩的规则（写内容前对照一遍）**：
+
+| 规则 | 含义 | 怎么避免 |
+|---|---|---|
+| E007 | `codePath` 指向的文件不存在 | 先放 `.cpp`，再写 `codePath`（反斜杠、相对根） |
+| E010 | 乱码（`代紅` 等） | 存 UTF-8；出现"洛谷"就写"洛谷" |
+| W002 | 标题有草稿自述 | 用正式算法/题目名 |
+| W007 / W008 | 缺复杂度 / 写了"未知" | 从代码层数数出来，如实填 |
+| W010 | 标签超过 8 个 | 3–6 个最佳 |
+| W013 | 图谱没有该知识点条目 | 在 `knowledgePoints` 补 `prerequisites`/`related` |
+| W017 | 草稿式自我修正 | 改成结论式陈述 |
+| W019 | 表格公式里有未转义 `|` | 用 `\lvert…\rvert` |
+| W020 | 正文出现一级标题 | 正文从 `##` 开始（标题由 frontmatter 提供） |
+| W022 / W023 | 缺必备章节 / 缺「适用场景」 | 按第 3.3 节补齐 |
+| W024 | 题目缺「输入格式/输出格式/数据范围」 | 三节都写 |
+| W027 | 题目缺 `oj` / `problemId` | 查不到写 `来源未考证` / `-` |
+| W028 | 正文整段代码与 `.cpp` 不一致 | 改任一边就同步另一边 |
+| W030 | 代码块疑似含调试/计时输出 | 删掉 `printf("耗时…")` 这类行 |
+| W033 | `related` 单向 | 双向补齐 |
+| W034 | 产物比内容旧 | 跑 `node build.js` |
+
+---
+
+## 7. 汇报格式（固定四段）
+
+```
+【改动】文件列表（每个文件一句话说明改了什么）
+【验证】node tools/lint.js → error N / warning M；node build.js → X 知识点 / Y 题目（+ 我额外跑的验证）
+【需要你本人做】例如：实现 xxx.cpp / 确认某处结论 / 提供题号
+【待确认】我拿不准或做了判断的地方（写清"我按什么处理，不同意怎么回退"）
+```
+
+---
+
+## 8. 环境事实（可能随时间变化，以实际为准）
+
+| 项 | 值 |
+|---|---|
+| 项目根目录 | `C:\Users\penti\Desktop\算法 - 副本` |
+| Node | 本机 PATH 里可能没有 `node`；Trae/终端里能跑就用，否则装 Node LTS 或用绝对路径 |
+| `g++`（对拍/编译验证） | `C:\CSP_SIM\tools\mingw64\bin\g++.exe`（MinGW-w64 13.2.0） |
+| PowerShell | 执行策略 Restricted：跑 `.ps1` 用 `tools\stress.cmd` 包装或加 `-ExecutionPolicy Bypass` |
+| 脚本编码 | `.trae/skills/*.ps1` 之类保持 **ASCII + CRLF**，否则 Windows PowerShell 5.1 会读成乱码 |
+| GitHub | 仓库 `https://github.com/World-Needs-Sunday/algorithm-knowledge-base.git`，分支 `master`，Pages 托管 |
+| Pages 缓存 | `Cache-Control: max-age=600` —— push 后约 10 分钟线上才更新，别急着下结论 |
+
+---
+
+## 9. 绝对不要做的事
+
+1. ❌ 生成/补全任何 `.cpp` 的实现（含暴力程序、造数据程序）。
+2. ❌ 手改 `data.js` / `code_data.js` / `problems_data.js`。
+3. ❌ 编造题号、样例、年份、出处、数据范围。
+4. ❌ 没跑门禁就宣称"完成了"。
+5. ❌ 顺手重构、批量改格式、改动与任务无关的文件。
+6. ❌ 把用户的 `.cpp` 复制进正文后不核对一致性（W028 就是这么来的）。
+7. ❌ 在正文里留调试输出、草稿痕迹、占位符（`TODO`/`待补充`）。

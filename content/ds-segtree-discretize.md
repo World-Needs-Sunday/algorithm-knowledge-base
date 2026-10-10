@@ -120,7 +120,7 @@ tree[5] += k * (myright[r] - myleft[mid+1] + 1)
 
 ```cpp
 #include<bits/stdc++.h>
-/*代紅P13825*/
+/*洛谷P13825*/
 using namespace std;
 struct T
 {

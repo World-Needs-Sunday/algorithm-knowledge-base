@@ -81,7 +81,7 @@ Lazy 标记下传示例：对 [1,8] 全区间加 k 后，根节点 rt=1 被完�
 
 ```cpp
 #include<bits/stdc++.h>
-/*代紅3372*/ 
+/*洛谷3372*/ 
 using namespace std;
 vector<long long> tree;
 vector<long long> lazy;

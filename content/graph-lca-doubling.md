@@ -3,7 +3,7 @@ id: graph-lca-doubling
 title: '最近公共祖先 LCA（倍增法）'
 category: 图论
 subcategory: 最近公共祖先
-tags: ["图论", "树", "LCA", "最近公共祖先", "倍增法", "二进制跳", "DFS", "动态规划", "多叉树"]
+tags: ["图论", "树", "LCA", "最近公共祖先", "倍增法", "DFS"]
 timeComplexity: '预处理O(n log n)，查询O(log n)'
 spaceComplexity: 'O(n log n)'
 codePath: '图论\最近公共祖先\倍增法\Untitled1.cpp'

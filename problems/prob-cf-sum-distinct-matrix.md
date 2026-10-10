@@ -1,6 +1,6 @@
 ---
 id: prob-cf-sum-distinct-matrix
-title: 'C. Sum of Distinct Values in a Matrix — 双指针贪心与公共值名额分配'
+title: 'Sum of Distinct Values in a Matrix — 双指针贪心与公共值名额分配'
 oj: 'Codeforces'
 problemId: 'C. Sum of Distinct Values in a Matrix'
 difficulty: '困难'
@@ -44,6 +44,13 @@ codePath: '题目专辑\贪心\矩阵不同值之和\代码.cpp'
 
 ---
 
+### 数据范围
+
+- $1 \le t \le 10^4$
+- $1 \le n, m \le 10^5$，$1 \le x, y \le n+m$
+- $1 \le a_i \le n+m$，$1 \le b_i \le n+m$
+- 数据保证所有测试用例的 $n$ 之和不超过 $10^5$，$m$ 之和不超过 $10^5$
+
 ## 样例
 
 ### 样例 1
@@ -84,7 +91,7 @@ codePath: '题目专辑\贪心\矩阵不同值之和\代码.cpp'
 
 ---
 
-## 核心洞察
+## 解题思路：核心洞察
 
 这道题的难点在于将「矩阵行/列覆盖操作」转化为一个纯粹的**名额分配问题**。下面逐步推导。
 

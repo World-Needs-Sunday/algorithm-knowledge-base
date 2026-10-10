@@ -1,11 +1,11 @@
 ---
 id: prob-cf-diss-quack-array-game
-title: 'D. diss_quack and Array Game — 01博弈·进位悬崖·批量折半优化'
+title: 'diss_quack and Array Game — 01博弈·进位悬崖·批量折半优化'
 oj: 'Codeforces'
 problemId: 'D'
 difficulty: '困难'
 category: '数学'
-tags: ["博弈论", "数论", "贪心", "popcount", "位运算", "剪枝", "进位悬崖", "批量折半", "枚举优化"]
+tags: ["博弈论", "数论", "贪心", "位运算", "进位悬崖", "批量折半"]
 timeComplexity: 'O(2^18 + T * 50n)'
 spaceComplexity: 'O(2^18 + n)'
 codePath: '题目专辑\数学\DissQuackArrayGame\源.cpp'
@@ -45,6 +45,11 @@ codePath: '题目专辑\数学\DissQuackArrayGame\源.cpp'
 ## 输出格式
 
 每组输出一个整数——Alice 在双方最优博弈下的操作数。
+
+## 数据范围
+
+- $1 \le t \le 10^4$
+- $1 \le n \le 10^5$
 
 ## 样例
 

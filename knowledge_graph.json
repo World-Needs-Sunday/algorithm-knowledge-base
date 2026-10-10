@@ -182,7 +182,8 @@
     "basic-high-precision": {
       "prerequisites": [],
       "related": [
-        "math-quick-pow-highprecision"
+        "math-quick-pow-highprecision",
+        "dp-digit-count"
       ]
     },
     "basic-interval-scheduling": {
@@ -196,7 +197,8 @@
         "basic-interval-scheduling"
       ],
       "related": [
-        "basic-interval-scheduling"
+        "basic-interval-scheduling",
+        "basic-divide-conquer-merge-inversion"
       ]
     },
     "basic-two-pointer-cycle": {
@@ -213,7 +215,8 @@
       ],
       "related": [
         "math-quick-pow-basic",
-        "str-hash"
+        "str-hash",
+        "exam-bit-operation"
       ]
     },
     "dp-01bag-standard": {
@@ -224,7 +227,22 @@
         "dp-01bag-2d",
         "dp-complete-bag",
         "dp-group-bag",
-        "dp-01bag-record"
+        "dp-01bag-record",
+        "dp-count-01bag",
+        "dp-multi-bag-binary",
+        "dp-linear-triangle",
+        "dp-tree-dance",
+        "dp-tree-01bag"
+      ]
+    },
+    "dp-bitmask-hamilton": {
+      "prerequisites": [
+        "exam-bit-operation",
+        "dp-linear-triangle"
+      ],
+      "related": [
+        "graph-floyd",
+        "graph-dijkstra-heap"
       ]
     },
     "dp-01bag-2d": {
@@ -242,7 +260,8 @@
       ],
       "related": [
         "dp-01bag-standard",
-        "dp-count-01bag"
+        "dp-count-01bag",
+        "dp-01bag-2d"
       ]
     },
     "dp-count-01bag": {
@@ -315,7 +334,9 @@
       "related": [
         "dp-linear-lis-bit-count",
         "dp-linear-lcs-length",
-        "dp-linear-maxsub"
+        "dp-linear-maxsub",
+        "basic-two-pointer-cycle",
+        "dp-linear-triangle"
       ]
     },
     "dp-linear-lis-bit-count": {
@@ -335,7 +356,8 @@
       "related": [
         "dp-linear-lcs-output",
         "dp-linear-lcs-substring",
-        "dp-linear-edit-distance"
+        "dp-linear-edit-distance",
+        "dp-linear-lis-binary"
       ]
     },
     "dp-linear-lcs-output": {
@@ -353,7 +375,8 @@
       ],
       "related": [
         "dp-linear-lcs-length",
-        "dp-linear-lcs-output"
+        "dp-linear-lcs-output",
+        "dp-linear-edit-distance"
       ]
     },
     "dp-linear-edit-distance": {
@@ -372,7 +395,8 @@
       ],
       "related": [
         "dp-tree-01bag",
-        "dp-01bag-standard"
+        "dp-01bag-standard",
+        "graph-topo-sort"
       ]
     },
     "dp-tree-01bag": {
@@ -388,7 +412,8 @@
     "dp-digit-count": {
       "prerequisites": [],
       "related": [
-        "basic-high-precision"
+        "basic-high-precision",
+        "dp-interval-stone-merge"
       ]
     },
     "dp-interval-stone-merge": {
@@ -404,7 +429,8 @@
       "related": [
         "ds-diff-1d",
         "ds-prefix-sum-2d",
-        "ds-bit-point-range"
+        "ds-bit-point-range",
+        "str-hash"
       ]
     },
     "ds-diff-1d": {
@@ -414,7 +440,9 @@
       "related": [
         "ds-prefix-sum-1d",
         "ds-prefix-sum-2d",
-        "ds-diff-2d"
+        "ds-diff-2d",
+        "ds-prefix-sum-tree",
+        "ds-diff-tree"
       ]
     },
     "ds-prefix-sum-2d": {
@@ -424,7 +452,8 @@
       "related": [
         "ds-prefix-sum-1d",
         "ds-diff-1d",
-        "ds-diff-2d"
+        "ds-diff-2d",
+        "ds-prefix-sum-tree"
       ]
     },
     "ds-diff-2d": {
@@ -445,7 +474,10 @@
       "related": [
         "ds-bit-range-point",
         "ds-segtree-basic",
-        "ds-prefix-sum-1d"
+        "ds-prefix-sum-1d",
+        "dp-linear-lis-bit-count",
+        "basic-divide-conquer-merge-inversion",
+        "exam-bit-operation"
       ]
     },
     "ds-bit-range-point": {
@@ -464,7 +496,16 @@
       "related": [
         "ds-segtree-discretize",
         "ds-segtree-mul",
-        "ds-bit-point-range"
+        "ds-bit-point-range",
+        "ds-bit-range-point",
+        "ds-persistent-segtree-template",
+        "ds-persistent-segtree-3919",
+        "ds-splay",
+        "ds-trie",
+        "ds-trie-01-max-xor",
+        "ds-st-table-1",
+        "ds-st-table-2",
+        "ds-block-decomposition"
       ]
     },
     "ds-segtree-discretize": {
@@ -509,7 +550,9 @@
       ],
       "related": [
         "ds-segtree-basic",
-        "graph-lca-hld"
+        "graph-lca-hld",
+        "ds-dual-heap",
+        "basic-quickselect-kth"
       ]
     },
     "ds-dual-heap": {
@@ -517,7 +560,9 @@
       "related": [
         "ds-splay",
         "ds-monoqueue-1d",
-        "basic-quickselect-kth"
+        "basic-quickselect-kth",
+        "ds-stack-prefix-max",
+        "ds-monostack-histogram"
       ]
     },
     "ds-trie": {
@@ -535,7 +580,8 @@
       ],
       "related": [
         "math-quick-pow-basic",
-        "ds-segtree-basic"
+        "ds-segtree-basic",
+        "ds-trie"
       ]
     },
     "ds-stack-prefix-max": {
@@ -545,7 +591,8 @@
       "related": [
         "ds-dual-heap",
         "ds-monoqueue-1d",
-        "ds-st-table-1"
+        "ds-st-table-1",
+        "ds-monostack-histogram"
       ]
     },
     "ds-st-table-1": {
@@ -554,7 +601,8 @@
       ],
       "related": [
         "ds-st-table-2",
-        "ds-segtree-basic"
+        "ds-segtree-basic",
+        "ds-stack-prefix-max"
       ]
     },
     "ds-st-table-2": {
@@ -573,7 +621,11 @@
       "related": [
         "ds-monoqueue-2d",
         "basic-two-pointer-cycle",
-        "dp-multi-bag-monotone"
+        "dp-multi-bag-monotone",
+        "ds-dual-heap",
+        "ds-stack-prefix-max",
+        "ds-mo-team",
+        "ds-monostack-histogram"
       ]
     },
     "ds-monoqueue-2d": {
@@ -582,7 +634,8 @@
       ],
       "related": [
         "ds-monoqueue-1d",
-        "ds-block-decomposition"
+        "ds-block-decomposition",
+        "ds-monostack-histogram"
       ]
     },
     "ds-block-decomposition": {
@@ -591,7 +644,9 @@
       ],
       "related": [
         "ds-mo-team",
-        "ds-segtree-basic"
+        "ds-segtree-basic",
+        "ds-monoqueue-2d",
+        "basic-quickselect-kth"
       ]
     },
     "ds-mo-team": {
@@ -609,7 +664,9 @@
       "related": [
         "ds-uf-rank",
         "graph-kruskal",
-        "ds-uf-extended-domain"
+        "ds-uf-extended-domain",
+        "ds-uf-weighted-old",
+        "graph-lca-tarjan"
       ]
     },
     "ds-uf-rank": {
@@ -627,7 +684,8 @@
       ],
       "related": [
         "ds-uf-weighted-food",
-        "ds-uf-basic"
+        "ds-uf-basic",
+        "ds-uf-rank"
       ]
     },
     "ds-uf-weighted-food": {
@@ -653,7 +711,12 @@
       "related": [
         "graph-bellman-ford",
         "graph-floyd",
-        "graph-prim"
+        "graph-prim",
+        "dp-bitmask-hamilton",
+        "graph-dag-shortest-path",
+        "graph-spfa",
+        "graph-topo-sort",
+        "basic-bfs-bidirectional"
       ]
     },
     "graph-bellman-ford": {
@@ -662,7 +725,8 @@
       ],
       "related": [
         "graph-spfa",
-        "graph-dijkstra-heap"
+        "graph-dijkstra-heap",
+        "graph-johnson"
       ]
     },
     "graph-spfa": {
@@ -671,7 +735,8 @@
       ],
       "related": [
         "graph-bellman-ford",
-        "graph-dijkstra-heap"
+        "graph-dijkstra-heap",
+        "graph-dag-shortest-path"
       ]
     },
     "graph-floyd": {
@@ -680,7 +745,9 @@
       ],
       "related": [
         "graph-johnson",
-        "graph-dijkstra-heap"
+        "graph-dijkstra-heap",
+        "dp-bitmask-hamilton",
+        "graph-dag-shortest-path"
       ]
     },
     "graph-johnson": {
@@ -699,7 +766,8 @@
       ],
       "related": [
         "graph-prim",
-        "ds-uf-basic"
+        "ds-uf-basic",
+        "graph-bipartite-hungarian"
       ]
     },
     "graph-prim": {
@@ -726,7 +794,8 @@
       ],
       "related": [
         "graph-lca-tarjan",
-        "graph-lca-hld"
+        "graph-lca-hld",
+        "graph-centroid"
       ]
     },
     "graph-lca-tarjan": {
@@ -737,7 +806,11 @@
       "related": [
         "graph-lca-doubling",
         "graph-lca-hld",
-        "ds-uf-basic"
+        "ds-uf-basic",
+        "graph-tarjan-cut-vertex",
+        "graph-tarjan-scc",
+        "ds-prefix-sum-tree",
+        "ds-diff-tree"
       ]
     },
     "graph-lca-hld": {
@@ -746,14 +819,44 @@
       ],
       "related": [
         "graph-lca-doubling",
-        "graph-lca-tarjan"
+        "graph-lca-tarjan",
+        "graph-hld-segtree",
+        "ds-splay"
+      ]
+    },
+    "graph-hld-segtree": {
+      "prerequisites": [
+        "ds-segtree-basic",
+        "graph-lca-hld"
+      ],
+      "related": [
+        "graph-lca-hld",
+        "ds-diff-tree",
+        "ds-prefix-sum-tree",
+        "graph-centroid"
       ]
     },
     "graph-topo-sort": {
       "prerequisites": [],
       "related": [
         "graph-dijkstra-heap",
-        "dp-tree-dance"
+        "dp-tree-dance",
+        "graph-tarjan-scc",
+        "graph-scc-condensation",
+        "graph-scc-dag-dp"
+      ]
+    },
+    "graph-dag-shortest-path": {
+      "prerequisites": [
+        "graph-topo-sort"
+      ],
+      "related": [
+        "graph-dijkstra-heap",
+        "graph-floyd",
+        "graph-spfa",
+        "graph-tarjan-scc",
+        "graph-scc-condensation",
+        "graph-scc-dag-dp"
       ]
     },
     "graph-tarjan-cut-vertex": {
@@ -761,7 +864,9 @@
       "related": [
         "graph-tarjan-scc",
         "graph-lca-tarjan",
-        "graph-tarjan-bridge"
+        "graph-tarjan-bridge",
+        "graph-e-dcc-condensation",
+        "graph-bipartite-dfs-coloring"
       ]
     },
     "graph-tarjan-bridge": {
@@ -782,7 +887,10 @@
         "graph-lca-tarjan",
         "graph-dag-shortest-path",
         "graph-scc-condensation",
-        "graph-tarjan-cut-vertex"
+        "graph-tarjan-cut-vertex",
+        "graph-tarjan-bridge",
+        "graph-bipartite-dfs-coloring",
+        "graph-scc-dag-dp"
       ]
     },
     "graph-scc-condensation": {
@@ -794,7 +902,9 @@
         "graph-tarjan-scc",
         "graph-dag-shortest-path",
         "graph-topo-sort",
-        "graph-e-dcc-condensation"
+        "graph-e-dcc-condensation",
+        "graph-tarjan-bridge",
+        "graph-scc-dag-dp"
       ]
     },
     "graph-e-dcc-condensation": {
@@ -835,7 +945,17 @@
       "related": [
         "math-quick-pow-highprecision",
         "math-lcm-pair-count",
-        "basic-digit-power-cycle-self"
+        "basic-digit-power-cycle-self",
+        "math-matrix-linear-recurrence",
+        "ds-trie-01-max-xor",
+        "math-matrix-multiplication",
+        "math-matrix-quick-pow",
+        "math-gcd-lcm",
+        "math-sieve-eratosthenes",
+        "math-euler-phi",
+        "math-modular-inverse",
+        "math-crt",
+        "exam-bit-operation"
       ]
     },
     "math-quick-pow-highprecision": {
@@ -843,14 +963,16 @@
         "math-quick-pow-basic"
       ],
       "related": [
-        "math-quick-pow-basic"
+        "math-quick-pow-basic",
+        "basic-high-precision"
       ]
     },
     "math-matrix-multiplication": {
       "prerequisites": [],
       "related": [
         "math-quick-pow-basic",
-        "math-matrix-quick-pow"
+        "math-matrix-quick-pow",
+        "math-matrix-linear-recurrence"
       ]
     },
     "math-matrix-quick-pow": {
@@ -860,6 +982,17 @@
       ],
       "related": [
         "math-matrix-multiplication",
+        "math-quick-pow-basic",
+        "math-matrix-linear-recurrence"
+      ]
+    },
+    "math-matrix-linear-recurrence": {
+      "prerequisites": [
+        "math-matrix-quick-pow"
+      ],
+      "related": [
+        "math-matrix-quick-pow",
+        "math-matrix-multiplication",
         "math-quick-pow-basic"
       ]
     },
@@ -868,7 +1001,10 @@
       "related": [
         "math-lcm-pair-count",
         "math-quick-pow-basic",
-        "math-sieve-eratosthenes"
+        "math-sieve-eratosthenes",
+        "math-euler-phi",
+        "math-linear-sieve-phi",
+        "math-crt"
       ]
     },
     "math-sieve-eratosthenes": {
@@ -878,7 +1014,10 @@
       "related": [
         "math-gcd-lcm",
         "math-quick-pow-basic",
-        "math-euler-phi"
+        "math-euler-phi",
+        "math-linear-sieve-phi",
+        "math-linear-sieve-divisor-count",
+        "math-linear-sieve-divisor-sum"
       ]
     },
     "math-euler-phi": {
@@ -890,7 +1029,10 @@
         "math-gcd-lcm",
         "math-sieve-eratosthenes",
         "math-quick-pow-basic",
-        "math-linear-sieve-phi"
+        "math-linear-sieve-phi",
+        "math-linear-sieve-divisor-count",
+        "math-linear-sieve-divisor-sum",
+        "math-modular-inverse"
       ]
     },
     "math-linear-sieve-phi": {
@@ -902,7 +1044,9 @@
         "math-euler-phi",
         "math-sieve-eratosthenes",
         "math-gcd-lcm",
-        "math-linear-sieve-divisor-count"
+        "math-linear-sieve-divisor-count",
+        "math-linear-sieve-divisor-sum",
+        "math-modular-inverse"
       ]
     },
     "math-linear-sieve-divisor-count": {
@@ -962,7 +1106,8 @@
       ],
       "related": [
         "math-gcd-lcm",
-        "math-quick-pow-basic"
+        "math-quick-pow-basic",
+        "math-stars-and-bars"
       ]
     },
     "math-stars-and-bars": {
@@ -977,14 +1122,17 @@
       "related": [
         "basic-combination-dfs",
         "basic-meet-in-middle-binary-search",
-        "basic-bfs-bidirectional"
+        "basic-bfs-bidirectional",
+        "graph-bipartite-dfs-coloring"
       ]
     },
     "basic-combination-dfs": {
       "prerequisites": [],
       "related": [
         "basic-permutation-dfs",
-        "basic-meet-in-middle-binary-search"
+        "basic-meet-in-middle-binary-search",
+        "math-stars-and-bars",
+        "basic-bfs-bidirectional"
       ]
     },
     "basic-meet-in-middle-binary-search": {
@@ -992,7 +1140,9 @@
         "basic-combination-dfs"
       ],
       "related": [
-        "basic-meet-in-middle-two-pointer"
+        "basic-meet-in-middle-two-pointer",
+        "basic-permutation-dfs",
+        "basic-combination-dfs"
       ]
     },
     "basic-meet-in-middle-two-pointer": {
@@ -1016,7 +1166,10 @@
       "related": [
         "str-minimal-representation",
         "ds-prefix-sum-1d",
-        "basic-digit-power-cycle-self"
+        "basic-digit-power-cycle-self",
+        "ds-trie",
+        "str-kmp",
+        "str-sunday"
       ]
     },
     "str-minimal-representation": {
@@ -1025,7 +1178,8 @@
       ],
       "related": [
         "str-hash",
-        "basic-two-pointer-cycle"
+        "basic-two-pointer-cycle",
+        "str-kmp"
       ]
     },
     "str-kmp": {
@@ -1033,7 +1187,8 @@
       "related": [
         "str-hash",
         "str-minimal-representation",
-        "str-sunday"
+        "str-sunday",
+        "ds-trie"
       ]
     },
     "str-sunday": {
@@ -1048,7 +1203,11 @@
       "related": [
         "ds-bit-point-range",
         "basic-interval-merge",
-        "basic-divide-conquer-closest-pair"
+        "basic-divide-conquer-closest-pair",
+        "graph-bipartite-hungarian",
+        "basic-quickselect-kth",
+        "basic-radix-sort-k",
+        "basic-shell-sort"
       ]
     },
     "basic-divide-conquer-closest-pair": {
@@ -1067,7 +1226,9 @@
       "related": [
         "ds-prefix-sum-2d",
         "ds-diff-1d",
-        "graph-lca-tarjan"
+        "graph-lca-tarjan",
+        "graph-hld-segtree",
+        "ds-diff-tree"
       ]
     },
     "ds-diff-tree": {
@@ -1078,7 +1239,9 @@
       "related": [
         "ds-prefix-sum-tree",
         "ds-diff-1d",
-        "graph-lca-tarjan"
+        "graph-lca-tarjan",
+        "graph-hld-segtree",
+        "ds-diff-2d"
       ]
     },
     "basic-quickselect-kth": {
@@ -1088,7 +1251,9 @@
       "related": [
         "basic-divide-conquer-merge-inversion",
         "ds-block-decomposition",
-        "ds-splay"
+        "ds-splay",
+        "ds-dual-heap",
+        "basic-radix-sort-k"
       ]
     },
     "ds-monostack-histogram": {

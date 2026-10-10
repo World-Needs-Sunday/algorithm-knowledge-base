@@ -11,6 +11,14 @@
 node_modules/
 package-lock.json
 
+# 质检与对拍产物
+tools/lint-report.md
+_fail.in
+_fail.out
+
+# Trae 分享包（本地缓存，不是源码）
+.trae-html-share-packages/
+
 # 系统
 Thumbs.db
 desktop.ini

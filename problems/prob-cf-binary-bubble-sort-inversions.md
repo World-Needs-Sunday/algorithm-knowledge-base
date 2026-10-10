@@ -1,6 +1,6 @@
 ---
 id: prob-cf-binary-bubble-sort-inversions
-title: 'F. Binary Bubble Sort Inversions — 01数组冒泡逆序对计数（懒标记水位模型）'
+title: 'Binary Bubble Sort Inversions — 01数组冒泡逆序对计数（懒标记水位模型）'
 oj: 'Codeforces'
 problemId: 'F'
 difficulty: '困难'
@@ -43,6 +43,12 @@ codePath: '题目专辑\数据结构\BinaryBubbleSortInversions\代码.cpp'
 ## 输出格式
 
 每组输出 $n+1$ 个空格分隔的整数，第 $i$ 个表示前 $i-1$ 次操作后的逆序对数。
+
+## 数据范围
+
+- $1 \le t \le 10^4$
+- $1 \le n \le 5 \times 10^5$，$a_i \in \{0, 1\}$，$|s| = n$ 且 $s_i \in \{0, 1\}$
+- 所有测试组的 $n$ 之和不超过 $5 \times 10^5$
 
 ## 样例
 

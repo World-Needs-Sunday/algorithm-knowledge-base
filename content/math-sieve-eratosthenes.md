@@ -6,11 +6,13 @@ subcategory: '数论基础'
 difficulty: '入门'
 tags: ['数学', '数论', '素数', '筛法', '埃氏筛', '预处理']
 prerequisites: ['math-gcd-lcm']
+timeComplexity: 'O(n log log n)'
+spaceComplexity: 'O(n)'
 codePath: '数学\数论基础\埃氏筛\源.cpp'
 description: '埃拉托斯特尼筛法是最经典的素数判定预处理算法：从 2 开始，每找到一个质数就将其所有倍数标记为合数。时间复杂度 O(n log log n)，空间 O(n)，适合需要大量查询素数或多组判定的场景。'
 ---
 
-# 埃拉托斯特尼筛法（埃氏筛）
+## 埃拉托斯特尼筛法（埃氏筛）
 
 ## 一、算法原理
 

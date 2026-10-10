@@ -46,7 +46,7 @@ using namespace std;
 int N , W;
 vector<long long> dp;
 vector<pair<long long , long long>> A;
-/*代紅P1776*/
+/*洛谷P1776*/
 int main()
 {
 	ios::sync_with_stdio(false);

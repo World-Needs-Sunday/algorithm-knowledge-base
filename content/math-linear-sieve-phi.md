@@ -6,11 +6,13 @@ subcategory: '数论基础'
 difficulty: '进阶'
 tags: ['数学', '数论', '欧拉函数', '线性筛', '欧拉筛', '积性函数', '预处理']
 prerequisites: ['math-euler-phi', 'math-sieve-eratosthenes']
+timeComplexity: 'O(n)（预处理）+ O(1)（单次查询）'
+spaceComplexity: 'O(n)'
 codePath: '数学\数论基础\线性筛求欧拉函数\源.cpp'
 description: '在线性筛（欧拉筛）框架上同时计算欧拉函数 φ(n)：每个合数仅被其最小质因子筛一次，利用 φ 的积性分两种情况递推——当 prime[j] 整除 i 时 φ(i*p) = p*φ(i)，不整除时 φ(i*p) = (p-1)*φ(i)。复杂度 O(n)，适合需要批量查询 φ 值的场景。'
 ---
 
-# 线性筛求欧拉函数（欧拉筛批量预处理）
+## 线性筛求欧拉函数（欧拉筛批量预处理）
 
 ## 一、算法原理
 

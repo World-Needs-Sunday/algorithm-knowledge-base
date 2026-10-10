@@ -2,6 +2,15 @@
 <html lang="zh-CN" data-theme="light"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="面向信息学竞赛的算法知识点查询库：知识点讲解、复杂度分析、常见陷阱与可运行 C++ 代码，支持分类浏览、标签筛选与全文搜索。">
+    <meta name="theme-color" content="#1e293b">
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="算法知识点查询系统">
+    <meta property="og:description" content="面向信息学竞赛的算法知识点查询库：知识点讲解、复杂度分析、常见陷阱与可运行 C++ 代码。">
+    <meta property="og:url" content="https://world-needs-sunday.github.io/algorithm-knowledge-base/">
+    <meta property="og:locale" content="zh_CN">
+    <meta name="twitter:card" content="summary">
     <title>算法知识点查询系统</title>
     <script>
         // 防止主题闪烁
@@ -1118,6 +1127,34 @@
             transform: translateY(-1px);
             box-shadow: var(--shadow);
         }
+        .subsubcategory-block {
+            grid-column: 1 / -1;
+            margin-bottom: 0.4rem;
+        }
+        .subsubcategory-block-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0.5rem 0 0.35rem;
+            padding-left: 0.5rem;
+            border-left: 3px solid var(--primary-light);
+        }
+        .subsubcategory-block-count {
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+        .subsubcategory-block-desc {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0 0 0.5rem 0.65rem;
+        }
+        .subsubcategory-block-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.6rem;
+        }
         .category-name-link { cursor: pointer; }
         .category-name-link:hover { color: var(--primary-light); text-decoration: underline; }
         .subcategory-link { cursor: pointer; }
@@ -1190,10 +1227,10 @@
                 </div>
                 <div class="catalog-btn" id="catalog-btn" onclick="if(currentMode==='kp'){showCatalog();}else{showProblemCatalog();}">📑 总目录</div>
             </div>
-            <nav id="sidebar-nav"><div class="category expanded"><div class="category-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron">▼</span><span class="category-name category-name-link" onclick="event.stopPropagation(); showCategoryOverview('动态规划')">动态规划</span><span class="category-count">19</span></div><div class="category-body"><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('动态规划')" title="点击查看分类详情">树形DP</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('dp-tree-01bag')" title="树状01背包">树状01背包</div><div class="kp-item" onclick="selectKP('dp-tree-dance')" title="没有上司的舞会（树形DP）">没有上司的舞会（树形DP）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('动态规划')" title="点击查看分类详情">状态压缩DP</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="subsubcategory">路径问题</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-bitmask-hamilton')" title="状态压缩DP（Hamilton路径最短路）">状态压缩DP（Hamilton路径最短路）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('动态规划')" title="点击查看分类详情">线性DP</span><span class="category-count">8</span></div><div class="subcategory-body"><div class="subsubcategory">LCS</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-linear-lcs-length')" title="最长公共子序列长度（普通）">最长公共子序列长度（普通）</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-linear-lcs-output')" title="最长公共子序列（带输出）">最长公共子序列（带输出）</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-linear-lcs-substring')" title="最长公共子串">最长公共子串</div><div class="subsubcategory">LIS</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-linear-lis-binary')" title="最长上升子序列（二分）">最长上升子序列（二分）</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-linear-lis-bit-count')" title="最长上升子序列（树状数组优化·带计数）">最长上升子序列（树状数组优化·带计数）</div><div class="subsubcategory">经典模型</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-linear-edit-distance')" title="字符串编辑距离">字符串编辑距离</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-linear-maxsub')" title="长度不超过m的最大子段和">长度不超过m的最大子段和</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-linear-triangle')" title="数字三角形">数字三角形</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('动态规划')" title="点击查看分类详情">背包问题</span><span class="category-count">8</span></div><div class="subcategory-body"><div class="subsubcategory">01背包</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-01bag-2d')" title="二维费用01背包">二维费用01背包</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-01bag-record')" title="01背包（带记录/路径还原）">01背包（带记录/路径还原）</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-01bag-standard')" title="01背包（标准）">01背包（标准）</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-count-01bag')" title="计数01背包（最大值方案计数）">计数01背包（最大值方案计数）</div><div class="subsubcategory">分组背包</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-group-bag')" title="分组背包">分组背包</div><div class="subsubcategory">多重背包</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-multi-bag-binary')" title="多重背包（二进制优化）">多重背包（二进制优化）</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-multi-bag-monotone')" title="多重背包（单调队列优化）">多重背包（单调队列优化）</div><div class="subsubcategory">完全背包</div><div class="kp-item kp-item-sub" onclick="selectKP('dp-complete-bag')" title="完全背包">完全背包</div></div></div></div></div><div class="category expanded"><div class="category-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron">▼</span><span class="category-name category-name-link" onclick="event.stopPropagation(); showCategoryOverview('图论')">图论</span><span class="category-count">20</span></div><div class="category-body"><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">二分图</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('graph-bipartite-dfs-coloring')" title="二分图判定（DFS染色法）">二分图判定（DFS染色法）</div><div class="kp-item" onclick="selectKP('graph-bipartite-hungarian')" title="匈牙利算法（二分图最大匹配）">匈牙利算法（二分图最大匹配）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">割点与桥</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('graph-tarjan-bridge')" title="Tarjan 求桥（割边）">Tarjan 求桥（割边）</div><div class="kp-item" onclick="selectKP('graph-tarjan-cut-vertex')" title="Tarjan 求割点">Tarjan 求割点</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">拓扑排序</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('graph-topo-sort')" title="拓扑排序（Kahn算法/BFS）">拓扑排序（Kahn算法/BFS）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">最小生成树</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('graph-kruskal')" title="Kruskal 最小生成树（并查集+贪心）">Kruskal 最小生成树（并查集+贪心）</div><div class="kp-item" onclick="selectKP('graph-prim')" title="Prim 最小生成树（堆优化·Lazy 版）">Prim 最小生成树（堆优化·Lazy 版）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">最短路</span><span class="category-count">6</span></div><div class="subcategory-body"><div class="subsubcategory">DAG最短路</div><div class="kp-item kp-item-sub" onclick="selectKP('graph-dag-shortest-path')" title="DAG 最短路（拓扑排序）">DAG 最短路（拓扑排序）</div><div class="subsubcategory">全源最短路</div><div class="kp-item kp-item-sub" onclick="selectKP('graph-floyd')" title="Floyd-Warshall 全源最短路（传递闭包法）">Floyd-Warshall 全源最短路（传递闭包法）</div><div class="kp-item kp-item-sub" onclick="selectKP('graph-johnson')" title="Johnson 全源最短路（负权图）">Johnson 全源最短路（负权图）</div><div class="subsubcategory">单源最短路</div><div class="kp-item kp-item-sub" onclick="selectKP('graph-bellman-ford')" title="Bellman-Ford 单源最短路（含负权）">Bellman-Ford 单源最短路（含负权）</div><div class="kp-item kp-item-sub" onclick="selectKP('graph-dijkstra-heap')" title="Dijkstra 最短路（堆优化）">Dijkstra 最短路（堆优化）</div><div class="kp-item kp-item-sub" onclick="selectKP('graph-spfa')" title="Bellman-Ford 批量松弛优化（类SPFA变体）">Bellman-Ford 批量松弛优化（类SPFA变体）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">最近公共祖先</span><span class="category-count">3</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('graph-lca-doubling')" title="最近公共祖先 LCA（倍增法）">最近公共祖先 LCA（倍增法）</div><div class="kp-item" onclick="selectKP('graph-lca-hld')" title="最近公共祖先 LCA（重链剖分）">最近公共祖先 LCA（重链剖分）</div><div class="kp-item" onclick="selectKP('graph-lca-tarjan')" title="最近公共祖先 LCA（Tarjan 离线·并查集）">最近公共祖先 LCA（Tarjan 离线·并查集）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">树链剖分</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('graph-hld-segtree')" title="树链剖分（重链剖分+线段树）">树链剖分（重链剖分+线段树）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">连通分量</span><span class="category-count">3</span></div><div class="subcategory-body"><div class="subsubcategory">强连通分量</div><div class="kp-item kp-item-sub" onclick="selectKP('graph-scc-condensation')" title="SCC 缩点（强连通分量缩点）">SCC 缩点（强连通分量缩点）</div><div class="kp-item kp-item-sub" onclick="selectKP('graph-tarjan-scc')" title="Tarjan 强连通分量">Tarjan 强连通分量</div><div class="subsubcategory">边双连通分量</div><div class="kp-item kp-item-sub" onclick="selectKP('graph-e-dcc-condensation')" title="边双连通分量缩点（E-DCC）">边双连通分量缩点（E-DCC）</div></div></div></div></div><div class="category expanded"><div class="category-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron">▼</span><span class="category-name category-name-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')">基础算法</span><span class="category-count">14</span></div><div class="category-body"><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">分治</span><span class="category-count">3</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('basic-divide-conquer-closest-pair')" title="最近点对（平面最小点对，分治）">最近点对（平面最小点对，分治）</div><div class="kp-item" onclick="selectKP('basic-divide-conquer-merge-inversion')" title="归并排序求逆序对（分治）">归并排序求逆序对（分治）</div><div class="kp-item" onclick="selectKP('basic-quickselect-kth')" title="快速选择（Quickselect — 找第 k 小）">快速选择（Quickselect — 找第 k 小）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">双指针</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('basic-two-pointer-cycle')" title="链表环检测（Floyd 快慢指针）">链表环检测（Floyd 快慢指针）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">排序</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('basic-radix-sort-k')" title="k 进制基数排序">k 进制基数排序</div><div class="kp-item" onclick="selectKP('basic-shell-sort')" title="希尔排序（Shell Sort）">希尔排序（Shell Sort）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">搜索</span><span class="category-count">5</span></div><div class="subcategory-body"><div class="subsubcategory">BFS</div><div class="kp-item kp-item-sub" onclick="selectKP('basic-bfs-bidirectional')" title="双向 BFS（双向广度优先搜索）">双向 BFS（双向广度优先搜索）</div><div class="subsubcategory">DFS</div><div class="kp-item kp-item-sub" onclick="selectKP('basic-combination-dfs')" title="DFS 生成组合（选/不选 + 剪枝）">DFS 生成组合（选/不选 + 剪枝）</div><div class="kp-item kp-item-sub" onclick="selectKP('basic-permutation-dfs')" title="DFS 生成全排列（回溯法）">DFS 生成全排列（回溯法）</div><div class="subsubcategory">折半搜索</div><div class="kp-item kp-item-sub" onclick="selectKP('basic-meet-in-middle-binary-search')" title="折半搜索（Meet in the Middle）— 二分查找版">折半搜索（Meet in the Middle）— 二分查找版</div><div class="kp-item kp-item-sub" onclick="selectKP('basic-meet-in-middle-two-pointer')" title="折半搜索（Meet in the Middle）— 双指针合并版">折半搜索（Meet in the Middle）— 双指针合并版</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">数位提升</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('basic-digit-power-cycle-self')" title="按数位分层扩张幂周期算法（自己写的 P1050循环）">按数位分层扩张幂周期算法（自己写的 P1050循环）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">贪心</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('basic-interval-merge')" title="区间合并（合并重叠/相邻区间）">区间合并（合并重叠/相邻区间）</div><div class="kp-item" onclick="selectKP('basic-interval-scheduling')" title="区间调度（选最多不重叠区间）">区间调度（选最多不重叠区间）</div></div></div></div></div><div class="category expanded"><div class="category-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron">▼</span><span class="category-name category-name-link" onclick="event.stopPropagation(); showCategoryOverview('字符串')">字符串</span><span class="category-count">4</span></div><div class="category-body"><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('字符串')" title="点击查看分类详情">字符串匹配</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('str-kmp')" title="KMP 字符串匹配算法">KMP 字符串匹配算法</div><div class="kp-item" onclick="selectKP('str-sunday')" title="Sunday 字符串匹配算法">Sunday 字符串匹配算法</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('字符串')" title="点击查看分类详情">字符串哈希</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('str-hash')" title="字符串哈希（多项式滚动哈希）">字符串哈希（多项式滚动哈希）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('字符串')" title="点击查看分类详情">最小表示法</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('str-minimal-representation')" title="最小表示法（循环同构串的最小字典序）">最小表示法（循环同构串的最小字典序）</div></div></div></div></div><div class="category expanded"><div class="category-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron">▼</span><span class="category-name category-name-link" onclick="event.stopPropagation(); showCategoryOverview('数学')">数学</span><span class="category-count">14</span></div><div class="category-body"><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数学')" title="点击查看分类详情">快速幂</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('math-quick-pow-basic')" title="快速幂（基础，模意义下）">快速幂（基础，模意义下）</div><div class="kp-item" onclick="selectKP('math-quick-pow-highprecision')" title="快速幂（高精度）——麦森数2^P−1">快速幂（高精度）——麦森数2^P−1</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数学')" title="点击查看分类详情">数论基础</span><span class="category-count">8</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('math-crt')" title="中国剩余定理（CRT）">中国剩余定理（CRT）</div><div class="kp-item" onclick="selectKP('math-euler-phi')" title="欧拉函数（单次求值）">欧拉函数（单次求值）</div><div class="kp-item" onclick="selectKP('math-gcd-lcm')" title="GCD 与 LCM（欧几里得算法）">GCD 与 LCM（欧几里得算法）</div><div class="kp-item" onclick="selectKP('math-linear-sieve-divisor-count')" title="线性筛求约数个数（欧拉筛批量预处理）">线性筛求约数个数（欧拉筛批量预处理）</div><div class="kp-item" onclick="selectKP('math-linear-sieve-divisor-sum')" title="线性筛求约数和（欧拉筛批量预处理）">线性筛求约数和（欧拉筛批量预处理）</div><div class="kp-item" onclick="selectKP('math-linear-sieve-phi')" title="线性筛求欧拉函数（欧拉筛批量预处理）">线性筛求欧拉函数（欧拉筛批量预处理）</div><div class="kp-item" onclick="selectKP('math-modular-inverse')" title="模逆元（费马小定理 + 扩展欧几里得）">模逆元（费马小定理 + 扩展欧几里得）</div><div class="kp-item" onclick="selectKP('math-sieve-eratosthenes')" title="埃拉托斯特尼筛法（埃氏筛）">埃拉托斯特尼筛法（埃氏筛）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数学')" title="点击查看分类详情">数论计数</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('math-lcm-pair-count')" title="LCM数对计数问题">LCM数对计数问题</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数学')" title="点击查看分类详情">矩阵</span><span class="category-count">3</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('math-matrix-linear-recurrence')" title="矩阵加速线性递推">矩阵加速线性递推</div><div class="kp-item" onclick="selectKP('math-matrix-multiplication')" title="矩阵乘法">矩阵乘法</div><div class="kp-item" onclick="selectKP('math-matrix-quick-pow')" title="矩阵快速幂">矩阵快速幂</div></div></div></div></div><div class="category expanded"><div class="category-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron">▼</span><span class="category-name category-name-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')">数据结构</span><span class="category-count">30</span></div><div class="category-body"><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">ST表</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('ds-st-table-1')" title="ST表（标准版1 - 手动预处理对数表）">ST表（标准版1 - 手动预处理对数表）</div><div class="kp-item" onclick="selectKP('ds-st-table-2')" title="ST表（标准版2 - 内建函数求对数）">ST表（标准版2 - 内建函数求对数）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">分块</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('ds-block-decomposition')" title="分块（区间加·区间求和·区间≤k求和）">分块（区间加·区间求和·区间≤k求和）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">前缀和与差分</span><span class="category-count">6</span></div><div class="subcategory-body"><div class="subsubcategory">一维</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-diff-1d')" title="一维差分（区间加·批量更新）">一维差分（区间加·批量更新）</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-prefix-sum-1d')" title="一维前缀和（区间和查询）">一维前缀和（区间和查询）</div><div class="subsubcategory">二维</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-diff-2d')" title="二维差分（子矩阵加·批量更新）">二维差分（子矩阵加·批量更新）</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-prefix-sum-2d')" title="二维前缀和（子矩阵和查询）">二维前缀和（子矩阵和查询）</div><div class="subsubcategory">树上</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-diff-tree')" title="树上点差分（路径点权修改）">树上点差分（路径点权修改）</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-prefix-sum-tree')" title="树上前缀和（路径点权和查询）">树上前缀和（路径点权和查询）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">单调队列</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('ds-monoqueue-1d')" title="一维滑动窗口最值（单调队列基础模板）">一维滑动窗口最值（单调队列基础模板）</div><div class="kp-item" onclick="selectKP('ds-monoqueue-2d')" title="二维滑动窗口最值（两阶段单调队列）">二维滑动窗口最值（两阶段单调队列）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">可持久化线段树</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('ds-persistent-segtree-3919')" title="可持久化线段树（单点修改单点查询 P3919）">可持久化线段树（单点修改单点查询 P3919）</div><div class="kp-item" onclick="selectKP('ds-persistent-segtree-template')" title="可持久化线段树（单点修改区间求和 普通模板）">可持久化线段树（单点修改区间求和 普通模板）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">堆</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('ds-dual-heap')" title="对顶堆（动态维护第 k 小）">对顶堆（动态维护第 k 小）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">字典树</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('ds-trie-01-max-xor')" title="01-Trie — 最大异或和（按位贪心）">01-Trie — 最大异或和（按位贪心）</div><div class="kp-item" onclick="selectKP('ds-trie')" title="字典树（Trie）— 前缀检索的标配结构">字典树（Trie）— 前缀检索的标配结构</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">平衡树</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('ds-splay')" title="Splay树（伸展树）">Splay树（伸展树）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">并查集</span><span class="category-count">5</span></div><div class="subcategory-body"><div class="subsubcategory">基础</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-uf-basic')" title="并查集（基础 - 仅路径压缩）">并查集（基础 - 仅路径压缩）</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-uf-rank')" title="并查集（带秩优化）">并查集（带秩优化）</div><div class="subsubcategory">带权</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-uf-weighted-food')" title="带权并查集（扩展题目 - 食物链P2024）">带权并查集（扩展题目 - 食物链P2024）</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-uf-weighted-old')" title="带权并查集（以前没有学的时候写的 - 蓝桥1156）">带权并查集（以前没有学的时候写的 - 蓝桥1156）</div><div class="subsubcategory">扩展域</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-uf-extended-domain')" title="扩展域并查集（P1892）">扩展域并查集（P1892）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">栈</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="subsubcategory">前缀最值</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-stack-prefix-max')" title="前缀最值栈（栈内最大值查询）">前缀最值栈（栈内最大值查询）</div><div class="subsubcategory">单调栈</div><div class="kp-item kp-item-sub" onclick="selectKP('ds-monostack-histogram')" title="单调栈（直方图最大矩形）">单调栈（直方图最大矩形）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">树状数组</span><span class="category-count">2</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('ds-bit-point-range')" title="树状数组（单点修改区间求和 P3374）">树状数组（单点修改区间求和 P3374）</div><div class="kp-item" onclick="selectKP('ds-bit-range-point')" title="树状数组（区间修改单点求和 P3368）">树状数组（区间修改单点求和 P3368）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">线段树</span><span class="category-count">3</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('ds-segtree-basic')" title="线段树基础模板（区间加法+区间求和 P3372）">线段树基础模板（区间加法+区间求和 P3372）</div><div class="kp-item" onclick="selectKP('ds-segtree-discretize')" title="离散化+线段树（大值域少查询）">离散化+线段树（大值域少查询）</div><div class="kp-item" onclick="selectKP('ds-segtree-mul')" title="乘法线段树（区间乘法+区间加法双标记 P3373）">乘法线段树（区间乘法+区间加法双标记 P3373）</div></div></div><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">莫队</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('ds-mo-team')" title="普通莫队">普通莫队</div></div></div></div></div><div class="category expanded"><div class="category-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron">▼</span><span class="category-name category-name-link" onclick="event.stopPropagation(); showCategoryOverview('输入输出')">输入输出</span><span class="category-count">1</span></div><div class="category-body"><div class="subcategory"><div class="subcategory-header" onclick="this.parentElement.classList.toggle('expanded')"><span class="chevron chevron-sub">▼</span><span class="subcategory-name subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('输入输出')" title="点击查看分类详情">IO优化</span><span class="category-count">1</span></div><div class="subcategory-body"><div class="kp-item" onclick="selectKP('io-fast-io')" title="快速输入输出（读入/输出优化模板）">快速输入输出（读入/输出优化模板）</div></div></div></div></div></nav>
-            <div class="sidebar-footer"><span id="kp-count">102</span> 个知识点</div>
+            <nav id="sidebar-nav"></nav>
+            <div class="sidebar-footer"><span id="kp-count">109</span> 个知识点</div>
         </aside>
-        <main id="content"><div class="catalog-page"><h1>📑 知识点总目录</h1><div class="catalog-desc">按分类浏览所有知识点，点击任意知识点即可跳转查看详情。</div><div class="catalog-stats"><div class="catalog-stat"><div class="catalog-stat-num">102</div><div class="catalog-stat-label">知识点</div></div><div class="catalog-stat"><div class="catalog-stat-num">7</div><div class="catalog-stat-label">大类</div></div><div class="catalog-stat"><div class="catalog-stat-num">39</div><div class="catalog-stat-label">子分类</div></div></div><div class="catalog-category"><div class="catalog-category-header" onclick="this.parentElement.classList.toggle('expanded')"><div class="catalog-category-header-left"><span class="catalog-category-chevron">▶</span><span class="catalog-category-name">动态规划</span><span class="catalog-category-nature">最优化方法</span><span class="catalog-category-count">19</span></div><span class="catalog-category-detail-link" onclick="event.stopPropagation(); showCategoryOverview('动态规划')">查看详情 →</span></div><div class="catalog-category-body"><div class="catalog-sub-grid"><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('动态规划')" title="点击查看分类详情">树形DP</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('dp-tree-01bag')" title="树状01背包">树状01背包</li><li class="catalog-kp-item" onclick="selectKP('dp-tree-dance')" title="没有上司的舞会（树形DP）">没有上司的舞会（树形DP）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('动态规划')" title="点击查看分类详情">状态压缩DP</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-subsub-title">路径问题</li><li class="catalog-kp-item" onclick="selectKP('dp-bitmask-hamilton')" title="状态压缩DP（Hamilton路径最短路）">状态压缩DP（Hamilton路径最短路）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('动态规划')" title="点击查看分类详情">线性DP</span><span class="catalog-subtitle-count">8 个</span></div><ul class="catalog-kp-list"><li class="catalog-subsub-title">LCS</li><li class="catalog-kp-item" onclick="selectKP('dp-linear-lcs-length')" title="最长公共子序列长度（普通）">最长公共子序列长度（普通）</li><li class="catalog-kp-item" onclick="selectKP('dp-linear-lcs-output')" title="最长公共子序列（带输出）">最长公共子序列（带输出）</li><li class="catalog-kp-item" onclick="selectKP('dp-linear-lcs-substring')" title="最长公共子串">最长公共子串</li><li class="catalog-subsub-title">LIS</li><li class="catalog-kp-item" onclick="selectKP('dp-linear-lis-binary')" title="最长上升子序列（二分）">最长上升子序列（二分）</li><li class="catalog-kp-item" onclick="selectKP('dp-linear-lis-bit-count')" title="最长上升子序列（树状数组优化·带计数）">最长上升子序列（树状数组优化·带计数）</li><li class="catalog-subsub-title">经典模型</li><li class="catalog-kp-item" onclick="selectKP('dp-linear-edit-distance')" title="字符串编辑距离">字符串编辑距离</li><li class="catalog-kp-item" onclick="selectKP('dp-linear-maxsub')" title="长度不超过m的最大子段和">长度不超过m的最大子段和</li><li class="catalog-kp-item" onclick="selectKP('dp-linear-triangle')" title="数字三角形">数字三角形</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('动态规划')" title="点击查看分类详情">背包问题</span><span class="catalog-subtitle-count">8 个</span></div><ul class="catalog-kp-list"><li class="catalog-subsub-title">01背包</li><li class="catalog-kp-item" onclick="selectKP('dp-01bag-2d')" title="二维费用01背包">二维费用01背包</li><li class="catalog-kp-item" onclick="selectKP('dp-01bag-record')" title="01背包（带记录/路径还原）">01背包（带记录/路径还原）</li><li class="catalog-kp-item" onclick="selectKP('dp-01bag-standard')" title="01背包（标准）">01背包（标准）</li><li class="catalog-kp-item" onclick="selectKP('dp-count-01bag')" title="计数01背包（最大值方案计数）">计数01背包（最大值方案计数）</li><li class="catalog-subsub-title">分组背包</li><li class="catalog-kp-item" onclick="selectKP('dp-group-bag')" title="分组背包">分组背包</li><li class="catalog-subsub-title">多重背包</li><li class="catalog-kp-item" onclick="selectKP('dp-multi-bag-binary')" title="多重背包（二进制优化）">多重背包（二进制优化）</li><li class="catalog-kp-item" onclick="selectKP('dp-multi-bag-monotone')" title="多重背包（单调队列优化）">多重背包（单调队列优化）</li><li class="catalog-subsub-title">完全背包</li><li class="catalog-kp-item" onclick="selectKP('dp-complete-bag')" title="完全背包">完全背包</li></ul></div></div></div></div><div class="catalog-category"><div class="catalog-category-header" onclick="this.parentElement.classList.toggle('expanded')"><div class="catalog-category-header-left"><span class="catalog-category-chevron">▶</span><span class="catalog-category-name">图论</span><span class="catalog-category-nature">图结构算法</span><span class="catalog-category-count">20</span></div><span class="catalog-category-detail-link" onclick="event.stopPropagation(); showCategoryOverview('图论')">查看详情 →</span></div><div class="catalog-category-body"><div class="catalog-sub-grid"><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">二分图</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('graph-bipartite-dfs-coloring')" title="二分图判定（DFS染色法）">二分图判定（DFS染色法）</li><li class="catalog-kp-item" onclick="selectKP('graph-bipartite-hungarian')" title="匈牙利算法（二分图最大匹配）">匈牙利算法（二分图最大匹配）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">割点与桥</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('graph-tarjan-bridge')" title="Tarjan 求桥（割边）">Tarjan 求桥（割边）</li><li class="catalog-kp-item" onclick="selectKP('graph-tarjan-cut-vertex')" title="Tarjan 求割点">Tarjan 求割点</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">拓扑排序</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('graph-topo-sort')" title="拓扑排序（Kahn算法/BFS）">拓扑排序（Kahn算法/BFS）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">最小生成树</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('graph-kruskal')" title="Kruskal 最小生成树（并查集+贪心）">Kruskal 最小生成树（并查集+贪心）</li><li class="catalog-kp-item" onclick="selectKP('graph-prim')" title="Prim 最小生成树（堆优化·Lazy 版）">Prim 最小生成树（堆优化·Lazy 版）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">最短路</span><span class="catalog-subtitle-count">6 个</span></div><ul class="catalog-kp-list"><li class="catalog-subsub-title">DAG最短路</li><li class="catalog-kp-item" onclick="selectKP('graph-dag-shortest-path')" title="DAG 最短路（拓扑排序）">DAG 最短路（拓扑排序）</li><li class="catalog-subsub-title">全源最短路</li><li class="catalog-kp-item" onclick="selectKP('graph-floyd')" title="Floyd-Warshall 全源最短路（传递闭包法）">Floyd-Warshall 全源最短路（传递闭包法）</li><li class="catalog-kp-item" onclick="selectKP('graph-johnson')" title="Johnson 全源最短路（负权图）">Johnson 全源最短路（负权图）</li><li class="catalog-subsub-title">单源最短路</li><li class="catalog-kp-item" onclick="selectKP('graph-bellman-ford')" title="Bellman-Ford 单源最短路（含负权）">Bellman-Ford 单源最短路（含负权）</li><li class="catalog-kp-item" onclick="selectKP('graph-dijkstra-heap')" title="Dijkstra 最短路（堆优化）">Dijkstra 最短路（堆优化）</li><li class="catalog-kp-item" onclick="selectKP('graph-spfa')" title="Bellman-Ford 批量松弛优化（类SPFA变体）">Bellman-Ford 批量松弛优化（类SPFA变体）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">最近公共祖先</span><span class="catalog-subtitle-count">3 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('graph-lca-doubling')" title="最近公共祖先 LCA（倍增法）">最近公共祖先 LCA（倍增法）</li><li class="catalog-kp-item" onclick="selectKP('graph-lca-hld')" title="最近公共祖先 LCA（重链剖分）">最近公共祖先 LCA（重链剖分）</li><li class="catalog-kp-item" onclick="selectKP('graph-lca-tarjan')" title="最近公共祖先 LCA（Tarjan 离线·并查集）">最近公共祖先 LCA（Tarjan 离线·并查集）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">树链剖分</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('graph-hld-segtree')" title="树链剖分（重链剖分+线段树）">树链剖分（重链剖分+线段树）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('图论')" title="点击查看分类详情">连通分量</span><span class="catalog-subtitle-count">3 个</span></div><ul class="catalog-kp-list"><li class="catalog-subsub-title">强连通分量</li><li class="catalog-kp-item" onclick="selectKP('graph-scc-condensation')" title="SCC 缩点（强连通分量缩点）">SCC 缩点（强连通分量缩点）</li><li class="catalog-kp-item" onclick="selectKP('graph-tarjan-scc')" title="Tarjan 强连通分量">Tarjan 强连通分量</li><li class="catalog-subsub-title">边双连通分量</li><li class="catalog-kp-item" onclick="selectKP('graph-e-dcc-condensation')" title="边双连通分量缩点（E-DCC）">边双连通分量缩点（E-DCC）</li></ul></div></div></div></div><div class="catalog-category"><div class="catalog-category-header" onclick="this.parentElement.classList.toggle('expanded')"><div class="catalog-category-header-left"><span class="catalog-category-chevron">▶</span><span class="catalog-category-name">基础算法</span><span class="catalog-category-nature">算法范式与技巧</span><span class="catalog-category-count">14</span></div><span class="catalog-category-detail-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')">查看详情 →</span></div><div class="catalog-category-body"><div class="catalog-sub-grid"><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">分治</span><span class="catalog-subtitle-count">3 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('basic-divide-conquer-closest-pair')" title="最近点对（平面最小点对，分治）">最近点对（平面最小点对，分治）</li><li class="catalog-kp-item" onclick="selectKP('basic-divide-conquer-merge-inversion')" title="归并排序求逆序对（分治）">归并排序求逆序对（分治）</li><li class="catalog-kp-item" onclick="selectKP('basic-quickselect-kth')" title="快速选择（Quickselect — 找第 k 小）">快速选择（Quickselect — 找第 k 小）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">双指针</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('basic-two-pointer-cycle')" title="链表环检测（Floyd 快慢指针）">链表环检测（Floyd 快慢指针）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">排序</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('basic-radix-sort-k')" title="k 进制基数排序">k 进制基数排序</li><li class="catalog-kp-item" onclick="selectKP('basic-shell-sort')" title="希尔排序（Shell Sort）">希尔排序（Shell Sort）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">搜索</span><span class="catalog-subtitle-count">5 个</span></div><ul class="catalog-kp-list"><li class="catalog-subsub-title">BFS</li><li class="catalog-kp-item" onclick="selectKP('basic-bfs-bidirectional')" title="双向 BFS（双向广度优先搜索）">双向 BFS（双向广度优先搜索）</li><li class="catalog-subsub-title">DFS</li><li class="catalog-kp-item" onclick="selectKP('basic-combination-dfs')" title="DFS 生成组合（选/不选 + 剪枝）">DFS 生成组合（选/不选 + 剪枝）</li><li class="catalog-kp-item" onclick="selectKP('basic-permutation-dfs')" title="DFS 生成全排列（回溯法）">DFS 生成全排列（回溯法）</li><li class="catalog-subsub-title">折半搜索</li><li class="catalog-kp-item" onclick="selectKP('basic-meet-in-middle-binary-search')" title="折半搜索（Meet in the Middle）— 二分查找版">折半搜索（Meet in the Middle）— 二分查找版</li><li class="catalog-kp-item" onclick="selectKP('basic-meet-in-middle-two-pointer')" title="折半搜索（Meet in the Middle）— 双指针合并版">折半搜索（Meet in the Middle）— 双指针合并版</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">数位提升</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('basic-digit-power-cycle-self')" title="按数位分层扩张幂周期算法（自己写的 P1050循环）">按数位分层扩张幂周期算法（自己写的 P1050循环）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('基础算法')" title="点击查看分类详情">贪心</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('basic-interval-merge')" title="区间合并（合并重叠/相邻区间）">区间合并（合并重叠/相邻区间）</li><li class="catalog-kp-item" onclick="selectKP('basic-interval-scheduling')" title="区间调度（选最多不重叠区间）">区间调度（选最多不重叠区间）</li></ul></div></div></div></div><div class="catalog-category"><div class="catalog-category-header" onclick="this.parentElement.classList.toggle('expanded')"><div class="catalog-category-header-left"><span class="catalog-category-chevron">▶</span><span class="catalog-category-name">字符串</span><span class="catalog-category-nature">字符串处理</span><span class="catalog-category-count">4</span></div><span class="catalog-category-detail-link" onclick="event.stopPropagation(); showCategoryOverview('字符串')">查看详情 →</span></div><div class="catalog-category-body"><div class="catalog-sub-grid"><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('字符串')" title="点击查看分类详情">字符串匹配</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('str-kmp')" title="KMP 字符串匹配算法">KMP 字符串匹配算法</li><li class="catalog-kp-item" onclick="selectKP('str-sunday')" title="Sunday 字符串匹配算法">Sunday 字符串匹配算法</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('字符串')" title="点击查看分类详情">字符串哈希</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('str-hash')" title="字符串哈希（多项式滚动哈希）">字符串哈希（多项式滚动哈希）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('字符串')" title="点击查看分类详情">最小表示法</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('str-minimal-representation')" title="最小表示法（循环同构串的最小字典序）">最小表示法（循环同构串的最小字典序）</li></ul></div></div></div></div><div class="catalog-category"><div class="catalog-category-header" onclick="this.parentElement.classList.toggle('expanded')"><div class="catalog-category-header-left"><span class="catalog-category-chevron">▶</span><span class="catalog-category-name">数学</span><span class="catalog-category-nature">数论与组合数学</span><span class="catalog-category-count">14</span></div><span class="catalog-category-detail-link" onclick="event.stopPropagation(); showCategoryOverview('数学')">查看详情 →</span></div><div class="catalog-category-body"><div class="catalog-sub-grid"><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数学')" title="点击查看分类详情">快速幂</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('math-quick-pow-basic')" title="快速幂（基础，模意义下）">快速幂（基础，模意义下）</li><li class="catalog-kp-item" onclick="selectKP('math-quick-pow-highprecision')" title="快速幂（高精度）——麦森数2^P−1">快速幂（高精度）——麦森数2^P−1</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数学')" title="点击查看分类详情">数论基础</span><span class="catalog-subtitle-count">8 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('math-crt')" title="中国剩余定理（CRT）">中国剩余定理（CRT）</li><li class="catalog-kp-item" onclick="selectKP('math-euler-phi')" title="欧拉函数（单次求值）">欧拉函数（单次求值）</li><li class="catalog-kp-item" onclick="selectKP('math-gcd-lcm')" title="GCD 与 LCM（欧几里得算法）">GCD 与 LCM（欧几里得算法）</li><li class="catalog-kp-item" onclick="selectKP('math-linear-sieve-divisor-count')" title="线性筛求约数个数（欧拉筛批量预处理）">线性筛求约数个数（欧拉筛批量预处理）</li><li class="catalog-kp-item" onclick="selectKP('math-linear-sieve-divisor-sum')" title="线性筛求约数和（欧拉筛批量预处理）">线性筛求约数和（欧拉筛批量预处理）</li><li class="catalog-kp-item" onclick="selectKP('math-linear-sieve-phi')" title="线性筛求欧拉函数（欧拉筛批量预处理）">线性筛求欧拉函数（欧拉筛批量预处理）</li><li class="catalog-kp-item" onclick="selectKP('math-modular-inverse')" title="模逆元（费马小定理 + 扩展欧几里得）">模逆元（费马小定理 + 扩展欧几里得）</li><li class="catalog-kp-item" onclick="selectKP('math-sieve-eratosthenes')" title="埃拉托斯特尼筛法（埃氏筛）">埃拉托斯特尼筛法（埃氏筛）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数学')" title="点击查看分类详情">数论计数</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('math-lcm-pair-count')" title="LCM数对计数问题">LCM数对计数问题</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数学')" title="点击查看分类详情">矩阵</span><span class="catalog-subtitle-count">3 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('math-matrix-linear-recurrence')" title="矩阵加速线性递推">矩阵加速线性递推</li><li class="catalog-kp-item" onclick="selectKP('math-matrix-multiplication')" title="矩阵乘法">矩阵乘法</li><li class="catalog-kp-item" onclick="selectKP('math-matrix-quick-pow')" title="矩阵快速幂">矩阵快速幂</li></ul></div></div></div></div><div class="catalog-category"><div class="catalog-category-header" onclick="this.parentElement.classList.toggle('expanded')"><div class="catalog-category-header-left"><span class="catalog-category-chevron">▶</span><span class="catalog-category-name">数据结构</span><span class="catalog-category-nature">数据组织与查询</span><span class="catalog-category-count">30</span></div><span class="catalog-category-detail-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')">查看详情 →</span></div><div class="catalog-category-body"><div class="catalog-sub-grid"><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">ST表</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('ds-st-table-1')" title="ST表（标准版1 - 手动预处理对数表）">ST表（标准版1 - 手动预处理对数表）</li><li class="catalog-kp-item" onclick="selectKP('ds-st-table-2')" title="ST表（标准版2 - 内建函数求对数）">ST表（标准版2 - 内建函数求对数）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">分块</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('ds-block-decomposition')" title="分块（区间加·区间求和·区间≤k求和）">分块（区间加·区间求和·区间≤k求和）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">前缀和与差分</span><span class="catalog-subtitle-count">6 个</span></div><ul class="catalog-kp-list"><li class="catalog-subsub-title">一维</li><li class="catalog-kp-item" onclick="selectKP('ds-diff-1d')" title="一维差分（区间加·批量更新）">一维差分（区间加·批量更新）</li><li class="catalog-kp-item" onclick="selectKP('ds-prefix-sum-1d')" title="一维前缀和（区间和查询）">一维前缀和（区间和查询）</li><li class="catalog-subsub-title">二维</li><li class="catalog-kp-item" onclick="selectKP('ds-diff-2d')" title="二维差分（子矩阵加·批量更新）">二维差分（子矩阵加·批量更新）</li><li class="catalog-kp-item" onclick="selectKP('ds-prefix-sum-2d')" title="二维前缀和（子矩阵和查询）">二维前缀和（子矩阵和查询）</li><li class="catalog-subsub-title">树上</li><li class="catalog-kp-item" onclick="selectKP('ds-diff-tree')" title="树上点差分（路径点权修改）">树上点差分（路径点权修改）</li><li class="catalog-kp-item" onclick="selectKP('ds-prefix-sum-tree')" title="树上前缀和（路径点权和查询）">树上前缀和（路径点权和查询）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">单调队列</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('ds-monoqueue-1d')" title="一维滑动窗口最值（单调队列基础模板）">一维滑动窗口最值（单调队列基础模板）</li><li class="catalog-kp-item" onclick="selectKP('ds-monoqueue-2d')" title="二维滑动窗口最值（两阶段单调队列）">二维滑动窗口最值（两阶段单调队列）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">可持久化线段树</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('ds-persistent-segtree-3919')" title="可持久化线段树（单点修改单点查询 P3919）">可持久化线段树（单点修改单点查询 P3919）</li><li class="catalog-kp-item" onclick="selectKP('ds-persistent-segtree-template')" title="可持久化线段树（单点修改区间求和 普通模板）">可持久化线段树（单点修改区间求和 普通模板）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">堆</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('ds-dual-heap')" title="对顶堆（动态维护第 k 小）">对顶堆（动态维护第 k 小）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">字典树</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('ds-trie-01-max-xor')" title="01-Trie — 最大异或和（按位贪心）">01-Trie — 最大异或和（按位贪心）</li><li class="catalog-kp-item" onclick="selectKP('ds-trie')" title="字典树（Trie）— 前缀检索的标配结构">字典树（Trie）— 前缀检索的标配结构</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">平衡树</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('ds-splay')" title="Splay树（伸展树）">Splay树（伸展树）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">并查集</span><span class="catalog-subtitle-count">5 个</span></div><ul class="catalog-kp-list"><li class="catalog-subsub-title">基础</li><li class="catalog-kp-item" onclick="selectKP('ds-uf-basic')" title="并查集（基础 - 仅路径压缩）">并查集（基础 - 仅路径压缩）</li><li class="catalog-kp-item" onclick="selectKP('ds-uf-rank')" title="并查集（带秩优化）">并查集（带秩优化）</li><li class="catalog-subsub-title">带权</li><li class="catalog-kp-item" onclick="selectKP('ds-uf-weighted-food')" title="带权并查集（扩展题目 - 食物链P2024）">带权并查集（扩展题目 - 食物链P2024）</li><li class="catalog-kp-item" onclick="selectKP('ds-uf-weighted-old')" title="带权并查集（以前没有学的时候写的 - 蓝桥1156）">带权并查集（以前没有学的时候写的 - 蓝桥1156）</li><li class="catalog-subsub-title">扩展域</li><li class="catalog-kp-item" onclick="selectKP('ds-uf-extended-domain')" title="扩展域并查集（P1892）">扩展域并查集（P1892）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">栈</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-subsub-title">前缀最值</li><li class="catalog-kp-item" onclick="selectKP('ds-stack-prefix-max')" title="前缀最值栈（栈内最大值查询）">前缀最值栈（栈内最大值查询）</li><li class="catalog-subsub-title">单调栈</li><li class="catalog-kp-item" onclick="selectKP('ds-monostack-histogram')" title="单调栈（直方图最大矩形）">单调栈（直方图最大矩形）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">树状数组</span><span class="catalog-subtitle-count">2 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('ds-bit-point-range')" title="树状数组（单点修改区间求和 P3374）">树状数组（单点修改区间求和 P3374）</li><li class="catalog-kp-item" onclick="selectKP('ds-bit-range-point')" title="树状数组（区间修改单点求和 P3368）">树状数组（区间修改单点求和 P3368）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">线段树</span><span class="catalog-subtitle-count">3 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('ds-segtree-basic')" title="线段树基础模板（区间加法+区间求和 P3372）">线段树基础模板（区间加法+区间求和 P3372）</li><li class="catalog-kp-item" onclick="selectKP('ds-segtree-discretize')" title="离散化+线段树（大值域少查询）">离散化+线段树（大值域少查询）</li><li class="catalog-kp-item" onclick="selectKP('ds-segtree-mul')" title="乘法线段树（区间乘法+区间加法双标记 P3373）">乘法线段树（区间乘法+区间加法双标记 P3373）</li></ul></div><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('数据结构')" title="点击查看分类详情">莫队</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('ds-mo-team')" title="普通莫队">普通莫队</li></ul></div></div></div></div><div class="catalog-category"><div class="catalog-category-header" onclick="this.parentElement.classList.toggle('expanded')"><div class="catalog-category-header-left"><span class="catalog-category-chevron">▶</span><span class="catalog-category-name">输入输出</span><span class="catalog-category-nature">I/O优化技术</span><span class="catalog-category-count">1</span></div><span class="catalog-category-detail-link" onclick="event.stopPropagation(); showCategoryOverview('输入输出')">查看详情 →</span></div><div class="catalog-category-body"><div class="catalog-sub-grid"><div class="catalog-subcard"><div class="catalog-subtitle"><span class="subcategory-link" onclick="event.stopPropagation(); showCategoryOverview('输入输出')" title="点击查看分类详情">IO优化</span><span class="catalog-subtitle-count">1 个</span></div><ul class="catalog-kp-list"><li class="catalog-kp-item" onclick="selectKP('io-fast-io')" title="快速输入输出（读入/输出优化模板）">快速输入输出（读入/输出优化模板）</li></ul></div></div></div></div></div></main>
+        <main id="content"><div class="placeholder">📑 正在加载知识点总目录…</div></main>
     </div>
     <button id="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
     <button id="theme-toggle" onclick="toggleDark()"><span id="theme-icon">🌙</span></button>
@@ -1254,12 +1291,8 @@
             buildSidebar();
 
             // Search
-            searchInput.addEventListener('input', function(e) {
-                if (currentMode === 'kp') {
-                    buildSidebar(e.target.value);
-                } else {
-                    buildProblemSidebar(e.target.value);
-                }
+            searchInput.addEventListener('input', function() {
+                scheduleSearch();
             });
 
             // Keyboard
@@ -1391,6 +1424,29 @@
             } else {
                 buildProblemSidebar(searchInput.value);
             }
+        }
+
+        // 输入防抖：避免每敲一个字符都全量重建侧栏
+        var searchTimer = null;
+        function scheduleSearch() {
+            if (searchTimer) clearTimeout(searchTimer);
+            searchTimer = setTimeout(function() {
+                searchTimer = null;
+                doSearch();
+            }, 120);
+        }
+
+        // 搜索用小写索引：首次使用时构建并缓存在条目上（标题 / ID / 分类 / 小分类 / 标签 / 正文）
+        function searchBlob(item) {
+            if (item._searchBlob !== undefined) return item._searchBlob;
+            var parts = [item.title, item.id, item.category, item.subcategory, item.subSubcategory,
+                item.oj, item.problemId, item.difficulty, (item.tags || []).join(' '), item.content];
+            var blob = '';
+            for (var i = 0; i < parts.length; i++) {
+                if (parts[i]) blob += String(parts[i]).toLowerCase() + '\n';
+            }
+            item._searchBlob = blob;
+            return blob;
         }
 
         function matchesTagFilter(item) {
@@ -1529,20 +1585,13 @@
         function buildSidebar(filter) {
             filter = filter || '';
             var hasFilter = filter || selectedTags.size > 0;
+            var q = filter ? filter.toLowerCase() : '';
             var tree = {};
 
             KNOWLEDGE_DATA.forEach(function(kp) {
                 if (!matchesTagFilter(kp)) return;
-                if (filter) {
-                    var q = filter.toLowerCase();
-                    var matches = kp.title.toLowerCase().indexOf(q) >= 0 ||
-                        kp.category.toLowerCase().indexOf(q) >= 0 ||
-                        kp.subcategory.toLowerCase().indexOf(q) >= 0 ||
-                        (kp.subSubcategory && kp.subSubcategory.toLowerCase().indexOf(q) >= 0) ||
-                        (kp.tags && kp.tags.some(function(t) { return t.toLowerCase().indexOf(q) >= 0; })) ||
-                        (kp.content && kp.content.toLowerCase().indexOf(q) >= 0);
-                    if (!matches) return;
-                }
+                // 搜索命中范围：标题 / ID / 分类 / 子分类 / 小分类 / 标签 / 正文
+                if (q && searchBlob(kp).indexOf(q) < 0) return;
                 if (!tree[kp.category]) tree[kp.category] = {};
                 if (!tree[kp.category][kp.subcategory]) tree[kp.category][kp.subcategory] = {};
                 var ssub = kp.subSubcategory || '';
@@ -1564,7 +1613,7 @@
                 var totalCount = Object.values(subs).reduce(function(s, ssubs) {
                     return s + Object.values(ssubs).reduce(function(s2, arr) { return s2 + arr.length; }, 0);
                 }, 0);
-                var expanded = hasFilter ? ' expanded' : ' expanded';
+                var expanded = hasFilter ? ' expanded' : '';
 
                 html += '<div class="category' + expanded + '">';
                 html += '<div class="category-header" onclick="this.parentElement.classList.toggle(\'expanded\')">';
@@ -1631,10 +1680,76 @@
             });
         }
 
+        // 展开当前选中项所在的大类/子分类，避免默认收起时看不到高亮条目
+        function revealActiveInSidebar() {
+            var el = sidebarNav.querySelector('.kp-item.active');
+            if (!el) return;
+            var node = el.parentElement;
+            while (node && node !== sidebarNav) {
+                if (node.classList.contains('category') || node.classList.contains('subcategory')) {
+                    node.classList.add('expanded');
+                }
+                node = node.parentElement;
+            }
+        }
+
+        // 切到总目录/分类概览时同步清掉侧栏高亮，避免「主区域换了、侧栏还停在旧条目」
+        function clearSidebarActive() {
+            currentId = null;
+            var actives = sidebarNav.querySelectorAll('.kp-item.active');
+            for (var i = 0; i < actives.length; i++) {
+                actives[i].classList.remove('active');
+            }
+        }
+
+        // ===== Markdown + LaTeX 渲染（提取-解析-恢复三步法）=====
+        // marked.js 会转义反斜杠、拆分 $ 分隔符，所以先把公式抽成占位符，解析完再换回 KaTeX HTML。
+        // 行内公式护栏：$ 后紧跟空白、或 $ 前是空白，都不认作公式（正文里孤立的 $ 因此不会被误配成公式）。
+        var INLINE_MATH_RE = /\$(?!\s)([^\$\n]*?[^\s$])\$/g;
+        function renderMarkdownWithMath(raw) {
+            var mathStore = [];
+            var text = String(raw || '');
+
+            // Step 1: Extract block math $$...$$ → placeholder
+            text = text.replace(/\$\$([\s\S]+?)\$\$/g, function(m, p1) {
+                var idx = mathStore.length;
+                mathStore.push({ type: 'block', tex: p1 });
+                return '@@KATEX' + idx + '@@';
+            });
+
+            // Step 2: Extract inline math $...$ → placeholder
+            text = text.replace(INLINE_MATH_RE, function(m, p1) {
+                var idx = mathStore.length;
+                mathStore.push({ type: 'inline', tex: p1 });
+                return '@@KATEX' + idx + '@@';
+            });
+
+            // Step 3: Parse Markdown (placeholders are plain text, safe from marked.js)
+            var html = marked.parse(text);
+
+            // Step 4: Replace placeholders with KaTeX-rendered HTML
+            for (var i = 0; i < mathStore.length; i++) {
+                var placeholder = '@@KATEX' + i + '@@';
+                var rendered;
+                try {
+                    rendered = katex.renderToString(mathStore[i].tex, {
+                        displayMode: mathStore[i].type === 'block',
+                        throwOnError: false,
+                        errorColor: '#cc0000'
+                    });
+                } catch (e) {
+                    rendered = '<code>' + escHtml(mathStore[i].tex) + '</code>';
+                }
+                html = html.split(placeholder).join(rendered);
+            }
+            return html;
+        }
+
         // ===== Select Knowledge Point =====
         function selectKP(id) {
             var kp = KNOWLEDGE_DATA.find(function(k) { return k.id === id; });
             if (!kp) return;
+            document.title = kp.title + ' · 算法知识点查询系统';
 
             currentId = id;
 
@@ -1649,46 +1764,10 @@
             }
             metaHtml += '</div>';
 
-            // Render content: extract math → parse Markdown → restore math
-            // Placeholders protect LaTeX from being mangled by marked.js
-            // (e.g. __builtin_clz in LaTeX becomes bold markers in Markdown)
+            // Render content: 三步法保护 LaTeX（实现见 renderMarkdownWithMath）
             var contentHtml = '';
             try {
-                var raw = kp.content || '';
-                var mathStore = [];
-
-                // Step 1: Extract block math $$...$$ → placeholder
-                raw = raw.replace(/\$\$([\s\S]+?)\$\$/g, function(m, p1) {
-                    var idx = mathStore.length;
-                    mathStore.push({ type: 'block', tex: p1 });
-                    return '@@KATEX' + idx + '@@';
-                });
-
-                // Step 2: Extract inline math $...$ → placeholder
-                raw = raw.replace(/\$([^\$\n]+?)\$/g, function(m, p1) {
-                    var idx = mathStore.length;
-                    mathStore.push({ type: 'inline', tex: p1 });
-                    return '@@KATEX' + idx + '@@';
-                });
-
-                // Step 3: Parse Markdown (placeholders are plain text, safe from marked.js)
-                contentHtml = marked.parse(raw);
-
-                // Step 4: Replace placeholders with KaTeX-rendered HTML
-                for (var i = 0; i < mathStore.length; i++) {
-                    var placeholder = '@@KATEX' + i + '@@';
-                    var rendered = '';
-                    try {
-                        rendered = katex.renderToString(mathStore[i].tex, {
-                            displayMode: mathStore[i].type === 'block',
-                            throwOnError: false,
-                            errorColor: '#cc0000'
-                        });
-                    } catch (e) {
-                        rendered = '<code>' + escHtml(mathStore[i].tex) + '</code>';
-                    }
-                    contentHtml = contentHtml.split(placeholder).join(rendered);
-                }
+                contentHtml = renderMarkdownWithMath(kp.content);
             } catch(e) {
                 contentHtml = '<p>内容渲染出错: ' + escHtml(e.message) + '</p>';
             }
@@ -1799,6 +1878,7 @@
             var savedState = saveSidebarState();
             buildSidebar(searchInput.value);
             restoreSidebarState(savedState);
+            revealActiveInSidebar();
 
             // Scroll to top
             contentEl.scrollTop = 0;
@@ -1832,7 +1912,7 @@
 
         // ===== Catalog Page =====
         function showCatalog() {
-            currentId = null;
+            clearSidebarActive();
             // Build category tree (3-level: category > subcategory > subSubcategory)
             var tree = {};
             KNOWLEDGE_DATA.forEach(function(kp) {
@@ -1850,6 +1930,7 @@
             cats.forEach(function(c) { totalSubs += Object.keys(tree[c]).length; });
 
             var html = '<div class="catalog-page">';
+            document.title = '算法知识点查询系统';
             html += '<h1>📑 知识点总目录</h1>';
             html += '<div class="catalog-desc">按分类浏览所有知识点，点击任意知识点即可跳转查看详情。</div>';
 
@@ -1913,7 +1994,7 @@
 
         // ===== Category Overview Page =====
         function showCategoryOverview(catName) {
-            currentId = null;
+            clearSidebarActive();
             var catMeta = (typeof CATEGORY_META !== 'undefined' && CATEGORY_META[catName]) || {};
 
             var subs = {};
@@ -1951,11 +2032,36 @@
                     html += '<p class="subcategory-block-desc">' + escHtml(subMeta.description) + '</p>';
                 }
                 html += '<div class="subcategory-kp-grid">';
+                var flatKps = [];
+                var ssubGroups = [];
                 Object.keys(ssubs).sort().forEach(function(ssub) {
-                    ssubs[ssub].forEach(function(kp) {
-                        var ssubLabel = ssub ? '<span style="font-size:0.7rem;color:var(--text-muted);display:block;margin-bottom:0.2rem;">' + escHtml(ssub) + '</span>' : '';
-                        html += '<div class="subcategory-kp-card" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' + ssubLabel + escHtml(kp.title) + '</div>';
+                    if (ssub) {
+                        ssubGroups.push({ name: ssub, items: ssubs[ssub] });
+                    } else {
+                        flatKps = flatKps.concat(ssubs[ssub]);
+                    }
+                });
+
+                // 没有小分类的知识点直接铺在子分类网格里
+                flatKps.forEach(function(kp) {
+                    html += renderKpCard(kp);
+                });
+
+                // 有小分类的按小分类成块，并接线 SUBSUBCATEGORY_META 的说明
+                ssubGroups.forEach(function(group) {
+                    var ssubMeta = (typeof SUBSUBCATEGORY_META !== 'undefined' &&
+                        SUBSUBCATEGORY_META[subKey + '|' + group.name]) || {};
+                    html += '<div class="subsubcategory-block">';
+                    html += '<div class="subsubcategory-block-title">' + escHtml(group.name);
+                    html += ' <span class="subsubcategory-block-count">' + group.items.length + ' 个</span></div>';
+                    if (ssubMeta.description) {
+                        html += '<p class="subsubcategory-block-desc">' + escHtml(ssubMeta.description) + '</p>';
+                    }
+                    html += '<div class="subsubcategory-block-grid">';
+                    group.items.forEach(function(kp) {
+                        html += renderKpCard(kp);
                     });
+                    html += '</div></div>';
                 });
                 html += '</div></div>';
             });
@@ -1963,10 +2069,6 @@
             html += '</div>';
             contentEl.innerHTML = html;
             contentEl.scrollTop = 0;
-
-            document.querySelectorAll('.kp-item').forEach(function(el) {
-                el.classList.remove('active');
-            });
 
             if (window.innerWidth <= 768) {
                 document.getElementById('sidebar').classList.remove('open');
@@ -1995,13 +2097,17 @@
         }
 
         function updateFooter() {
+            var count, label;
             if (currentMode === 'kp') {
-                kpCountEl.textContent = KNOWLEDGE_DATA.length;
-                document.querySelector('.sidebar-footer').innerHTML = '<span id="kp-count">' + KNOWLEDGE_DATA.length + '</span> 个知识点';
+                count = KNOWLEDGE_DATA.length;
+                label = '个知识点';
             } else {
-                var count = (typeof PROBLEMS_DATA !== 'undefined') ? PROBLEMS_DATA.length : 0;
-                document.querySelector('.sidebar-footer').innerHTML = '<span id="kp-count">' + count + '</span> 个题目';
+                count = (typeof PROBLEMS_DATA !== 'undefined') ? PROBLEMS_DATA.length : 0;
+                label = '个题目';
             }
+            // 整块重写，避免再引用被 innerHTML 替换掉的旧节点
+            document.querySelector('.sidebar-footer').innerHTML =
+                '<span id="kp-count">' + count + '</span> ' + label;
         }
 
         // ===== Build Problem Sidebar =====
@@ -2015,17 +2121,12 @@
 
             var tree = {};
 
+            var q = filter ? filter.toLowerCase() : '';
+
             PROBLEMS_DATA.forEach(function(prob) {
                 if (!matchesTagFilter(prob)) return;
-                if (filter) {
-                    var q = filter.toLowerCase();
-                    var matches = prob.title.toLowerCase().indexOf(q) >= 0 ||
-                        (prob.category && prob.category.toLowerCase().indexOf(q) >= 0) ||
-                        (prob.oj && prob.oj.toLowerCase().indexOf(q) >= 0) ||
-                        (prob.tags && prob.tags.some(function(t) { return t.toLowerCase().indexOf(q) >= 0; })) ||
-                        (prob.content && prob.content.toLowerCase().indexOf(q) >= 0);
-                    if (!matches) return;
-                }
+                // 搜索命中范围：标题 / ID / 分类 / OJ / 题号 / 难度 / 标签 / 正文
+                if (q && searchBlob(prob).indexOf(q) < 0) return;
                 var cat = prob.category || '未分类';
                 if (!tree[cat]) tree[cat] = [];
                 tree[cat].push(prob);
@@ -2042,7 +2143,7 @@
 
             cats.forEach(function(cat) {
                 var probs = tree[cat];
-                var expanded = hasFilter ? ' expanded' : ' expanded';
+                var expanded = hasFilter ? ' expanded' : '';
 
                 html += '<div class="category' + expanded + '">';
                 html += '<div class="category-header" onclick="this.parentElement.classList.toggle(\'expanded\')">';
@@ -2072,6 +2173,7 @@
         function selectProblem(id) {
             var prob = PROBLEMS_DATA.find(function(p) { return p.id === id; });
             if (!prob) return;
+            document.title = prob.title + ' · 算法知识点查询系统';
 
             currentId = id;
 
@@ -2097,40 +2199,10 @@
             }
             metaHtml += '</div>';
 
-            // Render content (same LaTeX protection as knowledge points)
+            // Render content: 三步法保护 LaTeX（实现见 renderMarkdownWithMath）
             var contentHtml = '';
             try {
-                var raw = prob.content || '';
-                var mathStore = [];
-
-                raw = raw.replace(/\$\$([\s\S]+?)\$\$/g, function(m, p1) {
-                    var idx = mathStore.length;
-                    mathStore.push({ type: 'block', tex: p1 });
-                    return '@@KATEX' + idx + '@@';
-                });
-
-                raw = raw.replace(/\$([^\$\n]+?)\$/g, function(m, p1) {
-                    var idx = mathStore.length;
-                    mathStore.push({ type: 'inline', tex: p1 });
-                    return '@@KATEX' + idx + '@@';
-                });
-
-                contentHtml = marked.parse(raw);
-
-                for (var i = 0; i < mathStore.length; i++) {
-                    var placeholder = '@@KATEX' + i + '@@';
-                    var rendered = '';
-                    try {
-                        rendered = katex.renderToString(mathStore[i].tex, {
-                            displayMode: mathStore[i].type === 'block',
-                            throwOnError: false,
-                            errorColor: '#cc0000'
-                        });
-                    } catch (e) {
-                        rendered = '<code>' + escHtml(mathStore[i].tex) + '</code>';
-                    }
-                    contentHtml = contentHtml.split(placeholder).join(rendered);
-                }
+                contentHtml = renderMarkdownWithMath(prob.content);
             } catch(e) {
                 contentHtml = '<p>内容渲染出错: ' + escHtml(e.message) + '</p>';
             }
@@ -2204,6 +2276,7 @@
 
             // Update sidebar active
             buildProblemSidebar(searchInput.value);
+            revealActiveInSidebar();
 
             // Scroll to top
             contentEl.scrollTop = 0;
@@ -2216,7 +2289,7 @@
 
         // ===== Problem Catalog Page =====
         function showProblemCatalog() {
-            currentId = null;
+            clearSidebarActive();
 
             if (typeof PROBLEMS_DATA === 'undefined' || PROBLEMS_DATA.length === 0) {
                 contentEl.innerHTML = '<div class="placeholder">暂无题目<br><span style="font-size:0.85rem;margin-top:0.5rem;display:block;">将题目 .md 文件放入 problems/ 目录后运行 node build.js</span></div>';
@@ -2241,6 +2314,7 @@
             var otherCount = PROBLEMS_DATA.filter(function(p) { return p.difficulty !== '简单' && p.difficulty !== '中等' && p.difficulty !== '困难'; }).length;
 
             var html = '<div class="catalog-page">';
+            document.title = '题目专辑 · 算法知识点查询系统';
             html += '<h1>📝 题目专辑</h1>';
             html += '<div class="catalog-desc">按分类浏览所有题目，点击题目即可查看题解详情。</div>';
 
@@ -2345,6 +2419,10 @@
         }
 
         // ===== Helpers =====
+        function renderKpCard(kp) {
+            return '<div class="subcategory-kp-card" onclick="selectKP(\'' + kp.id + '\')" title="' + escAttr(kp.title) + '">' + escHtml(kp.title) + '</div>';
+        }
+
         function escHtml(text) {
             if (!text) return '';
             var div = document.createElement('div');

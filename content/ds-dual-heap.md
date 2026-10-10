@@ -246,7 +246,7 @@ int main()
 |---|---|---|
 | 插入 `add` | $O(\log n)$ | 堆插入 $O(\log n)$ $+$ 平衡（最多移动 1 个元素）$O(\log n)$ |
 | 查询第 $k$ 小 | $O(1)$ | 直接读 $L.\text{top}()$ |
-| 修改 $k$ 值 `my_move` | $O(|\Delta| \cdot \log n)$ | $\Delta$ 为需要移动的元素数量，最坏 $O(n \log n)$ |
+| 修改 $k$ 值 `my_move` | $O(\lvert\Delta\rvert \cdot \log n)$ | $\Delta$ 为需要移动的元素数量，最坏 $O(n \log n)$ |
 | 空间 | $O(n)$ | 两个堆共存储 $n$ 个元素 |
 
 插入的平摊复杂度：每次 `add` 后 `my_move` 最多移动 1 个元素（因为插入前后 $|L|$ 最多偏移 1），所以单次插入确实是 $O(\log n)$。
@@ -302,7 +302,7 @@ int main()
 |---|---|---|---|---|
 | 动态插入 | $O(\log n)$ | $O(\log n)$ | 不支持（静态） | 不支持 |
 | 查询第 $k$ 小 | $O(1)$ | $O(\log n)$ | $O(\log n)$ | $O(n)$（单次） |
-| 修改 $k$ 值 | $O(|\Delta| \log n)$ | $O(\log n)$ | — | — |
+| 修改 $k$ 值 | $O(\lvert\Delta\rvert \log n)$ | $O(\log n)$ | — | — |
 | 删除元素 | 不支持 | $O(\log n)$ | 不支持 | 不支持 |
 | 区间第 $k$ 小 | 不支持 | 不支持 | 支持 | 不支持 |
 | 空间 | $O(n)$ | $O(n)$ | $O(n \log n)$ | $O(n)$ |

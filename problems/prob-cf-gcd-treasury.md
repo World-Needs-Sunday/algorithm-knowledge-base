@@ -1,6 +1,6 @@
 ---
 id: prob-cf-gcd-treasury
-title: 'C. GCD Treasury — 质因子枚举 + 数论结论'
+title: 'GCD Treasury — 质因子枚举 + 数论结论'
 oj: 'Codeforces'
 problemId: 'C. GCD Treasury'
 difficulty: '中等'
@@ -42,6 +42,12 @@ codePath: '题目专辑\数学\GCD国库\代码.cpp'
 
 ---
 
+### 数据范围
+
+- $1 \le t \le 10^4$
+- $1 \le n, x \le 3 \times 10^5$，$1 \le a_i \le 3 \times 10^5$
+- 所有测试用例的 $n$ 之和不超过 $3 \times 10^5$
+
 ## 样例
 
 ### 样例 1
@@ -79,7 +85,7 @@ codePath: '题目专辑\数学\GCD国库\代码.cpp'
 
 ---
 
-## 核心洞察：从模拟到结论
+## 解题思路：核心洞察——从模拟到结论
 
 这道题的难点在于从「模拟偷取过程」的表象中提炼出简洁的数论结论。下面逐步推导。
 
@@ -200,7 +206,9 @@ int main()
                 for (int j = 1; j <= n; j++)
                 {
                     if (A[j] % i == 0)  // 能被 i 整除的堆都可以被偷光
+                    {
                         tmp += A[j];
+                    }
                 }
                 ans = max(ans, tmp);
             }
@@ -213,7 +221,9 @@ int main()
             for (int j = 1; j <= n; j++)
             {
                 if (A[j] % x == 0)
+                {
                     tmp += A[j];
+                }
             }
             ans = max(ans, tmp);
         }

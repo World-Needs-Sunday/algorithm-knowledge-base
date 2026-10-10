@@ -6,11 +6,13 @@ subcategory: '数论基础'
 difficulty: '普及+'
 tags: ['数学', '数论', '模逆元', '费马小定理', '欧拉定理', '快速幂', '扩展欧几里得']
 prerequisites: ['math-quick-pow-basic', 'math-euler-phi', 'math-gcd-lcm']
+timeComplexity: 'O(log q)'
+spaceComplexity: 'O(1)'
 codePath: '数学\数论基础\模逆元\源.cpp'
 description: '模逆元 a^{-1} mod q 满足 a * a^{-1} ≡ 1 (mod q)。当 q 为质数时，由费马小定理 a^{q-2} ≡ a^{-1} (mod q)，用快速幂 O(log q) 求解；当 q 不为质数但 gcd(a,q)=1 时，由欧拉定理 a^{φ(q)-1} ≡ a^{-1} (mod q)。逆元是模意义下做除法的核心工具。'
 ---
 
-# 模逆元（费马小定理 + 扩展欧几里得）
+## 模逆元（费马小定理 + 扩展欧几里得）
 
 ## 一、算法原理
 

@@ -119,7 +119,7 @@ long long get(int i) {
 
 ```cpp
 #include<bits/stdc++.h>
-/*代紅P3368*/
+/*洛谷P3368*/
 using namespace std; 
 vector<long long> treearr;          // 存差分数组的树状数组
 inline int lowbit(int i)

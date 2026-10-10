@@ -107,7 +107,7 @@ long long get(int i) {
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-/*代紅P3374*/
+/*洛谷P3374*/
 vector<long long> treearr;          // 一维数组充当树，用 long long 防溢出
 inline int lowbit(int i)
 {

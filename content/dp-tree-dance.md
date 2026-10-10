@@ -44,7 +44,7 @@ $$\text{ans} = \max\big(dp[\text{root}][0],\; dp[\text{root}][1]\big)$$
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-/*代紅P1352*/
+/*洛谷P1352*/
 vector<int> A;
 vector<vector<int>> dp;
 vector<bool> fa;

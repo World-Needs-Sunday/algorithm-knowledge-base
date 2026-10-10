@@ -42,6 +42,78 @@ $$f[(1 \ll n) - 1][n - 1]$$
 
 经过所有点（全 $1$ 状态），停在终点 $n-1$。
 
+## 逐行代码解析
+
+### 定义与初始化
+
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+int main()
+{
+	//Hamilton路径的定义是从0到n - 1不重不漏地经过每个点一次。
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+	int n, m;
+	cin >> n >> m;
+	//f[i][j]:当前状态为i,正在j点上
+	vector<vector<long long>> f((1 << n), vector<long long>(n,INT_MAX));
+	vector<vector<int>> edges(n, vector<int>(n,INT_MAX));
+```
+
+- `n`、`m` 分别是有向图的点数和边数；关闭同步流是为了让 $n \le 20$ 时的读入不成为瓶颈。
+- `f[mask][j]` 表示「已访问点集为 `mask`、当前停留在点 $j$」的最短路径长度。初值 `INT_MAX` 用于表示该状态尚不可达。
+- `edges[u][v]` 是邻接矩阵；同样初始化为 `INT_MAX`，这样后面的松弛不会误用不存在的边。
+
+### 读入边与起点状态
+
+```cpp
+	for (int i = 1; i <= m; i++)
+	{
+		int u, v, k;
+		cin >> u >> v >> k;
+		edges[u][v] = min(edges[u][v], k);
+	}
+
+	f[1][0] = 0;
+```
+
+- 逐条读入有向边 $(u, v, k)$，`min` 保证**重边取最小权**。
+- `f[1][0] = 0`：`mask = 1` 表示「只访问了点 0」，当前正停在点 0，路径长度为 0。这是唯一的初始可达状态。
+
+### 状态转移
+
+```cpp
+	for (int i = 1; i < (1 << n); i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			//如果点j被经过了，则退出这一轮
+			if (!((i >> j) & 1)) continue;
+			for (int k = 0; k < n; k++)
+			{
+				//判断上一个状态的k是否被经过，如果是则松弛边
+				if (((i ^ (1 << j)) >> k & 1))f[i][j] = min(f[i][j], f[i ^ (1 << j)][k] + edges[k][j]);
+			}
+		}
+	}
+```
+
+- 外层 `i` 按 `mask` **从小到大**枚举；由于 $i \oplus 2^j < i$ 恒成立，`i ^ (1 << j)` 一定已经算过，不需要额外排序。
+- 第二层要求 $j$ 在 `i` 中（`(i >> j) & 1`），否则跳过。
+- 内层枚举「上一个点」$k$，要求 $k$ 属于 `i ^ (1 << j)`（去掉 $j$ 之后的状态），用 `f[i ^ (1 << j)][k] + edges[k][j]` 松弛 `f[i][j]`。
+
+### 输出答案
+
+```cpp
+	if (f[(1 << n) - 1][n - 1] != INT_MAX) cout << f[(1 << n) - 1][n - 1];
+	else cout << -1;
+}
+```
+
+- 终态是「所有点都访问过」即 `(1 << n) - 1`，终点固定为 $n - 1$。
+- 若该状态仍为 `INT_MAX`，说明不存在 Hamilton 路径，输出 `-1`。
+
 ## 复杂度分析
 
 - **时间复杂度**：$O(n^2 \cdot 2^n)$

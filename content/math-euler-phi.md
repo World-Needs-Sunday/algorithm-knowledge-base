@@ -6,11 +6,13 @@ subcategory: '数论基础'
 difficulty: '入门'
 tags: ['数学', '数论', '欧拉函数', '积性函数', '质因数分解']
 prerequisites: ['math-gcd-lcm', 'math-sieve-eratosthenes']
+timeComplexity: 'O(√n)'
+spaceComplexity: 'O(1)'
 codePath: '数学\数论基础\欧拉函数\源.cpp'
 description: '欧拉函数 φ(n) 表示 [1, n] 中与 n 互素的正整数个数。利用质因数分解，在 O(√n) 时间内单次求值。核心公式：φ(n) = n × ∏(1 - 1/pᵢ)，仅由 n 的不同质因子决定，与质因子的幂次无关。'
 ---
 
-# 欧拉函数（单次求值）
+## 欧拉函数（单次求值）
 
 ## 一、算法原理
 

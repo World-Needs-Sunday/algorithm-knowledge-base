@@ -6,11 +6,13 @@ subcategory: '数论基础'
 difficulty: '进阶'
 tags: ['数学', '数论', '约数个数', '线性筛', '欧拉筛', '积性函数', '预处理']
 prerequisites: ['math-sieve-eratosthenes', 'math-linear-sieve-phi']
+timeComplexity: 'O(n)（预处理）+ O(1)（单次查询）'
+spaceComplexity: 'O(n)'
 codePath: '数学\数论基础\线性筛求约数个数\源.cpp'
 description: '在线性筛（欧拉筛）框架上同时计算约数个数函数 d(n)（即 σ₀(n)）：每个合数仅被其最小质因子筛一次，利用 d 的积性分两种情况递推——当 prime[j] 不整除 i 时 d(i*p) = 2*d(i)，整除时需要额外维护最小质因子指数 a，递推 d(i*p) = d(i)/a*(a+1)。复杂度 O(n)，适合需要批量查询约数个数的场景。'
 ---
 
-# 线性筛求约数个数（欧拉筛批量预处理）
+## 线性筛求约数个数（欧拉筛批量预处理）
 
 ## 一、算法原理
 

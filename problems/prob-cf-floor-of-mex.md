@@ -1,8 +1,8 @@
 ---
 id: prob-cf-floor-of-mex
-title: 'C1. Floor of MEX (Easy Version) — MEX 反向构造与差分数组'
+title: 'Floor of MEX (Easy Version) — MEX 反向构造与差分数组'
 oj: 'Codeforces'
-problemId: 'C1'
+problemId: 'CF2263C1'
 difficulty: '中等'
 category: '数据结构'
 tags: ["MEX", "差分", "构造", "思维", "差分数组"]
@@ -45,7 +45,41 @@ $$a_k = f(A, k)$$
 
 ---
 
-## 一、MEX 的关键性质
+### 数据范围
+
+- $1 \le t \le 10^4$，$1 \le n \le 10^5$
+- $0 \le a_i \le n$
+- 所有测试用例的 $\sum n \le 10^5$
+- 题目保证一定存在合法解
+
+## 样例
+
+### 样例输入
+
+```
+3
+6
+0 3 2 2 2 1
+5
+2 1 1 1 1
+6
+1 2 1 1 1 1
+```
+
+### 样例输出
+
+```
+5
+1 2 3 4 5
+2
+0 1
+2
+0 2
+```
+
+> 构造方案不唯一，样例输出给出的是其中一组可行解（输出集合大小 $m$ 与集合 $B$ 的元素）。
+
+## 一、解题思路：MEX 的关键性质
 
 $\text{mex}(C) = v$ 当且仅当：
 - $0, 1, 2, \dots, v-1$ 都在 $C$ 中

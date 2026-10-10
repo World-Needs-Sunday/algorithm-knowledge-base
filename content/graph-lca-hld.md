@@ -3,7 +3,7 @@ id: graph-lca-hld
 title: '最近公共祖先 LCA（重链剖分）'
 category: 图论
 subcategory: 最近公共祖先
-tags: ["图论", "树", "LCA", "最近公共祖先", "重链剖分", "树链剖分", "Heavy-Light Decomposition", "DFS", "重儿子", "重链"]
+tags: ["图论", "树", "LCA", "最近公共祖先", "树链剖分", "重链剖分"]
 timeComplexity: '预处理O(n)，查询O(log n)'
 spaceComplexity: 'O(n)'
 codePath: '图论\最近公共祖先\重链剖分\Untitled1.cpp'

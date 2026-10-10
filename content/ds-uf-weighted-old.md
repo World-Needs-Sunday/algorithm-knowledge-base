@@ -1,6 +1,6 @@
 ---
 id: ds-uf-weighted-old
-title: '带权并查集（以前没有学的时候写的 - 蓝桥1156）'
+title: '带权并查集（蓝桥杯 1156）'
 category: 数据结构
 subcategory: 并查集
 subSubcategory: 带权

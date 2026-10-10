@@ -61,7 +61,7 @@ codePath: '数据结构\普通莫队\Untitled1.cpp'
 #include<iostream>
 #include<vector>
 #include<cmath>
-/*代紅P2709*/
+/*洛谷P2709*/
 using namespace std;
 int n, m, k, s;          // n=数组长度, m=查询数, k=颜色范围, s=块大小
 long long cur = 0;        // 当前区间的答案 (各颜色出现次数的平方和)

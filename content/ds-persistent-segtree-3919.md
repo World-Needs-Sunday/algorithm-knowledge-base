@@ -67,7 +67,7 @@ codePath: '数据结构\可持久化线段树\单点修改，区间求和(第一
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-/*代紅3919*/
+/*洛谷3919*/
 struct node
 {
 	long long val;       // 节点维护的值 (区间和或单点值)

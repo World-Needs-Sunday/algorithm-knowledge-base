@@ -12,7 +12,7 @@ codePath: '基础算法\搜索\折半搜索二分查找版\源.cpp'
 description: '折半搜索（Meet in the Middle）将 n 个元素分成前后两半，分别枚举所有子集和（O(2^(n/2))），再通过排序+二分查找合并两部分结果，将 O(2^n) 的暴力复杂度降至 O(n×2^(n/2))，是 n≈40 时子集类问题的标准解法。'
 ---
 
-# 折半搜索（Meet in the Middle）— 二分查找版
+## 折半搜索（Meet in the Middle）— 二分查找版
 
 ## 一、算法原理
 

@@ -124,7 +124,7 @@ codePath: '数据结构\并查集\并查集(带权)\扩展题目\Untitled1.cpp'
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-/*代紅P2024*/
+/*洛谷P2024*/
 vector<int> A;
 vector<long long> d;
 void init(int n)

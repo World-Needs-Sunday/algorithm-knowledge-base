@@ -6,11 +6,13 @@ subcategory: '数论基础'
 difficulty: '提高'
 tags: ['数学', '数论', '中国剩余定理', 'CRT', '模逆元', '费马小定理', '同余方程组']
 prerequisites: ['math-modular-inverse', 'math-gcd-lcm', 'math-quick-pow-basic']
+timeComplexity: 'O(n log r_max)'
+spaceComplexity: 'O(n)'
 codePath: '数学\数论基础\中国剩余定理\源.cpp'
 description: '中国剩余定理（CRT）求解两两互质模数的同余方程组 x ≡ a_i (mod m_i)，解为 x ≡ Σ a_i · M_i · M_i^{-1} (mod M)，其中 M = Π m_i，M_i = M/m_i。本实现基于费马小定理求逆元，要求模数为质数。'
 ---
 
-# 中国剩余定理（CRT）
+## 中国剩余定理（CRT）
 
 > ⚠️ **代码质量警告：本实现大数容易溢出**
 >

@@ -5,11 +5,13 @@ category: '数学'
 subcategory: '数论基础'
 difficulty: '入门'
 tags: ['数学', '数论', '最大公约数', '最小公倍数', '欧几里得算法', '递归']
+timeComplexity: 'O(log min(a,b))'
+spaceComplexity: 'O(log min(a,b))（递归栈）'
 codePath: '数学\数论基础\GCD与LCM\源.cpp'
 description: '用欧几里得算法（辗转相除法）求最大公约数 GCD，再利用 gcd(a,b) × lcm(a,b) = a × b 求最小公倍数 LCM。递归写法仅需一行核心代码，时间复杂度 O(log min(a,b))，是数论中最基础也是最重要的算法之一。'
 ---
 
-# GCD 与 LCM（欧几里得算法）
+## GCD 与 LCM（欧几里得算法）
 
 ## 一、算法原理
 
