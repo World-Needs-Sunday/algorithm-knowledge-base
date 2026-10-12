@@ -314,7 +314,8 @@ const KNOWLEDGE_DATA = [
             "ds-block-decomposition",
             "ds-splay",
             "ds-dual-heap",
-            "basic-radix-sort-k"
+            "basic-radix-sort-k",
+            "basic-random-mt19937"
         ]
     },
     {
@@ -342,6 +343,53 @@ const KNOWLEDGE_DATA = [
             "basic-quickselect-kth",
             "basic-divide-conquer-merge-inversion",
             "basic-shell-sort"
+        ]
+    },
+    {
+        "id": "basic-random-mt19937",
+        "category": "基础算法",
+        "subcategory": "随机化",
+        "subSubcategory": "",
+        "title": "C++ 随机数生成（mt19937 与分布对象）",
+        "content": "## 算法原理\n\n解决的问题：在 C++ 里生成**高质量、可控**的随机数，用于造数据、对拍、随机化算法（如随机化快速选择）。\n\n核心思想：C++11 的 `<random>` 库把随机数的生成拆成**引擎**和**分布**两个正交的部分：\n\n- **引擎**（如 `std::mt19937`）负责产生伪随机序列。它是确定性的——给定同一个种子，产生的序列完全一样。种子决定序列的起点。\n- **分布**（如 `std::uniform_int_distribution`）负责把引擎输出的均匀原始值映射为目标分布（指定类型与范围）。\n\n标准流程只有三步：**种子初始化引擎 → 定义分布对象 → 用 `分布对象(引擎)` 生成随机数**。引擎只创建一次，分布对象可反复调用。\n\n选择 `<random>` 而不是传统 `rand()` 的原因：`rand()` 质量差、周期短，且 `rand() % n` 会因模数不整除周期而引入**取模偏差**；`<random>` 的引擎与分布都更现代、更可控。\n\n## 核心公式 / 状态定义与转移方程\n\n三个常用分布的定义与取值区间：\n\n- **整数均匀分布**：$X\\sim U[a,b]$，闭区间，含两端点 $a,b$\n\n$$\nP(X=x)=\\frac{1}{b-a+1},\\quad x\\in\\{a,a+1,\\dots,b\\}\n$$\n\n- **实数均匀分布**：$X\\sim U[a,b)$，左闭右开区间\n\n$$\nf(x)=\\frac{1}{b-a},\\quad x\\in[a,b)\n$$\n\n- **正态分布**：$X\\sim N(\\mu,\\sigma)$，参数为均值 $\\mu$ 与标准差 $\\sigma$\n\n$$\nf(x)=\\frac{1}{\\sigma\\sqrt{2\\pi}}e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}\n$$\n\n引擎侧的递推（了解即可）：`mt19937` 是梅森旋转算法，内部维护 624 个 32 位字的状态向量，每次生成按固定线性规则批量更新。种子只影响初始状态，所以「相同种子 → 相同序列」。\n\n记忆口诀：**种子决定起点，分布决定形状，`dist(gen)` 生成最终随机数。**\n\n## 逐行代码解析\n\n```cpp\n#include<iostream>\n#include<ctime>//获取时间头文件\n#include <random>//随机数头文件\nusing namespace std;\nint main()\n{\n\t//第一步,获取种子\n\t//std::mt19937 是随机数种子，有3种常见的获取方法\n\n\t//1,固定种子,每次生成的序列相同\n\tstd::mt19937 reg_gen(13331);\n\n\t//2,简单时间种子,精确到秒\n\tstd::mt19937 time_gen(static_cast<unsigned int>(std::time(nullptr)));\n\n\t//3,操作系统获取熵种子,从操作系统获取熵后处理出来的种子(最常用)\n\tstd::random_device rd;\n\tstd::mt19937 gen(rd());\n\n\t/*----------------------------------------------------------------------*/\n\n\t//第2步,定义分布对象(默认熵种子)\n\n\t//1,整形,均匀分布   范围; [0,100]\n\tstd::uniform_int_distribution<int> number_dist(0, 100);\n\t\n\t//2,浮点型,均匀分布   范围: [0.0,1.0)\n\tstd::uniform_real_distribution<double> float_dist(0.0, 1.0);\n\n\t//3,浮点型,正态分布   均值:10.0 , 标准差:2.0\n\tstd::normal_distribution<double> nd_dist(10.0, 2.0);\n\n\t/*----------------------------------------------------------------------*/\n\n\t//第三步,生成随机数\n\t//格式: 分布对象(随机种子);\n\t\n\t//例子:   生成10个 整形,均匀分布   范围; [0,100] 的随机数\n\tfor (int i = 0; i < 10; ++i) cout << number_dist(gen) << ' ';\n\n\treturn 0;\n}\n```\n\n- 头文件：`<ctime>` 提供 `std::time(nullptr)`（Unix 时间戳，秒级）；`<random>` 提供引擎与分布。\n- `std::mt19937 reg_gen(13331);`：固定种子。每次运行序列完全相同，适合调试、复现。\n- `std::mt19937 time_gen(static_cast<unsigned int>(std::time(nullptr)));`：以当前秒数作种子。缺陷是同一秒内启动的多个进程会产生相同序列。\n- `std::random_device rd; std::mt19937 gen(rd());`：从操作系统取熵作种子，随机性最好，是最常用的写法。注意 `rd` 只在初始化时用一次。\n- 三个分布对象：`number_dist(0, 100)` 生成闭区间 `[0,100]` 的 `int`；`float_dist(0.0, 1.0)` 生成 `[0.0,1.0)` 的 `double`；`nd_dist(10.0, 2.0)` 生成均值 $10.0$、标准差 $2.0$ 的正态分布 `double`。\n- `number_dist(gen)`：把引擎 `gen` 传给分布对象，得到最终随机数；每次调用引擎内部状态前进一步。\n\n## 复杂度分析\n\n- **时间复杂度**：每生成一个随机数 $O(1)$（引擎递推是常数次位运算，分布映射是常数次缩放/查表）。\n- **空间复杂度**：$O(1)$。`mt19937` 内部状态固定为 624 个 32 位字（约 2.5 KB），与生成数量无关。\n\n## 适用场景\n\n- **造数据 / 对拍**：按数据范围生成随机输入，配合暴力程序对拍验正确性；需要复现某个 bug 数据时换固定种子。\n- **随机化算法**：需要随机 pivot、随机初始点、随机扰动打破坏数据时（如本库「快速选择」里的随机化选主元）。\n- **随机打乱**：`std::shuffle(v.begin(), v.end(), gen)` 生成随机排列。\n- 不适用：密码学相关需求（应使用 CSPRNG，如操作系统提供的安全随机源）、要求「真随机」的场景——`mt19937` 本质是**伪随机**，种子可被预测整个序列。\n\n## 常见陷阱与注意事项\n\n1. **在循环里反复播种**：每次循环都 `std::mt19937 gen(rd())` 是错误的——若循环执行得比熵源更新快，会反复拿到相同种子，产生相同序列。引擎放循环外，只创建一次。\n2. **开闭区间记混**：`uniform_int_distribution` 是闭区间 `[a,b]`；`uniform_real_distribution` 是左闭右开 `[a,b)`。造数据时右端点差 1 会导致边界值缺失。\n3. **正态分布不能用 `int` 模板参数**：`std::normal_distribution<int>` 不能编译。只能生成 `double`，需要整数时用 `std::lround` 四舍五入后再转。\n4. **时间种子的精度只有秒**：同一秒内多次运行 `time(nullptr)` 种子相同，序列相同（对拍的重启间隔小于 1 秒时尤其明显）；要区分进程就用 `random_device` 或混合进程 ID。\n5. **旧接口的取模偏差**：`rand() % n` 在 `RAND_MAX+1` 不整除 `n` 时分布不均；且 `rand()` 周期短、质量差。新代码统一用 `<random>`。\n6. **需要固定小数位数**：不要生成 `double` 再硬截断。先生成整数再除 $10^k$，如 `uniform_int_distribution<int> dist(0, 99); double x = dist(gen) / 100.0;`。\n7. **多线程共享引擎**：多个线程共用同一个引擎既有数据竞争问题，又会因为调度顺序不定而难以复现。每个线程应创建独立引擎（可用线程 ID 参与种子混合）。\n\n## 对比与扩展\n\n| 项目 | 旧式 `rand()` | 本知识点 `<random>` |\n|---|---|---|\n| 引擎 | 全局 `rand()`，实现定义 | 可显式选 `mt19937`、`mt19937_64` 等 |\n| 种子 | `srand()`，全局生效 | 每个引擎独立持有种子 |\n| 分布 | 只有均匀，靠取模变造 | 均匀/正态/伯努利/泊松等全家桶 |\n| 取模偏差 | `rand()%n` 引入偏差 | 分布对象内部做无偏映射 |\n| 随机打乱 | `random_shuffle`（C++17 已移除） | `std::shuffle` + 引擎对象 |\n\n- **相关知识点**：随机化快速选择（`basic-quickselect-kth`）用随机 pivot 把最坏情况概率化，正是本库随机数的一个典型应用。\n- **延伸**：`std::shuffle` 洗牌、`std::bernoulli_distribution` 伯努利分布（随机 01）、`mt19937_64` 64 位引擎、`std::seed_seq` 组合多来源种子（多个 `random_device` 值、线程 ID、时间戳混合）。",
+        "timeComplexity": "O(1)",
+        "spaceComplexity": "O(1)",
+        "tags": [
+            "随机数",
+            "mt19937",
+            "随机种子",
+            "分布对象",
+            "造数据"
+        ],
+        "codePath": "基础算法\\随机化\\随机数生成\\Untitled1.cpp",
+        "prerequisites": [],
+        "related": [
+            "basic-quickselect-kth",
+            "basic-random-sa-point"
+        ]
+    },
+    {
+        "id": "basic-random-sa-point",
+        "category": "基础算法",
+        "subcategory": "随机化",
+        "subSubcategory": "",
+        "title": "模拟退火 · 点退火（求加权费马点）",
+        "content": "## 算法原理\n\n解决的问题：在**连续空间中求多峰函数的近似全局最优**。典型应用是洛谷 P1337「平衡点」（带权费马点 / 费马-韦伯点）：给定平面上的 $n$ 个点和权重，求\n\n$$\nf(x,y)=\\sum_{i=1}^{n}w_i\\cdot\\sqrt{(x-x_i)^2+(y-y_i)^2}\n$$\n\n的最小值点。该函数是凸函数，但一般没有闭式解，用模拟退火求数值解非常合适。\n\n核心思想来自金属退火的物理过程：高温时原子剧烈运动，随温度缓慢下降，能量逐渐降到最低。对应到算法上：\n\n- **当前解**：一个状态（本代码里是坐标 $(x,y)$），伴随当前能量值（目标函数值）。\n- **随机扰动**：每步在当前解附近随机跳一步，扰动幅度与当前温度 $T$ 成正比——温度越高跳得越远。\n- **Metropolis 准则**：新解更优（$\\Delta E<0$）就接受；更劣则以概率 $\\exp(-\\Delta E/T)$ 接受——这是模拟退火与「爬山法」的唯一本质区别。\n- **缓慢降温**：$T\\gets T\\cdot k$（$k$ 略小于 1）。温度越低，扰动越小、接受劣解的概率也越小。\n\n为什么这样设计：爬山法只接受更优解，会卡在局部最优；Metropolis 准则让算法在高温时能「翻墙」逃出局部最优去探索全局，低温时趋于稳定收敛。温降得足够慢时，算法以概率收敛到全局最优。\n\n抽象成模板：\n\n```\n初始化当前解 cur 与全局最优 best\nfor (T = T0; T > T_min; T *= k):\n    new = cur + 随机扰动(幅度 ~ T)\n    Δ = f(new) - f(cur)\n    if Δ < 0 或 exp(-Δ/T) > random(): cur = new\n    若 f(cur) 更优则更新 best\n输出 best\n```\n\n## 核心公式 / 状态定义与转移方程\n\n**状态**：当前坐标 $(curx, cury)$ 与当前能量 $curE$；全局最优 $(bestx, besty)$ 与 $bestE$。每次扰动都从当前解出发，但**历史最优单独记录**——中途接受过劣解不会丢掉已经找到的最优值。\n\n**目标函数**（本代码的带权费马点）：\n\n$$\nf(x,y)=\\sum_{i=1}^{n}w_i\\sqrt{(x-x_i)^2+(y-y_i)^2}\n$$\n\n**扰动（转移）**：\n\n$$\nnx = curx + U(-32767,32767)\\cdot T,\\qquad ny = cury + S\\cdot T\n$$\n\n其中 $U$ 是均匀分布，$S$ 为与 $U$ 同分布的新抽样。幅度随温度收缩。\n\n**Metropolis 接受准则**：设 $\\Delta E = E_{new}-E_{cur}$，接受概率\n\n$$\nP(\\text{接受})=\\begin{cases}1, & \\Delta E\\le 0\\\\[2pt] e^{-\\Delta E/T}, & \\Delta E>0\\end{cases}\n$$\n\n**降温策略**：$T_0=4000$，每步 $T\\gets T\\cdot 0.9992$，直到 $T<10^{-12}$。降温次数约为\n\n$$\n\\frac{\\ln(T_0/T_{min})}{\\ln(1/0.9992)}\\approx\\frac{\\ln(4\\times 10^{15})}{0.0008}\\approx 2\\times 10^4\n$$\n\n次；配合 `clock()` 时间卡点（`TL = 0.992` 秒）反复多轮退火，直到时限耗尽。\n\n## 逐行代码解析\n\n```cpp\n#include<bits/stdc++.h>\nusing namespace std;\nmt19937 rd;\nvector<double> x, y, w;\nconst double TL = 0.992;\ndouble curx, cury, curE, bestE, bestx, besty;\ndouble cala(double mx, double my, int n)\n{\n\tdouble res = 0;\n\tfor (int i = 1; i <= n; i++)\n\t{\n\t\tdouble dx = mx - x[i];\n\t\tdouble dy = my - y[i];\n\t\tdouble len = sqrt(dx * dx + dy * dy);\n\n\t\tres += len * w[i];\n\t}\n\treturn res;\n}\nvoid init(int n)\n{\n\tx.assign(n + 1, 0);\n\ty.assign(n + 1, 0);\n\tw.assign(n + 1, 0);\n\trd.seed(static_cast<unsigned int>(std::time(nullptr)));\n}\nvoid sa(int n)\n{\n\tcurx = bestx;\n\tcury = besty;\n\tcurE = bestE;\n\tstatic uniform_real_distribution<double> dist(-32767.0, 32767.0);\n\tstatic uniform_real_distribution<double> prob(0.0, 1.0);\n\tfor (double t = 4000; t > 1e-12; t *= 0.9992)\n\t{\n\t\tdouble nx = curx + dist(rd) * t;\n\t\tdouble ny = cury + dist(rd) * t;\n\t\tdouble newE = cala(nx, ny, n);\n\t\tdouble delta = newE - curE;\n\t\tif (delta < 0 || exp(-delta / t) > prob(rd))\n\t\t{\n\t\t\tcurx = nx;\n\t\t\tcury = ny;\n\t\t\tcurE = newE;\n\t\t}\n\n\t\tif (curE < bestE) \n\t\t{\n\t\t\tbestE = curE;\n\t\t\tbestx = curx;\n\t\t\tbesty = cury;\n\t\t}\n\n\t\tif ((double)clock() / CLOCKS_PER_SEC >= TL) break;\n\t}\n}\nint main()\n{\n\tios::sync_with_stdio(false);\n\tcin.tie(nullptr); cout.tie(nullptr);\n\n\tint n;\n\tcin >> n;\n\tinit(n);\n\tdouble mx = 0, my = 0, mw = 0;\n\tfor (int i = 1; i <= n; i++)\n\t{\n\t\tcin >> x[i] >> y[i] >> w[i];\n\t\tmx += x[i] * w[i];\n\t\tmy += y[i] * w[i];\n\t\tmw += w[i];\n\t}\n\tmx /= mw;\n\tmy /= mw;\n\n\tcurx = mx, cury = my, curE = cala(mx, my, n);\n\tbestE = curE, bestx = mx, besty = my;\n\twhile ((double)clock() / CLOCKS_PER_SEC < TL) sa(n);\n\n\tcout << fixed << setprecision(3) << bestx << ' ' << besty;\n\t\n}\n```\n\n- `cala(mx, my, n)`：目标函数，$O(n)$ 求一点到所有点的加权距离和，是每次扰动后的评估核心。\n- `rd.seed(static_cast<unsigned int>(std::time(nullptr)))`：用当前时间初始化 `mt19937` 引擎；每轮 `sa` 用的 `dist`、`prob` 是 `static` 分布对象，不会重复构造。\n- `curx = bestx; ...`：每轮退火**从历史最优重新出发**，而不是从上一轮停下的位置继续，避免在劣解区域浪费迭代。\n- `double nx = curx + dist(rd) * t;`：扰动幅度与温度 $t$ 成正比；`dist` 区间为 $[-32767,32767]$，高温时步长很大（见「常见陷阱」第 1 条）。\n- `if (delta < 0 || exp(-delta / t) > prob(rd))`：Metropolis 准则。`delta<0` 表示更优，直接接受；否则按 $e^{-\\Delta E/T}$ 概率接受劣解，`prob(rd)` 生成 $[0,1)$ 的均匀随机数作比较。\n- `if (curE < bestE)`：全程维护全局最优，与「当前解是否接受劣解」解耦。\n- `if ((double)clock() / CLOCKS_PER_SEC >= TL) break;`：超时立即退出一轮；外面 `while` 循环在时限内反复调用 `sa`，把评测时限用到极致。\n- 起点是**加权质心** $(\\sum x_iw_i/\\sum w_i,\\ \\sum y_iw_i/\\sum w_i)$：比算术平均更接近最优（$n=1$ 时它就是精确解）。\n- 输出 `fixed << setprecision(3)`：保留 3 位小数，$10^{-12}$ 级的终止温度对 3 位精度绰绰有余。\n\n## 复杂度分析\n\n- **时间复杂度**：单轮退火的降温次数为 $O(\\log(T_0/T_{min})/\\ln(1/k))\\approx 2\\times 10^4$，每次扰动的评估 `cala` 是 $O(n)$，故单轮 $O(n\\log(T_0/T_{min}))$。配合时间卡点，实际轮数由 `TL` 决定；总运行时间被钳制在约 1 秒内。\n- **空间复杂度**：只存坐标与权重的三个 `vector`，$O(n)$。\n\n## 适用场景\n\n- **连续空间的多峰最优化**：带权费马点 / 平衡点（P1337）、覆盖圆、旅行商这类没有多项式精确解的近似最优化问题。\n- **需要「够好就行」的数值解**：答案只要求若干位小数、允许误差的题（如几何平衡、连续函数求极值），模拟退火以极低实现成本换取稳定分数。\n- **非精确解不可的场景不适用**：要求输出精确整数解、或解空间离散且约束强的题，退火可能永远踩不到可行解；这类题优先考虑 DP / 精确算法。\n- 参数完全相同的两次运行结果可能不同（随机算法本质），对「必须复现」的评测要谨慎。\n\n## 常见陷阱与注意事项\n\n1. **扰动幅度没有归一化**：本代码 `dist(-32767, 32767) * t` 在 $t$ 还接近 $4000$ 时步长可达 $1.3\\times 10^8$，远超坐标范围，高温阶段大量迭代被浪费。更标准的写法是把随机数归一化到 $[-1,1]$ 再乘 $t$（`dist(-1.0, 1.0)`），使「幅度 = 温度」名副其实。两种写法在小数据下都能过题，但归一化更稳健。\n2. **只用当前解、丢掉历史最优**：随机游走会接受劣解，若最后输出「当前解」而不输出 `best`，可能丢掉了中途找到的最优值。务必单独维护 `bestE/bestx/besty`。\n3. **降温太快**：$k$ 太小（如 $0.9$）会让算法快速「冻结」在局部最优；常取 $0.998\\sim 0.999$。太慢又会超时，所以本代码把慢降温（$0.9992$）与时间卡点搭配使用。\n4. **种子取秒级时间且只播一次**：同一个程序内 `time(nullptr)` 播一次没问题；但两个进程若在同一秒启动会得到相同序列，对拍多开进程时要注意（可混入进程 ID）。\n5. **退化情形**：$n=1$ 时答案就是那一个点，算法应自然收敛于此（无需特判，但要知道会退化）；多个最优解（如两个等质量点）时答案不唯一，评测按误差判分，无需纠结。\n6. **初温与坐标范围要匹配**：坐标范围 $\\pm 10000$ 时 $T_0$ 取几百到几千都合理；若 $T_0$ 远小于整个搜索域，低温几乎探索不动全域，容易只找到局部最优。\n7. **计时函数**：`clock()` 计量 CPU 时间，Windows 与 Linux 的 `CLOCKS_PER_SEC` 不同，阈值 `TL=0.992` 是按秒计的墙钟近似；提交到不同平台前用本地近似时限试跑一次。\n\n## 对比与扩展\n\n| 方法 | 接受劣解 | 局部最优 | 适用 |\n|---|---|---|---|\n| 爬山法 | 从不 | 容易卡住 | 凸函数、单峰 |\n| 模拟退火 | 按 $e^{-\\Delta E/T}$ 概率 | 慢降温下可逃离 | 多峰、需要近似全局最优 |\n| 随机重启爬山 | 从不，但多次随机起点 | 靠重启覆盖 | 解空间小、重启成本低 |\n\n- **前置/相关**：随机数引擎 `mt19937` 与分布对象见「C++ 随机数生成（mt19937 与分布对象）」（`basic-random-mt19937`），本代码的 `rd`、`dist`、`prob` 都是它的直接应用。\n- **参数经验**（来自本题三套解法的对比）：降温系数 $0.9992$（慢、迭代约 2 万次）+ 时间卡点反复退火，鲁棒性最好；$0.993$（快、几千次一轮）配合跑 3 次也能过，但依赖题目数据较弱。慢降温 + 卡时间多跑几轮是最实用的稳分组合。\n- **延伸**：遗传算法、粒子群、禁忌搜索同属随机优化；退火思想还可用于离散问题（如旅行商的 2-opt 邻域 + Metropolis）。",
+        "timeComplexity": "O(n·log(T0/Tmin))（单轮退火）",
+        "spaceComplexity": "O(n)",
+        "tags": [
+            "模拟退火",
+            "随机化",
+            "爬山法",
+            "Metropolis准则",
+            "费马点"
+        ],
+        "codePath": "基础算法\\随机化\\点退火\\Untitled1.cpp",
+        "prerequisites": [
+            "basic-random-mt19937"
+        ],
+        "related": [
+            "basic-random-mt19937"
         ]
     },
     {
@@ -3016,6 +3064,9 @@ const SUBCATEGORY_META = {
     },
     "基础算法|数位提升": {
         "description": "按数位逐层处理数字的周期性和幂次问题，将大数运算分解为数位级别的迭代。"
+    },
+    "基础算法|随机化": {
+        "description": "利用随机数进行数据生成、对拍与算法随机化，涵盖 C++11 随机数引擎、分布对象与随机种子的基础工具。"
     },
     "动态规划|背包问题": {
         "description": "在容量限制下选择物品使价值最大化。涵盖01背包、完全背包、分组背包、多重背包等变体，是DP的入门必修。"

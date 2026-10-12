@@ -1,1384 +1,1403 @@
 {
-  "categories": {
-    "基础算法": {
-      "nature": "算法范式与技巧",
-      "description": "不依赖复杂数据结构的基础算法策略，核心在于问题建模和策略选择。涵盖贪心、双指针、数位处理等经典范式。",
-      "problemDomain": "区间调度、序列检测、模式匹配等无需高级数据结构即可解决的问题"
+    "categories": {
+        "基础算法": {
+            "nature": "算法范式与技巧",
+            "description": "不依赖复杂数据结构的基础算法策略，核心在于问题建模和策略选择。涵盖贪心、双指针、数位处理等经典范式。",
+            "problemDomain": "区间调度、序列检测、模式匹配等无需高级数据结构即可解决的问题"
+        },
+        "动态规划": {
+            "nature": "最优化方法",
+            "description": "将复杂问题分解为重叠子问题，通过状态定义和转移方程求解最优解。核心在于正确设计状态和保证无后效性。",
+            "problemDomain": "背包问题、序列最优解、树形最优决策等具有最优子结构的问题"
+        },
+        "数据结构": {
+            "nature": "数据组织与查询",
+            "description": "通过组织数据存储方式实现高效的查询与修改。从前缀和的O(1)区间求和到可持久化线段树的版本管理，数据结构是算法竞赛的核心工具箱。",
+            "problemDomain": "区间查询、单点修改、连通性维护、范围最值、滑动窗口等数据组织与查询问题"
+        },
+        "图论": {
+            "nature": "图结构算法",
+            "description": "处理图结构上的算法问题。包括单源/全源最短路、最小生成树、最近公共祖先、拓扑排序等核心图算法。",
+            "problemDomain": "路径规划、网络连通性、树结构查询、依赖关系处理等图结构问题"
+        },
+        "字符串": {
+            "nature": "字符串处理",
+            "description": "字符串匹配与表示相关算法，通过哈希映射和双指针比较实现高效字符串处理。",
+            "problemDomain": "子串匹配、循环同构、哈希碰撞等字符串处理问题"
+        },
+        "数学": {
+            "nature": "数论与组合数学",
+            "description": "数论与组合数学相关的算法与计数问题，包括数论基础、组合计数、快速幂、矩阵运算等。",
+            "problemDomain": "模运算、组合计数、高精度计算、数论计数等数学问题"
+        },
+        "输入输出": {
+            "nature": "I/O优化技术",
+            "description": "通过自定义读写函数替代标准I/O，在处理大规模数据时显著提升程序效率。",
+            "problemDomain": "竞赛中大量数据的快速读写场景"
+        },
+        "初赛笔记": {
+            "nature": "竞赛理论知识",
+            "description": "CSP 初赛涉及的理论知识与考点总结，不包含代码实现，侧重概念理解、公式记忆和应试技巧。涵盖位运算、数据类型、运算符优先级、进制转换等初赛高频考点。",
+            "problemDomain": "CSP 初赛的选择题、判断题、程序阅读题等理论考核场景"
+        }
     },
-    "动态规划": {
-      "nature": "最优化方法",
-      "description": "将复杂问题分解为重叠子问题，通过状态定义和转移方程求解最优解。核心在于正确设计状态和保证无后效性。",
-      "problemDomain": "背包问题、序列最优解、树形最优决策等具有最优子结构的问题"
+    "subcategories": {
+        "基础算法|贪心": {
+            "description": "在每一步选择中采取当前最优策略，期望得到全局最优解。适用于区间调度、区间合并等具有贪心选择性质的问题。"
+        },
+        "基础算法|双指针": {
+            "description": "利用两个指针的协作（同向、对撞、快慢）在线性时间内解决问题。核心在于指针移动策略所维护的不变量。"
+        },
+        "基础算法|高精度": {
+            "description": "用数组或字符串存储超出内置类型范围的大整数，模拟人工列竖式进行加减乘除运算。是处理阶乘、组合数、大幂等大数问题的基础工具。"
+        },
+        "基础算法|数位提升": {
+            "description": "按数位逐层处理数字的周期性和幂次问题，将大数运算分解为数位级别的迭代。"
+        },
+        "基础算法|随机化": {
+            "description": "利用随机数进行数据生成、对拍与算法随机化，涵盖 C++11 随机数引擎、分布对象与随机种子的基础工具。"
+        },
+        "动态规划|背包问题": {
+            "description": "在容量限制下选择物品使价值最大化。涵盖01背包、完全背包、分组背包、多重背包等变体，是DP的入门必修。"
+        },
+        "动态规划|线性DP": {
+            "description": "状态按线性顺序转移的DP，包括LIS、LCS、最大子段和、编辑距离等经典模型，是所有DP的基础。"
+        },
+        "动态规划|树形DP": {
+            "description": "在树结构上做动态规划，自底向上传递子树信息。适用于树上选点、树上背包等最优决策问题。"
+        },
+        "动态规划|状态压缩DP": {
+            "description": "用二进制位表示集合状态的动态规划技巧，将集合决策压缩为整数。适用于n较小的排列、路径、集合覆盖等问题，是TSP等NP问题的常用解法。"
+        },
+        "动态规划|数位DP": {
+            "description": "按数位逐位处理的动态规划，用于统计区间内满足特定条件的数字个数或数码出现次数。核心思想是将大问题拆解为数位级别的子问题，通过记忆化搜索或公式推导高效求解。"
+        },
+        "动态规划|区间DP": {
+            "description": "在区间[l,r]上定义状态的动态规划，大区间的最优解由小区间合并而来。典型问题包括石子合并、能量项链、括号匹配、加分二叉树等，是DP的重要分支。"
+        },
+        "数据结构|前缀和与差分": {
+            "description": "通过预处理前缀和实现O(1)区间求和，差分支持O(1)区间修改。是最基础也是最高效的数据结构工具。"
+        },
+        "数据结构|树状数组": {
+            "description": "基于二进制分区的动态前缀和结构，支持O(log n)的单点修改和前缀查询。是线段树的轻量级替代。"
+        },
+        "数据结构|线段树": {
+            "description": "基于区间二分的平衡树结构，支持区间修改、区间查询和懒标记下传。是功能最全面的数据结构之一。"
+        },
+        "数据结构|可持久化线段树": {
+            "description": "保留历史版本的线段树，通过共享节点实现O(n log n)空间的版本管理，支持查询任意历史版本。"
+        },
+        "数据结构|平衡树": {
+            "description": "通过旋转操作维持平衡的二叉搜索树。Splay树通过访问局部性优化频繁操作的场景。"
+        },
+        "数据结构|ST表": {
+            "description": "基于倍增思想的静态RMQ结构，O(n log n)预处理，O(1)查询区间最值。不支持修改。"
+        },
+        "数据结构|单调队列": {
+            "description": "维护单调性的双端队列，用于滑动窗口最值等问题的O(n)求解。是队列和单调性的结合应用。"
+        },
+        "数据结构|分块": {
+            "description": "将序列分成若干块，块内整体操作、块间逐个处理，平衡修改与查询复杂度至O(√n)。"
+        },
+        "数据结构|莫队": {
+            "description": "基于分块和指针移动的离线区间查询算法，通过排序询问顺序优化总移动次数，复杂度O(n√n)。"
+        },
+        "数据结构|并查集": {
+            "description": "维护不相交集合的数据结构，支持高效的合并和查询。可扩展为带权并查集和扩展域并查集。"
+        },
+        "数据结构|堆": {
+            "description": "基于优先队列的数据结构，通过堆的堆顶操作维护动态序列的最值或第k值。对顶堆用大根堆和小根堆协作维护第k小。"
+        },
+        "数据结构|栈": {
+            "description": "基于栈的数据结构，通过辅助数组或单调性维护实现高效查询。涵盖前缀最值栈（O(1)最值查询）和单调栈（直方图最大矩形、下一个更大/更小元素等）。"
+        },
+        "数据结构|字典树": {
+            "description": "将若干字符串按公共前缀组织成一棵多叉树，插入和查询均沿字符逐层下行，单次操作 O(|S|)。支持前缀计数、字符串检索、自动补全等，是AC自动机的基础结构。"
+        },
+        "图论|最短路": {
+            "description": "求解图中单源或全源最短路径。涵盖Dijkstra（非负权）、Bellman-Ford（含负权）、Floyd（全源）、Johnson（全源含负权）等算法。"
+        },
+        "图论|最小生成树": {
+            "description": "在连通图中选择n-1条边使总权值最小且保持连通。Kruskal基于并查集，Prim基于堆优化。"
+        },
+        "图论|最近公共祖先": {
+            "description": "求树中两节点的最近公共祖先。倍增法预处理O(n log n)查询O(log n)，Tarjan离线O(n)，重链剖分查询O(log n)。"
+        },
+        "图论|拓扑排序": {
+            "description": "对DAG进行线性排序，使得每条边的起点在终点之前。基于BFS的Kahn算法是最常用实现。"
+        },
+        "图论|树的重心": {
+            "description": "树中删除后各连通块大小均不超过 n/2 的节点。是点分治的核心，保证分治深度为 O(log n)。一次 DFS 回溯即可找到所有重心，时间复杂度 O(n)。"
+        },
+        "图论|树链剖分": {
+            "description": "将树拆分为若干条重链，使任意路径最多跨越O(log n)条链。配合线段树实现O(log²n)路径修改/查询和O(log n)子树修改/查询，是静态树上操作的核心工具。"
+        },
+        "图论|割点与桥": {
+            "description": "求无向图中的割点（关节点）和桥（割边）。割点是删除后图的连通分量增加的点，桥是删除后连通分量增加的边。Tarjan算法通过一次DFS在线性时间内求解，是点双/边双连通分量的基础。"
+        },
+        "图论|连通分量": {
+            "description": "研究图的连通性结构，包括有向图的强连通分量（SCC）和无向图的边双连通分量（E-DCC）。缩点技术将每个分量压缩为超级点，使原图变为DAG或树，大幅简化路径、可达性、可靠性等问题。Tarjan算法是求解各类连通分量的核心方法。"
+        },
+        "图论|二分图": {
+            "description": "顶点可划分为两个不交集合的无向图，等价于图中无奇环。染色法（DFS/BFS）是最常用的判定方法，通过交替染色检测冲突。是最大匹配、最小顶点覆盖等问题的基础。"
+        },
+        "字符串|字符串哈希": {
+            "description": "将字符串映射为数值，通过多项式滚动哈希实现O(n+m)的子串匹配。注意双哈希防碰撞。"
+        },
+        "字符串|最小表示法": {
+            "description": "求循环同构串中字典序最小的表示，通过双指针比较实现O(n)求解。"
+        },
+        "字符串|字符串匹配": {
+            "description": "在文本串中查找模式串的所有出现位置。涵盖KMP（前缀函数）、Sunday等经典线性时间匹配算法。"
+        },
+        "数学|矩阵": {
+            "description": "矩阵的基本运算与应用。包括矩阵乘法、矩阵快速幂、矩阵加速线性递推等。矩阵快速幂是计算工具，矩阵加速线性递推是其核心应用——将线性递推的转移封装为矩阵乘法，用快速幂在 O(k^3 log n) 时间内解决 10^18 规模的问题。"
+        },
+        "数学|快速幂": {
+            "description": "利用指数的二进制分解，在O(log n)次乘法内完成幂运算，支持模意义下的高效计算。"
+        },
+        "数学|数论基础": {
+            "description": "数论的基础算法与核心概念，包括GCD/LCM（欧几里得算法）、埃氏筛（素数预处理）、欧拉函数（单次求值与线性筛批量预处理）、约数个数与约数和的线性筛、模逆元（费马小定理）、中国剩余定理（CRT）等。是数论计数、组合数取模等高级数论算法的基石。"
+        },
+        "数学|数论计数": {
+            "description": "数论相关的计数问题，利用GCD、LCM等数论性质进行高效统计。"
+        },
+        "数学|组合数学": {
+            "description": "组合数学的核心计数方法与技巧，包括隔板法（Stars and Bars）、容斥原理、排列组合等。是各类计数问题的基础工具。"
+        },
+        "输入输出|IO优化": {
+            "description": "通过自定义读写函数替代scanf/printf，在大量I/O时提升数倍效率。竞赛必备基础技能。"
+        },
+        "基础算法|分治": {
+            "description": "将问题分解为子问题分别求解，再合并结果。分治是递归思想的核心应用，归并排序求逆序对是其经典实例。"
+        },
+        "基础算法|排序": {
+            "description": "各类排序算法，涵盖比较型排序（希尔排序、归并排序等）和非比较型排序（基数排序）。希尔排序是插入排序的增量改进版，通过逐步缩小gap使数组基本有序；基数排序通过按位分解和计数排序实现线性时间排序，优于比较排序的O(n log n)下界。"
+        },
+        "基础算法|搜索": {
+            "description": "通过DFS/BFS等搜索策略系统地枚举或寻找最短路径。DFS+回溯是组合搜索的核心技术，通过递归尝试所有选择并在不满足条件时回退，配合剪枝可大幅减少无效搜索。BFS按层扩展保证无权图最短路，双向BFS从起点和终点同时扩展以减少搜索范围。是排列、组合、子集、迷宫最短路等问题的基础范式。"
+        },
+        "初赛笔记|位运算": {
+            "description": "CSP 初赛位运算核心考点：补码表示、三大恒等式、异或性质与应用、代数定律、移位运算、lowbit操作、状压集合、运算符优先级、有符号/无符号坑、大小关系不等式链、常数与进制转换。不涉及代码实现，侧重公式记忆与考场速算。"
+        }
     },
-    "数据结构": {
-      "nature": "数据组织与查询",
-      "description": "通过组织数据存储方式实现高效的查询与修改。从前缀和的O(1)区间求和到可持久化线段树的版本管理，数据结构是算法竞赛的核心工具箱。",
-      "problemDomain": "区间查询、单点修改、连通性维护、范围最值、滑动窗口等数据组织与查询问题"
+    "subSubcategories": {
+        "数据结构|栈|前缀最值": {
+            "description": "通过辅助数组记录从栈底到各位置的最大值，实现O(1)最值查询。"
+        },
+        "数据结构|栈|单调栈": {
+            "description": "维护栈内元素单调性（递增或递减），当新元素破坏单调性时弹出栈顶。每个元素最多入栈出栈各一次，总复杂度O(n)。"
+        },
+        "数据结构|并查集|基础": {
+            "description": "基础并查集，仅路径压缩或按秩合并，适用于简单的连通性维护。"
+        },
+        "数据结构|并查集|带权": {
+            "description": "带权并查集，在路径压缩时维护节点间的权值关系（如距离、偏移量），适用于食物链等关系传递问题。"
+        },
+        "数据结构|并查集|扩展域": {
+            "description": "扩展域并查集（种类并查集），通过为每个实体建立多个域（如自身、敌人、猎物）来处理复杂的对立/关系约束。"
+        },
+        "数据结构|前缀和与差分|一维": {
+            "description": "一维序列上的前缀和与差分，支持O(1)区间求和与O(1)区间修改。"
+        },
+        "数据结构|前缀和与差分|二维": {
+            "description": "二维矩阵上的前缀和与差分，支持O(1)子矩阵求和与O(1)子矩阵修改。"
+        },
+        "数据结构|前缀和与差分|树上": {
+            "description": "树结构上的前缀和与差分，利用LCA实现路径点权/边权的O(1)查询与修改。"
+        },
+        "动态规划|背包问题|01背包": {
+            "description": "每件物品最多选一次的背包问题，是所有背包变体的基础。涵盖标准版、二维费用、路径记录、方案计数等扩展。"
+        },
+        "动态规划|背包问题|完全背包": {
+            "description": "每件物品可选无限次的背包问题，通过01背包的逆序遍历改为正序遍历即可转换。"
+        },
+        "动态规划|背包问题|多重背包": {
+            "description": "每件物品有数量上限的背包问题，需用二进制优化或单调队列优化将O(nm)降为O(nm log s)或O(nm)。"
+        },
+        "动态规划|背包问题|分组背包": {
+            "description": "物品分为若干组，每组最多选一件的背包问题，是泛化背包模型，需在组内做互斥决策。"
+        },
+        "动态规划|线性DP|LCS": {
+            "description": "最长公共子序列与最长公共子串问题，通过二维状态转移实现O(nm)求解，可扩展路径还原。"
+        },
+        "动态规划|线性DP|LIS": {
+            "description": "最长上升子序列问题，朴素DP为O(n²)，二分优化为O(n log n)，树状数组优化可同时计数方案数。"
+        },
+        "动态规划|线性DP|经典模型": {
+            "description": "线性DP中的经典问题，包括编辑距离、最大子段和、数字三角形等基础模型，是DP入门必学。"
+        },
+        "动态规划|状态压缩DP|路径问题": {
+            "description": "用状压DP求解路径覆盖类问题，如Hamilton路径、旅行商问题(TSP)。状态为已访问点集+当前位置，转移枚举前驱点。"
+        },
+        "图论|最短路|单源最短路": {
+            "description": "求从单一源点到其他所有顶点的最短路径。Dijkstra适用于非负权图，Bellman-Ford和SPFA可处理负权边。"
+        },
+        "图论|最短路|全源最短路": {
+            "description": "求所有顶点对之间的最短路径。Floyd基于传递闭包O(n³)，Johnson结合Dijkstra与Bellman-Ford处理含负权的全源问题。"
+        },
+        "图论|最短路|DAG最短路": {
+            "description": "在有向无环图上通过拓扑排序求最短路，时间复杂度O(n+m)，是所有最短路算法中最优的，且支持负权边。"
+        },
+        "图论|连通分量|强连通分量": {
+            "description": "有向图中极大的强连通子图（SCC），分量内任意两点互相可达。Tarjan算法通过一次DFS即可求解，缩点后原图变为DAG，是处理有向图环结构的核心工具。"
+        },
+        "图论|连通分量|边双连通分量": {
+            "description": "无向图中极大的边双连通子图（E-DCC），分量内没有桥（割边），任意两点至少有两条边不相交的路径。删去所有桥后各连通块即为E-DCC，缩点后得到一棵树。"
+        },
+        "基础算法|搜索|DFS": {
+            "description": "深度优先搜索（DFS）是最基础的搜索算法，沿着一条路径深入直到无法继续再回溯。常用于排列生成、组合生成、回溯等问题，是图论搜索和动态规划状态转移的基础。"
+        },
+        "基础算法|搜索|BFS": {
+            "description": "广度优先搜索（BFS）按层遍历，常用于最短路径、层次遍历等问题。双向BFS从起点和终点同时搜索，大幅减少搜索空间。"
+        },
+        "基础算法|搜索|折半搜索": {
+            "description": "Meet in the Middle（折半搜索）将搜索空间分成两半分别枚举，再合并结果，将指数级复杂度从O(2^n)降至O(n·2^(n/2))，是解决中等规模子集类问题的核心技巧。"
+        }
     },
-    "图论": {
-      "nature": "图结构算法",
-      "description": "处理图结构上的算法问题。包括单源/全源最短路、最小生成树、最近公共祖先、拓扑排序等核心图算法。",
-      "problemDomain": "路径规划、网络连通性、树结构查询、依赖关系处理等图结构问题"
-    },
-    "字符串": {
-      "nature": "字符串处理",
-      "description": "字符串匹配与表示相关算法，通过哈希映射和双指针比较实现高效字符串处理。",
-      "problemDomain": "子串匹配、循环同构、哈希碰撞等字符串处理问题"
-    },
-    "数学": {
-      "nature": "数论与组合数学",
-      "description": "数论与组合数学相关的算法与计数问题，包括数论基础、组合计数、快速幂、矩阵运算等。",
-      "problemDomain": "模运算、组合计数、高精度计算、数论计数等数学问题"
-    },
-    "输入输出": {
-      "nature": "I/O优化技术",
-      "description": "通过自定义读写函数替代标准I/O，在处理大规模数据时显著提升程序效率。",
-      "problemDomain": "竞赛中大量数据的快速读写场景"
-    },
-    "初赛笔记": {
-      "nature": "竞赛理论知识",
-      "description": "CSP 初赛涉及的理论知识与考点总结，不包含代码实现，侧重概念理解、公式记忆和应试技巧。涵盖位运算、数据类型、运算符优先级、进制转换等初赛高频考点。",
-      "problemDomain": "CSP 初赛的选择题、判断题、程序阅读题等理论考核场景"
+    "knowledgePoints": {
+        "basic-high-precision": {
+            "prerequisites": [],
+            "related": [
+                "math-quick-pow-highprecision",
+                "dp-digit-count"
+            ]
+        },
+        "basic-interval-scheduling": {
+            "prerequisites": [],
+            "related": [
+                "basic-interval-merge"
+            ]
+        },
+        "basic-interval-merge": {
+            "prerequisites": [
+                "basic-interval-scheduling"
+            ],
+            "related": [
+                "basic-interval-scheduling",
+                "basic-divide-conquer-merge-inversion"
+            ]
+        },
+        "basic-two-pointer-cycle": {
+            "prerequisites": [],
+            "related": [
+                "ds-monoqueue-1d",
+                "str-minimal-representation",
+                "dp-linear-lis-binary"
+            ]
+        },
+        "basic-digit-power-cycle-self": {
+            "prerequisites": [
+                "math-quick-pow-basic"
+            ],
+            "related": [
+                "math-quick-pow-basic",
+                "str-hash",
+                "exam-bit-operation"
+            ]
+        },
+        "dp-01bag-standard": {
+            "prerequisites": [
+                "dp-linear-triangle"
+            ],
+            "related": [
+                "dp-01bag-2d",
+                "dp-complete-bag",
+                "dp-group-bag",
+                "dp-01bag-record",
+                "dp-count-01bag",
+                "dp-multi-bag-binary",
+                "dp-linear-triangle",
+                "dp-tree-dance",
+                "dp-tree-01bag"
+            ]
+        },
+        "dp-bitmask-hamilton": {
+            "prerequisites": [
+                "exam-bit-operation",
+                "dp-linear-triangle"
+            ],
+            "related": [
+                "graph-floyd",
+                "graph-dijkstra-heap"
+            ]
+        },
+        "dp-01bag-2d": {
+            "prerequisites": [
+                "dp-01bag-standard"
+            ],
+            "related": [
+                "dp-01bag-standard",
+                "dp-01bag-record"
+            ]
+        },
+        "dp-01bag-record": {
+            "prerequisites": [
+                "dp-01bag-standard"
+            ],
+            "related": [
+                "dp-01bag-standard",
+                "dp-count-01bag",
+                "dp-01bag-2d"
+            ]
+        },
+        "dp-count-01bag": {
+            "prerequisites": [
+                "dp-01bag-standard"
+            ],
+            "related": [
+                "dp-01bag-standard",
+                "dp-01bag-record"
+            ]
+        },
+        "dp-complete-bag": {
+            "prerequisites": [
+                "dp-01bag-standard"
+            ],
+            "related": [
+                "dp-01bag-standard",
+                "dp-group-bag"
+            ]
+        },
+        "dp-group-bag": {
+            "prerequisites": [
+                "dp-01bag-standard"
+            ],
+            "related": [
+                "dp-01bag-standard",
+                "dp-complete-bag"
+            ]
+        },
+        "dp-multi-bag-binary": {
+            "prerequisites": [
+                "dp-01bag-standard"
+            ],
+            "related": [
+                "dp-multi-bag-monotone",
+                "dp-01bag-standard"
+            ]
+        },
+        "dp-multi-bag-monotone": {
+            "prerequisites": [
+                "dp-multi-bag-binary",
+                "ds-monoqueue-1d"
+            ],
+            "related": [
+                "dp-multi-bag-binary",
+                "ds-monoqueue-1d"
+            ]
+        },
+        "dp-linear-triangle": {
+            "prerequisites": [],
+            "related": [
+                "dp-linear-maxsub",
+                "dp-linear-lis-binary",
+                "dp-01bag-standard"
+            ]
+        },
+        "dp-linear-maxsub": {
+            "prerequisites": [
+                "dp-linear-triangle"
+            ],
+            "related": [
+                "dp-linear-triangle",
+                "dp-linear-lis-binary"
+            ]
+        },
+        "dp-linear-lis-binary": {
+            "prerequisites": [
+                "dp-linear-triangle"
+            ],
+            "related": [
+                "dp-linear-lis-bit-count",
+                "dp-linear-lcs-length",
+                "dp-linear-maxsub",
+                "basic-two-pointer-cycle",
+                "dp-linear-triangle"
+            ]
+        },
+        "dp-linear-lis-bit-count": {
+            "prerequisites": [
+                "dp-linear-lis-binary",
+                "ds-bit-point-range"
+            ],
+            "related": [
+                "dp-linear-lis-binary",
+                "ds-bit-point-range"
+            ]
+        },
+        "dp-linear-lcs-length": {
+            "prerequisites": [
+                "dp-linear-triangle"
+            ],
+            "related": [
+                "dp-linear-lcs-output",
+                "dp-linear-lcs-substring",
+                "dp-linear-edit-distance",
+                "dp-linear-lis-binary"
+            ]
+        },
+        "dp-linear-lcs-output": {
+            "prerequisites": [
+                "dp-linear-lcs-length"
+            ],
+            "related": [
+                "dp-linear-lcs-length",
+                "dp-linear-lcs-substring"
+            ]
+        },
+        "dp-linear-lcs-substring": {
+            "prerequisites": [
+                "dp-linear-lcs-length"
+            ],
+            "related": [
+                "dp-linear-lcs-length",
+                "dp-linear-lcs-output",
+                "dp-linear-edit-distance"
+            ]
+        },
+        "dp-linear-edit-distance": {
+            "prerequisites": [
+                "dp-linear-lcs-length"
+            ],
+            "related": [
+                "dp-linear-lcs-length",
+                "dp-linear-lcs-substring"
+            ]
+        },
+        "dp-tree-dance": {
+            "prerequisites": [
+                "dp-01bag-standard",
+                "graph-lca-doubling"
+            ],
+            "related": [
+                "dp-tree-01bag",
+                "dp-01bag-standard",
+                "graph-topo-sort"
+            ]
+        },
+        "dp-tree-01bag": {
+            "prerequisites": [
+                "dp-tree-dance",
+                "dp-01bag-standard"
+            ],
+            "related": [
+                "dp-tree-dance",
+                "dp-01bag-standard"
+            ]
+        },
+        "dp-digit-count": {
+            "prerequisites": [],
+            "related": [
+                "basic-high-precision",
+                "dp-interval-stone-merge"
+            ]
+        },
+        "dp-interval-stone-merge": {
+            "prerequisites": [
+                "dp-linear-triangle"
+            ],
+            "related": [
+                "dp-digit-count"
+            ]
+        },
+        "ds-prefix-sum-1d": {
+            "prerequisites": [],
+            "related": [
+                "ds-diff-1d",
+                "ds-prefix-sum-2d",
+                "ds-bit-point-range",
+                "str-hash"
+            ]
+        },
+        "ds-diff-1d": {
+            "prerequisites": [
+                "ds-prefix-sum-1d"
+            ],
+            "related": [
+                "ds-prefix-sum-1d",
+                "ds-prefix-sum-2d",
+                "ds-diff-2d",
+                "ds-prefix-sum-tree",
+                "ds-diff-tree"
+            ]
+        },
+        "ds-prefix-sum-2d": {
+            "prerequisites": [
+                "ds-prefix-sum-1d"
+            ],
+            "related": [
+                "ds-prefix-sum-1d",
+                "ds-diff-1d",
+                "ds-diff-2d",
+                "ds-prefix-sum-tree"
+            ]
+        },
+        "ds-diff-2d": {
+            "prerequisites": [
+                "ds-prefix-sum-2d",
+                "ds-diff-1d"
+            ],
+            "related": [
+                "ds-prefix-sum-2d",
+                "ds-diff-1d",
+                "ds-diff-tree"
+            ]
+        },
+        "ds-bit-point-range": {
+            "prerequisites": [
+                "ds-prefix-sum-1d"
+            ],
+            "related": [
+                "ds-bit-range-point",
+                "ds-segtree-basic",
+                "ds-prefix-sum-1d",
+                "dp-linear-lis-bit-count",
+                "basic-divide-conquer-merge-inversion",
+                "exam-bit-operation"
+            ]
+        },
+        "ds-bit-range-point": {
+            "prerequisites": [
+                "ds-bit-point-range"
+            ],
+            "related": [
+                "ds-bit-point-range",
+                "ds-segtree-basic"
+            ]
+        },
+        "ds-segtree-basic": {
+            "prerequisites": [
+                "ds-bit-point-range"
+            ],
+            "related": [
+                "ds-segtree-discretize",
+                "ds-segtree-mul",
+                "ds-bit-point-range",
+                "ds-bit-range-point",
+                "ds-persistent-segtree-template",
+                "ds-persistent-segtree-3919",
+                "ds-splay",
+                "ds-trie",
+                "ds-trie-01-max-xor",
+                "ds-st-table-1",
+                "ds-st-table-2",
+                "ds-block-decomposition"
+            ]
+        },
+        "ds-segtree-discretize": {
+            "prerequisites": [
+                "ds-segtree-basic"
+            ],
+            "related": [
+                "ds-segtree-basic",
+                "ds-segtree-mul"
+            ]
+        },
+        "ds-segtree-mul": {
+            "prerequisites": [
+                "ds-segtree-basic"
+            ],
+            "related": [
+                "ds-segtree-basic",
+                "ds-segtree-discretize"
+            ]
+        },
+        "ds-persistent-segtree-template": {
+            "prerequisites": [
+                "ds-segtree-basic"
+            ],
+            "related": [
+                "ds-persistent-segtree-3919",
+                "ds-segtree-basic"
+            ]
+        },
+        "ds-persistent-segtree-3919": {
+            "prerequisites": [
+                "ds-persistent-segtree-template"
+            ],
+            "related": [
+                "ds-persistent-segtree-template",
+                "ds-segtree-basic"
+            ]
+        },
+        "ds-splay": {
+            "prerequisites": [
+                "ds-segtree-basic"
+            ],
+            "related": [
+                "ds-segtree-basic",
+                "graph-lca-hld",
+                "ds-dual-heap",
+                "basic-quickselect-kth"
+            ]
+        },
+        "ds-dual-heap": {
+            "prerequisites": [],
+            "related": [
+                "ds-splay",
+                "ds-monoqueue-1d",
+                "basic-quickselect-kth",
+                "ds-stack-prefix-max",
+                "ds-monostack-histogram"
+            ]
+        },
+        "ds-trie": {
+            "prerequisites": [],
+            "related": [
+                "str-hash",
+                "str-kmp",
+                "ds-segtree-basic",
+                "ds-trie-01-max-xor"
+            ]
+        },
+        "ds-trie-01-max-xor": {
+            "prerequisites": [
+                "ds-trie"
+            ],
+            "related": [
+                "math-quick-pow-basic",
+                "ds-segtree-basic",
+                "ds-trie"
+            ]
+        },
+        "ds-stack-prefix-max": {
+            "prerequisites": [
+                "ds-prefix-sum-1d"
+            ],
+            "related": [
+                "ds-dual-heap",
+                "ds-monoqueue-1d",
+                "ds-st-table-1",
+                "ds-monostack-histogram"
+            ]
+        },
+        "ds-st-table-1": {
+            "prerequisites": [
+                "ds-prefix-sum-1d"
+            ],
+            "related": [
+                "ds-st-table-2",
+                "ds-segtree-basic",
+                "ds-stack-prefix-max"
+            ]
+        },
+        "ds-st-table-2": {
+            "prerequisites": [
+                "ds-st-table-1"
+            ],
+            "related": [
+                "ds-st-table-1",
+                "ds-segtree-basic"
+            ]
+        },
+        "ds-monoqueue-1d": {
+            "prerequisites": [
+                "ds-prefix-sum-1d"
+            ],
+            "related": [
+                "ds-monoqueue-2d",
+                "basic-two-pointer-cycle",
+                "dp-multi-bag-monotone",
+                "ds-dual-heap",
+                "ds-stack-prefix-max",
+                "ds-mo-team",
+                "ds-monostack-histogram"
+            ]
+        },
+        "ds-monoqueue-2d": {
+            "prerequisites": [
+                "ds-monoqueue-1d"
+            ],
+            "related": [
+                "ds-monoqueue-1d",
+                "ds-block-decomposition",
+                "ds-monostack-histogram"
+            ]
+        },
+        "ds-block-decomposition": {
+            "prerequisites": [
+                "ds-segtree-basic"
+            ],
+            "related": [
+                "ds-mo-team",
+                "ds-segtree-basic",
+                "ds-monoqueue-2d",
+                "basic-quickselect-kth"
+            ]
+        },
+        "ds-mo-team": {
+            "prerequisites": [
+                "ds-block-decomposition",
+                "ds-monoqueue-1d"
+            ],
+            "related": [
+                "ds-block-decomposition",
+                "ds-monoqueue-1d"
+            ]
+        },
+        "ds-uf-basic": {
+            "prerequisites": [],
+            "related": [
+                "ds-uf-rank",
+                "graph-kruskal",
+                "ds-uf-extended-domain",
+                "ds-uf-weighted-old",
+                "graph-lca-tarjan"
+            ]
+        },
+        "ds-uf-rank": {
+            "prerequisites": [
+                "ds-uf-basic"
+            ],
+            "related": [
+                "ds-uf-basic",
+                "ds-uf-weighted-old"
+            ]
+        },
+        "ds-uf-weighted-old": {
+            "prerequisites": [
+                "ds-uf-basic"
+            ],
+            "related": [
+                "ds-uf-weighted-food",
+                "ds-uf-basic",
+                "ds-uf-rank"
+            ]
+        },
+        "ds-uf-weighted-food": {
+            "prerequisites": [
+                "ds-uf-weighted-old"
+            ],
+            "related": [
+                "ds-uf-weighted-old",
+                "ds-uf-extended-domain"
+            ]
+        },
+        "ds-uf-extended-domain": {
+            "prerequisites": [
+                "ds-uf-basic"
+            ],
+            "related": [
+                "ds-uf-basic",
+                "ds-uf-weighted-food"
+            ]
+        },
+        "graph-dijkstra-heap": {
+            "prerequisites": [],
+            "related": [
+                "graph-bellman-ford",
+                "graph-floyd",
+                "graph-prim",
+                "dp-bitmask-hamilton",
+                "graph-dag-shortest-path",
+                "graph-spfa",
+                "graph-topo-sort",
+                "basic-bfs-bidirectional"
+            ]
+        },
+        "graph-bellman-ford": {
+            "prerequisites": [
+                "graph-dijkstra-heap"
+            ],
+            "related": [
+                "graph-spfa",
+                "graph-dijkstra-heap",
+                "graph-johnson"
+            ]
+        },
+        "graph-spfa": {
+            "prerequisites": [
+                "graph-bellman-ford"
+            ],
+            "related": [
+                "graph-bellman-ford",
+                "graph-dijkstra-heap",
+                "graph-dag-shortest-path"
+            ]
+        },
+        "graph-floyd": {
+            "prerequisites": [
+                "graph-dijkstra-heap"
+            ],
+            "related": [
+                "graph-johnson",
+                "graph-dijkstra-heap",
+                "dp-bitmask-hamilton",
+                "graph-dag-shortest-path"
+            ]
+        },
+        "graph-johnson": {
+            "prerequisites": [
+                "graph-floyd",
+                "graph-bellman-ford"
+            ],
+            "related": [
+                "graph-floyd",
+                "graph-bellman-ford"
+            ]
+        },
+        "graph-kruskal": {
+            "prerequisites": [
+                "ds-uf-basic"
+            ],
+            "related": [
+                "graph-prim",
+                "ds-uf-basic",
+                "graph-bipartite-hungarian"
+            ]
+        },
+        "graph-prim": {
+            "prerequisites": [
+                "graph-dijkstra-heap"
+            ],
+            "related": [
+                "graph-kruskal",
+                "graph-dijkstra-heap"
+            ]
+        },
+        "graph-centroid": {
+            "prerequisites": [
+                "graph-topo-sort"
+            ],
+            "related": [
+                "graph-hld-segtree",
+                "graph-lca-doubling"
+            ]
+        },
+        "graph-lca-doubling": {
+            "prerequisites": [
+                "graph-topo-sort"
+            ],
+            "related": [
+                "graph-lca-tarjan",
+                "graph-lca-hld",
+                "graph-centroid"
+            ]
+        },
+        "graph-lca-tarjan": {
+            "prerequisites": [
+                "ds-uf-basic",
+                "graph-lca-doubling"
+            ],
+            "related": [
+                "graph-lca-doubling",
+                "graph-lca-hld",
+                "ds-uf-basic",
+                "graph-tarjan-cut-vertex",
+                "graph-tarjan-scc",
+                "ds-prefix-sum-tree",
+                "ds-diff-tree"
+            ]
+        },
+        "graph-lca-hld": {
+            "prerequisites": [
+                "graph-lca-doubling"
+            ],
+            "related": [
+                "graph-lca-doubling",
+                "graph-lca-tarjan",
+                "graph-hld-segtree",
+                "ds-splay"
+            ]
+        },
+        "graph-hld-segtree": {
+            "prerequisites": [
+                "ds-segtree-basic",
+                "graph-lca-hld"
+            ],
+            "related": [
+                "graph-lca-hld",
+                "ds-diff-tree",
+                "ds-prefix-sum-tree",
+                "graph-centroid"
+            ]
+        },
+        "graph-topo-sort": {
+            "prerequisites": [],
+            "related": [
+                "graph-dijkstra-heap",
+                "dp-tree-dance",
+                "graph-tarjan-scc",
+                "graph-scc-condensation",
+                "graph-scc-dag-dp"
+            ]
+        },
+        "graph-dag-shortest-path": {
+            "prerequisites": [
+                "graph-topo-sort"
+            ],
+            "related": [
+                "graph-dijkstra-heap",
+                "graph-floyd",
+                "graph-spfa",
+                "graph-tarjan-scc",
+                "graph-scc-condensation",
+                "graph-scc-dag-dp"
+            ]
+        },
+        "graph-tarjan-cut-vertex": {
+            "prerequisites": [],
+            "related": [
+                "graph-tarjan-scc",
+                "graph-lca-tarjan",
+                "graph-tarjan-bridge",
+                "graph-e-dcc-condensation",
+                "graph-bipartite-dfs-coloring"
+            ]
+        },
+        "graph-tarjan-bridge": {
+            "prerequisites": [],
+            "related": [
+                "graph-tarjan-cut-vertex",
+                "graph-tarjan-scc",
+                "graph-scc-condensation",
+                "graph-e-dcc-condensation"
+            ]
+        },
+        "graph-tarjan-scc": {
+            "prerequisites": [
+                "graph-topo-sort"
+            ],
+            "related": [
+                "graph-topo-sort",
+                "graph-lca-tarjan",
+                "graph-dag-shortest-path",
+                "graph-scc-condensation",
+                "graph-tarjan-cut-vertex",
+                "graph-tarjan-bridge",
+                "graph-bipartite-dfs-coloring",
+                "graph-scc-dag-dp"
+            ]
+        },
+        "graph-scc-condensation": {
+            "prerequisites": [
+                "graph-tarjan-scc",
+                "graph-topo-sort"
+            ],
+            "related": [
+                "graph-tarjan-scc",
+                "graph-dag-shortest-path",
+                "graph-topo-sort",
+                "graph-e-dcc-condensation",
+                "graph-tarjan-bridge",
+                "graph-scc-dag-dp"
+            ]
+        },
+        "graph-e-dcc-condensation": {
+            "prerequisites": [
+                "graph-tarjan-bridge"
+            ],
+            "related": [
+                "graph-tarjan-bridge",
+                "graph-scc-condensation",
+                "graph-tarjan-cut-vertex"
+            ]
+        },
+        "graph-bipartite-dfs-coloring": {
+            "prerequisites": [],
+            "related": [
+                "graph-tarjan-scc",
+                "graph-tarjan-cut-vertex",
+                "basic-permutation-dfs",
+                "graph-bipartite-hungarian"
+            ]
+        },
+        "graph-bipartite-hungarian": {
+            "prerequisites": [
+                "graph-bipartite-dfs-coloring"
+            ],
+            "related": [
+                "graph-bipartite-dfs-coloring",
+                "graph-kruskal",
+                "basic-divide-conquer-merge-inversion"
+            ]
+        },
+        "io-fast-io": {
+            "prerequisites": [],
+            "related": []
+        },
+        "math-quick-pow-basic": {
+            "prerequisites": [],
+            "related": [
+                "math-quick-pow-highprecision",
+                "math-lcm-pair-count",
+                "basic-digit-power-cycle-self",
+                "math-matrix-linear-recurrence",
+                "ds-trie-01-max-xor",
+                "math-matrix-multiplication",
+                "math-matrix-quick-pow",
+                "math-gcd-lcm",
+                "math-sieve-eratosthenes",
+                "math-euler-phi",
+                "math-modular-inverse",
+                "math-crt",
+                "exam-bit-operation"
+            ]
+        },
+        "math-quick-pow-highprecision": {
+            "prerequisites": [
+                "math-quick-pow-basic"
+            ],
+            "related": [
+                "math-quick-pow-basic",
+                "basic-high-precision"
+            ]
+        },
+        "math-matrix-multiplication": {
+            "prerequisites": [],
+            "related": [
+                "math-quick-pow-basic",
+                "math-matrix-quick-pow",
+                "math-matrix-linear-recurrence"
+            ]
+        },
+        "math-matrix-quick-pow": {
+            "prerequisites": [
+                "math-matrix-multiplication",
+                "math-quick-pow-basic"
+            ],
+            "related": [
+                "math-matrix-multiplication",
+                "math-quick-pow-basic",
+                "math-matrix-linear-recurrence"
+            ]
+        },
+        "math-matrix-linear-recurrence": {
+            "prerequisites": [
+                "math-matrix-quick-pow"
+            ],
+            "related": [
+                "math-matrix-quick-pow",
+                "math-matrix-multiplication",
+                "math-quick-pow-basic"
+            ]
+        },
+        "math-gcd-lcm": {
+            "prerequisites": [],
+            "related": [
+                "math-lcm-pair-count",
+                "math-quick-pow-basic",
+                "math-sieve-eratosthenes",
+                "math-euler-phi",
+                "math-linear-sieve-phi",
+                "math-crt"
+            ]
+        },
+        "math-sieve-eratosthenes": {
+            "prerequisites": [
+                "math-gcd-lcm"
+            ],
+            "related": [
+                "math-gcd-lcm",
+                "math-quick-pow-basic",
+                "math-euler-phi",
+                "math-linear-sieve-phi",
+                "math-linear-sieve-divisor-count",
+                "math-linear-sieve-divisor-sum"
+            ]
+        },
+        "math-euler-phi": {
+            "prerequisites": [
+                "math-gcd-lcm",
+                "math-sieve-eratosthenes"
+            ],
+            "related": [
+                "math-gcd-lcm",
+                "math-sieve-eratosthenes",
+                "math-quick-pow-basic",
+                "math-linear-sieve-phi",
+                "math-linear-sieve-divisor-count",
+                "math-linear-sieve-divisor-sum",
+                "math-modular-inverse"
+            ]
+        },
+        "math-linear-sieve-phi": {
+            "prerequisites": [
+                "math-euler-phi",
+                "math-sieve-eratosthenes"
+            ],
+            "related": [
+                "math-euler-phi",
+                "math-sieve-eratosthenes",
+                "math-gcd-lcm",
+                "math-linear-sieve-divisor-count",
+                "math-linear-sieve-divisor-sum",
+                "math-modular-inverse"
+            ]
+        },
+        "math-linear-sieve-divisor-count": {
+            "prerequisites": [
+                "math-sieve-eratosthenes",
+                "math-linear-sieve-phi"
+            ],
+            "related": [
+                "math-linear-sieve-phi",
+                "math-sieve-eratosthenes",
+                "math-euler-phi",
+                "math-linear-sieve-divisor-sum"
+            ]
+        },
+        "math-linear-sieve-divisor-sum": {
+            "prerequisites": [
+                "math-sieve-eratosthenes",
+                "math-linear-sieve-phi",
+                "math-linear-sieve-divisor-count"
+            ],
+            "related": [
+                "math-linear-sieve-phi",
+                "math-linear-sieve-divisor-count",
+                "math-sieve-eratosthenes",
+                "math-euler-phi"
+            ]
+        },
+        "math-modular-inverse": {
+            "prerequisites": [
+                "math-quick-pow-basic",
+                "math-euler-phi",
+                "math-gcd-lcm"
+            ],
+            "related": [
+                "math-quick-pow-basic",
+                "math-euler-phi",
+                "math-linear-sieve-phi",
+                "math-crt"
+            ]
+        },
+        "math-crt": {
+            "prerequisites": [
+                "math-modular-inverse",
+                "math-gcd-lcm",
+                "math-quick-pow-basic"
+            ],
+            "related": [
+                "math-modular-inverse",
+                "math-gcd-lcm",
+                "math-quick-pow-basic"
+            ]
+        },
+        "math-lcm-pair-count": {
+            "prerequisites": [
+                "math-gcd-lcm",
+                "math-quick-pow-basic"
+            ],
+            "related": [
+                "math-gcd-lcm",
+                "math-quick-pow-basic",
+                "math-stars-and-bars"
+            ]
+        },
+        "math-stars-and-bars": {
+            "prerequisites": [],
+            "related": [
+                "basic-combination-dfs",
+                "math-lcm-pair-count"
+            ]
+        },
+        "basic-permutation-dfs": {
+            "prerequisites": [],
+            "related": [
+                "basic-combination-dfs",
+                "basic-meet-in-middle-binary-search",
+                "basic-bfs-bidirectional",
+                "graph-bipartite-dfs-coloring"
+            ]
+        },
+        "basic-combination-dfs": {
+            "prerequisites": [],
+            "related": [
+                "basic-permutation-dfs",
+                "basic-meet-in-middle-binary-search",
+                "math-stars-and-bars",
+                "basic-bfs-bidirectional"
+            ]
+        },
+        "basic-meet-in-middle-binary-search": {
+            "prerequisites": [
+                "basic-combination-dfs"
+            ],
+            "related": [
+                "basic-meet-in-middle-two-pointer",
+                "basic-permutation-dfs",
+                "basic-combination-dfs"
+            ]
+        },
+        "basic-meet-in-middle-two-pointer": {
+            "prerequisites": [
+                "basic-combination-dfs"
+            ],
+            "related": [
+                "basic-meet-in-middle-binary-search"
+            ]
+        },
+        "basic-bfs-bidirectional": {
+            "prerequisites": [],
+            "related": [
+                "basic-permutation-dfs",
+                "basic-combination-dfs",
+                "graph-dijkstra-heap"
+            ]
+        },
+        "str-hash": {
+            "prerequisites": [],
+            "related": [
+                "str-minimal-representation",
+                "ds-prefix-sum-1d",
+                "basic-digit-power-cycle-self",
+                "ds-trie",
+                "str-kmp",
+                "str-sunday"
+            ]
+        },
+        "str-minimal-representation": {
+            "prerequisites": [
+                "str-hash"
+            ],
+            "related": [
+                "str-hash",
+                "basic-two-pointer-cycle",
+                "str-kmp"
+            ]
+        },
+        "str-kmp": {
+            "prerequisites": [],
+            "related": [
+                "str-hash",
+                "str-minimal-representation",
+                "str-sunday",
+                "ds-trie"
+            ]
+        },
+        "str-sunday": {
+            "prerequisites": [],
+            "related": [
+                "str-kmp",
+                "str-hash"
+            ]
+        },
+        "basic-divide-conquer-merge-inversion": {
+            "prerequisites": [],
+            "related": [
+                "ds-bit-point-range",
+                "basic-interval-merge",
+                "basic-divide-conquer-closest-pair",
+                "graph-bipartite-hungarian",
+                "basic-quickselect-kth",
+                "basic-radix-sort-k",
+                "basic-shell-sort"
+            ]
+        },
+        "basic-divide-conquer-closest-pair": {
+            "prerequisites": [
+                "basic-divide-conquer-merge-inversion"
+            ],
+            "related": [
+                "basic-divide-conquer-merge-inversion"
+            ]
+        },
+        "ds-prefix-sum-tree": {
+            "prerequisites": [
+                "ds-prefix-sum-1d",
+                "graph-lca-doubling"
+            ],
+            "related": [
+                "ds-prefix-sum-2d",
+                "ds-diff-1d",
+                "graph-lca-tarjan",
+                "graph-hld-segtree",
+                "ds-diff-tree"
+            ]
+        },
+        "ds-diff-tree": {
+            "prerequisites": [
+                "ds-diff-1d",
+                "graph-lca-doubling"
+            ],
+            "related": [
+                "ds-prefix-sum-tree",
+                "ds-diff-1d",
+                "graph-lca-tarjan",
+                "graph-hld-segtree",
+                "ds-diff-2d"
+            ]
+        },
+        "basic-quickselect-kth": {
+            "prerequisites": [
+                "basic-divide-conquer-merge-inversion"
+            ],
+            "related": [
+                "basic-divide-conquer-merge-inversion",
+                "ds-block-decomposition",
+                "ds-splay",
+                "ds-dual-heap",
+                "basic-radix-sort-k",
+                "basic-random-mt19937"
+            ]
+        },
+        "ds-monostack-histogram": {
+            "prerequisites": [
+                "ds-stack-prefix-max",
+                "ds-monoqueue-1d"
+            ],
+            "related": [
+                "ds-stack-prefix-max",
+                "ds-monoqueue-1d",
+                "ds-monoqueue-2d",
+                "ds-dual-heap"
+            ]
+        },
+        "basic-radix-sort-k": {
+            "prerequisites": [
+                "basic-divide-conquer-merge-inversion"
+            ],
+            "related": [
+                "basic-quickselect-kth",
+                "basic-divide-conquer-merge-inversion",
+                "basic-shell-sort"
+            ]
+        },
+        "basic-shell-sort": {
+            "prerequisites": [],
+            "related": [
+                "basic-radix-sort-k",
+                "basic-divide-conquer-merge-inversion"
+            ]
+        },
+        "exam-bit-operation": {
+            "prerequisites": [],
+            "related": [
+                "math-quick-pow-basic",
+                "ds-bit-point-range",
+                "basic-digit-power-cycle-self"
+            ]
+        },
+        "graph-scc-dag-dp": {
+            "prerequisites": [
+                "graph-tarjan-scc",
+                "graph-scc-condensation",
+                "graph-topo-sort"
+            ],
+            "related": [
+                "graph-scc-condensation",
+                "graph-tarjan-scc",
+                "graph-dag-shortest-path",
+                "graph-topo-sort"
+            ]
+        },
+        "basic-random-mt19937": {
+            "prerequisites": [],
+            "related": [
+                "basic-quickselect-kth",
+                "basic-random-sa-point"
+            ]
+        },
+        "basic-random-sa-point": {
+            "prerequisites": [
+                "basic-random-mt19937"
+            ],
+            "related": [
+                "basic-random-mt19937"
+            ]
+        }
     }
-  },
-  "subcategories": {
-    "基础算法|贪心": {
-      "description": "在每一步选择中采取当前最优策略，期望得到全局最优解。适用于区间调度、区间合并等具有贪心选择性质的问题。"
-    },
-    "基础算法|双指针": {
-      "description": "利用两个指针的协作（同向、对撞、快慢）在线性时间内解决问题。核心在于指针移动策略所维护的不变量。"
-    },
-    "基础算法|高精度": {
-      "description": "用数组或字符串存储超出内置类型范围的大整数，模拟人工列竖式进行加减乘除运算。是处理阶乘、组合数、大幂等大数问题的基础工具。"
-    },
-    "基础算法|数位提升": {
-      "description": "按数位逐层处理数字的周期性和幂次问题，将大数运算分解为数位级别的迭代。"
-    },
-    "动态规划|背包问题": {
-      "description": "在容量限制下选择物品使价值最大化。涵盖01背包、完全背包、分组背包、多重背包等变体，是DP的入门必修。"
-    },
-    "动态规划|线性DP": {
-      "description": "状态按线性顺序转移的DP，包括LIS、LCS、最大子段和、编辑距离等经典模型，是所有DP的基础。"
-    },
-    "动态规划|树形DP": {
-      "description": "在树结构上做动态规划，自底向上传递子树信息。适用于树上选点、树上背包等最优决策问题。"
-    },
-    "动态规划|状态压缩DP": {
-      "description": "用二进制位表示集合状态的动态规划技巧，将集合决策压缩为整数。适用于n较小的排列、路径、集合覆盖等问题，是TSP等NP问题的常用解法。"
-    },
-    "动态规划|数位DP": {
-      "description": "按数位逐位处理的动态规划，用于统计区间内满足特定条件的数字个数或数码出现次数。核心思想是将大问题拆解为数位级别的子问题，通过记忆化搜索或公式推导高效求解。"
-    },
-    "动态规划|区间DP": {
-      "description": "在区间[l,r]上定义状态的动态规划，大区间的最优解由小区间合并而来。典型问题包括石子合并、能量项链、括号匹配、加分二叉树等，是DP的重要分支。"
-    },
-    "数据结构|前缀和与差分": {
-      "description": "通过预处理前缀和实现O(1)区间求和，差分支持O(1)区间修改。是最基础也是最高效的数据结构工具。"
-    },
-    "数据结构|树状数组": {
-      "description": "基于二进制分区的动态前缀和结构，支持O(log n)的单点修改和前缀查询。是线段树的轻量级替代。"
-    },
-    "数据结构|线段树": {
-      "description": "基于区间二分的平衡树结构，支持区间修改、区间查询和懒标记下传。是功能最全面的数据结构之一。"
-    },
-    "数据结构|可持久化线段树": {
-      "description": "保留历史版本的线段树，通过共享节点实现O(n log n)空间的版本管理，支持查询任意历史版本。"
-    },
-    "数据结构|平衡树": {
-      "description": "通过旋转操作维持平衡的二叉搜索树。Splay树通过访问局部性优化频繁操作的场景。"
-    },
-    "数据结构|ST表": {
-      "description": "基于倍增思想的静态RMQ结构，O(n log n)预处理，O(1)查询区间最值。不支持修改。"
-    },
-    "数据结构|单调队列": {
-      "description": "维护单调性的双端队列，用于滑动窗口最值等问题的O(n)求解。是队列和单调性的结合应用。"
-    },
-    "数据结构|分块": {
-      "description": "将序列分成若干块，块内整体操作、块间逐个处理，平衡修改与查询复杂度至O(√n)。"
-    },
-    "数据结构|莫队": {
-      "description": "基于分块和指针移动的离线区间查询算法，通过排序询问顺序优化总移动次数，复杂度O(n√n)。"
-    },
-    "数据结构|并查集": {
-      "description": "维护不相交集合的数据结构，支持高效的合并和查询。可扩展为带权并查集和扩展域并查集。"
-    },
-    "数据结构|堆": {
-      "description": "基于优先队列的数据结构，通过堆的堆顶操作维护动态序列的最值或第k值。对顶堆用大根堆和小根堆协作维护第k小。"
-    },
-    "数据结构|栈": {
-      "description": "基于栈的数据结构，通过辅助数组或单调性维护实现高效查询。涵盖前缀最值栈（O(1)最值查询）和单调栈（直方图最大矩形、下一个更大/更小元素等）。"
-    },
-    "数据结构|字典树": {
-      "description": "将若干字符串按公共前缀组织成一棵多叉树，插入和查询均沿字符逐层下行，单次操作 O(|S|)。支持前缀计数、字符串检索、自动补全等，是AC自动机的基础结构。"
-    },
-    "图论|最短路": {
-      "description": "求解图中单源或全源最短路径。涵盖Dijkstra（非负权）、Bellman-Ford（含负权）、Floyd（全源）、Johnson（全源含负权）等算法。"
-    },
-    "图论|最小生成树": {
-      "description": "在连通图中选择n-1条边使总权值最小且保持连通。Kruskal基于并查集，Prim基于堆优化。"
-    },
-    "图论|最近公共祖先": {
-      "description": "求树中两节点的最近公共祖先。倍增法预处理O(n log n)查询O(log n)，Tarjan离线O(n)，重链剖分查询O(log n)。"
-    },
-    "图论|拓扑排序": {
-      "description": "对DAG进行线性排序，使得每条边的起点在终点之前。基于BFS的Kahn算法是最常用实现。"
-    },
-    "图论|树的重心": {
-      "description": "树中删除后各连通块大小均不超过 n/2 的节点。是点分治的核心，保证分治深度为 O(log n)。一次 DFS 回溯即可找到所有重心，时间复杂度 O(n)。"
-    },
-    "图论|树链剖分": {
-      "description": "将树拆分为若干条重链，使任意路径最多跨越O(log n)条链。配合线段树实现O(log²n)路径修改/查询和O(log n)子树修改/查询，是静态树上操作的核心工具。"
-    },
-    "图论|割点与桥": {
-      "description": "求无向图中的割点（关节点）和桥（割边）。割点是删除后图的连通分量增加的点，桥是删除后连通分量增加的边。Tarjan算法通过一次DFS在线性时间内求解，是点双/边双连通分量的基础。"
-    },
-    "图论|连通分量": {
-      "description": "研究图的连通性结构，包括有向图的强连通分量（SCC）和无向图的边双连通分量（E-DCC）。缩点技术将每个分量压缩为超级点，使原图变为DAG或树，大幅简化路径、可达性、可靠性等问题。Tarjan算法是求解各类连通分量的核心方法。"
-    },
-    "图论|二分图": {
-      "description": "顶点可划分为两个不交集合的无向图，等价于图中无奇环。染色法（DFS/BFS）是最常用的判定方法，通过交替染色检测冲突。是最大匹配、最小顶点覆盖等问题的基础。"
-    },
-    "字符串|字符串哈希": {
-      "description": "将字符串映射为数值，通过多项式滚动哈希实现O(n+m)的子串匹配。注意双哈希防碰撞。"
-    },
-    "字符串|最小表示法": {
-      "description": "求循环同构串中字典序最小的表示，通过双指针比较实现O(n)求解。"
-    },
-    "字符串|字符串匹配": {
-      "description": "在文本串中查找模式串的所有出现位置。涵盖KMP（前缀函数）、Sunday等经典线性时间匹配算法。"
-    },
-    "数学|矩阵": {
-      "description": "矩阵的基本运算与应用。包括矩阵乘法、矩阵快速幂、矩阵加速线性递推等。矩阵快速幂是计算工具，矩阵加速线性递推是其核心应用——将线性递推的转移封装为矩阵乘法，用快速幂在 O(k^3 log n) 时间内解决 10^18 规模的问题。"
-    },
-    "数学|快速幂": {
-      "description": "利用指数的二进制分解，在O(log n)次乘法内完成幂运算，支持模意义下的高效计算。"
-    },
-    "数学|数论基础": {
-      "description": "数论的基础算法与核心概念，包括GCD/LCM（欧几里得算法）、埃氏筛（素数预处理）、欧拉函数（单次求值与线性筛批量预处理）、约数个数与约数和的线性筛、模逆元（费马小定理）、中国剩余定理（CRT）等。是数论计数、组合数取模等高级数论算法的基石。"
-    },
-    "数学|数论计数": {
-      "description": "数论相关的计数问题，利用GCD、LCM等数论性质进行高效统计。"
-    },
-    "数学|组合数学": {
-      "description": "组合数学的核心计数方法与技巧，包括隔板法（Stars and Bars）、容斥原理、排列组合等。是各类计数问题的基础工具。"
-    },
-    "输入输出|IO优化": {
-      "description": "通过自定义读写函数替代scanf/printf，在大量I/O时提升数倍效率。竞赛必备基础技能。"
-    },
-    "基础算法|分治": {
-      "description": "将问题分解为子问题分别求解，再合并结果。分治是递归思想的核心应用，归并排序求逆序对是其经典实例。"
-    },
-    "基础算法|排序": {
-      "description": "各类排序算法，涵盖比较型排序（希尔排序、归并排序等）和非比较型排序（基数排序）。希尔排序是插入排序的增量改进版，通过逐步缩小gap使数组基本有序；基数排序通过按位分解和计数排序实现线性时间排序，优于比较排序的O(n log n)下界。"
-    },
-    "基础算法|搜索": {
-      "description": "通过DFS/BFS等搜索策略系统地枚举或寻找最短路径。DFS+回溯是组合搜索的核心技术，通过递归尝试所有选择并在不满足条件时回退，配合剪枝可大幅减少无效搜索。BFS按层扩展保证无权图最短路，双向BFS从起点和终点同时扩展以减少搜索范围。是排列、组合、子集、迷宫最短路等问题的基础范式。"
-    },
-    "初赛笔记|位运算": {
-      "description": "CSP 初赛位运算核心考点：补码表示、三大恒等式、异或性质与应用、代数定律、移位运算、lowbit操作、状压集合、运算符优先级、有符号/无符号坑、大小关系不等式链、常数与进制转换。不涉及代码实现，侧重公式记忆与考场速算。"
-    }
-  },
-  "knowledgePoints": {
-    "basic-high-precision": {
-      "prerequisites": [],
-      "related": [
-        "math-quick-pow-highprecision",
-        "dp-digit-count"
-      ]
-    },
-    "basic-interval-scheduling": {
-      "prerequisites": [],
-      "related": [
-        "basic-interval-merge"
-      ]
-    },
-    "basic-interval-merge": {
-      "prerequisites": [
-        "basic-interval-scheduling"
-      ],
-      "related": [
-        "basic-interval-scheduling",
-        "basic-divide-conquer-merge-inversion"
-      ]
-    },
-    "basic-two-pointer-cycle": {
-      "prerequisites": [],
-      "related": [
-        "ds-monoqueue-1d",
-        "str-minimal-representation",
-        "dp-linear-lis-binary"
-      ]
-    },
-    "basic-digit-power-cycle-self": {
-      "prerequisites": [
-        "math-quick-pow-basic"
-      ],
-      "related": [
-        "math-quick-pow-basic",
-        "str-hash",
-        "exam-bit-operation"
-      ]
-    },
-    "dp-01bag-standard": {
-      "prerequisites": [
-        "dp-linear-triangle"
-      ],
-      "related": [
-        "dp-01bag-2d",
-        "dp-complete-bag",
-        "dp-group-bag",
-        "dp-01bag-record",
-        "dp-count-01bag",
-        "dp-multi-bag-binary",
-        "dp-linear-triangle",
-        "dp-tree-dance",
-        "dp-tree-01bag"
-      ]
-    },
-    "dp-bitmask-hamilton": {
-      "prerequisites": [
-        "exam-bit-operation",
-        "dp-linear-triangle"
-      ],
-      "related": [
-        "graph-floyd",
-        "graph-dijkstra-heap"
-      ]
-    },
-    "dp-01bag-2d": {
-      "prerequisites": [
-        "dp-01bag-standard"
-      ],
-      "related": [
-        "dp-01bag-standard",
-        "dp-01bag-record"
-      ]
-    },
-    "dp-01bag-record": {
-      "prerequisites": [
-        "dp-01bag-standard"
-      ],
-      "related": [
-        "dp-01bag-standard",
-        "dp-count-01bag",
-        "dp-01bag-2d"
-      ]
-    },
-    "dp-count-01bag": {
-      "prerequisites": [
-        "dp-01bag-standard"
-      ],
-      "related": [
-        "dp-01bag-standard",
-        "dp-01bag-record"
-      ]
-    },
-    "dp-complete-bag": {
-      "prerequisites": [
-        "dp-01bag-standard"
-      ],
-      "related": [
-        "dp-01bag-standard",
-        "dp-group-bag"
-      ]
-    },
-    "dp-group-bag": {
-      "prerequisites": [
-        "dp-01bag-standard"
-      ],
-      "related": [
-        "dp-01bag-standard",
-        "dp-complete-bag"
-      ]
-    },
-    "dp-multi-bag-binary": {
-      "prerequisites": [
-        "dp-01bag-standard"
-      ],
-      "related": [
-        "dp-multi-bag-monotone",
-        "dp-01bag-standard"
-      ]
-    },
-    "dp-multi-bag-monotone": {
-      "prerequisites": [
-        "dp-multi-bag-binary",
-        "ds-monoqueue-1d"
-      ],
-      "related": [
-        "dp-multi-bag-binary",
-        "ds-monoqueue-1d"
-      ]
-    },
-    "dp-linear-triangle": {
-      "prerequisites": [],
-      "related": [
-        "dp-linear-maxsub",
-        "dp-linear-lis-binary",
-        "dp-01bag-standard"
-      ]
-    },
-    "dp-linear-maxsub": {
-      "prerequisites": [
-        "dp-linear-triangle"
-      ],
-      "related": [
-        "dp-linear-triangle",
-        "dp-linear-lis-binary"
-      ]
-    },
-    "dp-linear-lis-binary": {
-      "prerequisites": [
-        "dp-linear-triangle"
-      ],
-      "related": [
-        "dp-linear-lis-bit-count",
-        "dp-linear-lcs-length",
-        "dp-linear-maxsub",
-        "basic-two-pointer-cycle",
-        "dp-linear-triangle"
-      ]
-    },
-    "dp-linear-lis-bit-count": {
-      "prerequisites": [
-        "dp-linear-lis-binary",
-        "ds-bit-point-range"
-      ],
-      "related": [
-        "dp-linear-lis-binary",
-        "ds-bit-point-range"
-      ]
-    },
-    "dp-linear-lcs-length": {
-      "prerequisites": [
-        "dp-linear-triangle"
-      ],
-      "related": [
-        "dp-linear-lcs-output",
-        "dp-linear-lcs-substring",
-        "dp-linear-edit-distance",
-        "dp-linear-lis-binary"
-      ]
-    },
-    "dp-linear-lcs-output": {
-      "prerequisites": [
-        "dp-linear-lcs-length"
-      ],
-      "related": [
-        "dp-linear-lcs-length",
-        "dp-linear-lcs-substring"
-      ]
-    },
-    "dp-linear-lcs-substring": {
-      "prerequisites": [
-        "dp-linear-lcs-length"
-      ],
-      "related": [
-        "dp-linear-lcs-length",
-        "dp-linear-lcs-output",
-        "dp-linear-edit-distance"
-      ]
-    },
-    "dp-linear-edit-distance": {
-      "prerequisites": [
-        "dp-linear-lcs-length"
-      ],
-      "related": [
-        "dp-linear-lcs-length",
-        "dp-linear-lcs-substring"
-      ]
-    },
-    "dp-tree-dance": {
-      "prerequisites": [
-        "dp-01bag-standard",
-        "graph-lca-doubling"
-      ],
-      "related": [
-        "dp-tree-01bag",
-        "dp-01bag-standard",
-        "graph-topo-sort"
-      ]
-    },
-    "dp-tree-01bag": {
-      "prerequisites": [
-        "dp-tree-dance",
-        "dp-01bag-standard"
-      ],
-      "related": [
-        "dp-tree-dance",
-        "dp-01bag-standard"
-      ]
-    },
-    "dp-digit-count": {
-      "prerequisites": [],
-      "related": [
-        "basic-high-precision",
-        "dp-interval-stone-merge"
-      ]
-    },
-    "dp-interval-stone-merge": {
-      "prerequisites": [
-        "dp-linear-triangle"
-      ],
-      "related": [
-        "dp-digit-count"
-      ]
-    },
-    "ds-prefix-sum-1d": {
-      "prerequisites": [],
-      "related": [
-        "ds-diff-1d",
-        "ds-prefix-sum-2d",
-        "ds-bit-point-range",
-        "str-hash"
-      ]
-    },
-    "ds-diff-1d": {
-      "prerequisites": [
-        "ds-prefix-sum-1d"
-      ],
-      "related": [
-        "ds-prefix-sum-1d",
-        "ds-prefix-sum-2d",
-        "ds-diff-2d",
-        "ds-prefix-sum-tree",
-        "ds-diff-tree"
-      ]
-    },
-    "ds-prefix-sum-2d": {
-      "prerequisites": [
-        "ds-prefix-sum-1d"
-      ],
-      "related": [
-        "ds-prefix-sum-1d",
-        "ds-diff-1d",
-        "ds-diff-2d",
-        "ds-prefix-sum-tree"
-      ]
-    },
-    "ds-diff-2d": {
-      "prerequisites": [
-        "ds-prefix-sum-2d",
-        "ds-diff-1d"
-      ],
-      "related": [
-        "ds-prefix-sum-2d",
-        "ds-diff-1d",
-        "ds-diff-tree"
-      ]
-    },
-    "ds-bit-point-range": {
-      "prerequisites": [
-        "ds-prefix-sum-1d"
-      ],
-      "related": [
-        "ds-bit-range-point",
-        "ds-segtree-basic",
-        "ds-prefix-sum-1d",
-        "dp-linear-lis-bit-count",
-        "basic-divide-conquer-merge-inversion",
-        "exam-bit-operation"
-      ]
-    },
-    "ds-bit-range-point": {
-      "prerequisites": [
-        "ds-bit-point-range"
-      ],
-      "related": [
-        "ds-bit-point-range",
-        "ds-segtree-basic"
-      ]
-    },
-    "ds-segtree-basic": {
-      "prerequisites": [
-        "ds-bit-point-range"
-      ],
-      "related": [
-        "ds-segtree-discretize",
-        "ds-segtree-mul",
-        "ds-bit-point-range",
-        "ds-bit-range-point",
-        "ds-persistent-segtree-template",
-        "ds-persistent-segtree-3919",
-        "ds-splay",
-        "ds-trie",
-        "ds-trie-01-max-xor",
-        "ds-st-table-1",
-        "ds-st-table-2",
-        "ds-block-decomposition"
-      ]
-    },
-    "ds-segtree-discretize": {
-      "prerequisites": [
-        "ds-segtree-basic"
-      ],
-      "related": [
-        "ds-segtree-basic",
-        "ds-segtree-mul"
-      ]
-    },
-    "ds-segtree-mul": {
-      "prerequisites": [
-        "ds-segtree-basic"
-      ],
-      "related": [
-        "ds-segtree-basic",
-        "ds-segtree-discretize"
-      ]
-    },
-    "ds-persistent-segtree-template": {
-      "prerequisites": [
-        "ds-segtree-basic"
-      ],
-      "related": [
-        "ds-persistent-segtree-3919",
-        "ds-segtree-basic"
-      ]
-    },
-    "ds-persistent-segtree-3919": {
-      "prerequisites": [
-        "ds-persistent-segtree-template"
-      ],
-      "related": [
-        "ds-persistent-segtree-template",
-        "ds-segtree-basic"
-      ]
-    },
-    "ds-splay": {
-      "prerequisites": [
-        "ds-segtree-basic"
-      ],
-      "related": [
-        "ds-segtree-basic",
-        "graph-lca-hld",
-        "ds-dual-heap",
-        "basic-quickselect-kth"
-      ]
-    },
-    "ds-dual-heap": {
-      "prerequisites": [],
-      "related": [
-        "ds-splay",
-        "ds-monoqueue-1d",
-        "basic-quickselect-kth",
-        "ds-stack-prefix-max",
-        "ds-monostack-histogram"
-      ]
-    },
-    "ds-trie": {
-      "prerequisites": [],
-      "related": [
-        "str-hash",
-        "str-kmp",
-        "ds-segtree-basic",
-        "ds-trie-01-max-xor"
-      ]
-    },
-    "ds-trie-01-max-xor": {
-      "prerequisites": [
-        "ds-trie"
-      ],
-      "related": [
-        "math-quick-pow-basic",
-        "ds-segtree-basic",
-        "ds-trie"
-      ]
-    },
-    "ds-stack-prefix-max": {
-      "prerequisites": [
-        "ds-prefix-sum-1d"
-      ],
-      "related": [
-        "ds-dual-heap",
-        "ds-monoqueue-1d",
-        "ds-st-table-1",
-        "ds-monostack-histogram"
-      ]
-    },
-    "ds-st-table-1": {
-      "prerequisites": [
-        "ds-prefix-sum-1d"
-      ],
-      "related": [
-        "ds-st-table-2",
-        "ds-segtree-basic",
-        "ds-stack-prefix-max"
-      ]
-    },
-    "ds-st-table-2": {
-      "prerequisites": [
-        "ds-st-table-1"
-      ],
-      "related": [
-        "ds-st-table-1",
-        "ds-segtree-basic"
-      ]
-    },
-    "ds-monoqueue-1d": {
-      "prerequisites": [
-        "ds-prefix-sum-1d"
-      ],
-      "related": [
-        "ds-monoqueue-2d",
-        "basic-two-pointer-cycle",
-        "dp-multi-bag-monotone",
-        "ds-dual-heap",
-        "ds-stack-prefix-max",
-        "ds-mo-team",
-        "ds-monostack-histogram"
-      ]
-    },
-    "ds-monoqueue-2d": {
-      "prerequisites": [
-        "ds-monoqueue-1d"
-      ],
-      "related": [
-        "ds-monoqueue-1d",
-        "ds-block-decomposition",
-        "ds-monostack-histogram"
-      ]
-    },
-    "ds-block-decomposition": {
-      "prerequisites": [
-        "ds-segtree-basic"
-      ],
-      "related": [
-        "ds-mo-team",
-        "ds-segtree-basic",
-        "ds-monoqueue-2d",
-        "basic-quickselect-kth"
-      ]
-    },
-    "ds-mo-team": {
-      "prerequisites": [
-        "ds-block-decomposition",
-        "ds-monoqueue-1d"
-      ],
-      "related": [
-        "ds-block-decomposition",
-        "ds-monoqueue-1d"
-      ]
-    },
-    "ds-uf-basic": {
-      "prerequisites": [],
-      "related": [
-        "ds-uf-rank",
-        "graph-kruskal",
-        "ds-uf-extended-domain",
-        "ds-uf-weighted-old",
-        "graph-lca-tarjan"
-      ]
-    },
-    "ds-uf-rank": {
-      "prerequisites": [
-        "ds-uf-basic"
-      ],
-      "related": [
-        "ds-uf-basic",
-        "ds-uf-weighted-old"
-      ]
-    },
-    "ds-uf-weighted-old": {
-      "prerequisites": [
-        "ds-uf-basic"
-      ],
-      "related": [
-        "ds-uf-weighted-food",
-        "ds-uf-basic",
-        "ds-uf-rank"
-      ]
-    },
-    "ds-uf-weighted-food": {
-      "prerequisites": [
-        "ds-uf-weighted-old"
-      ],
-      "related": [
-        "ds-uf-weighted-old",
-        "ds-uf-extended-domain"
-      ]
-    },
-    "ds-uf-extended-domain": {
-      "prerequisites": [
-        "ds-uf-basic"
-      ],
-      "related": [
-        "ds-uf-basic",
-        "ds-uf-weighted-food"
-      ]
-    },
-    "graph-dijkstra-heap": {
-      "prerequisites": [],
-      "related": [
-        "graph-bellman-ford",
-        "graph-floyd",
-        "graph-prim",
-        "dp-bitmask-hamilton",
-        "graph-dag-shortest-path",
-        "graph-spfa",
-        "graph-topo-sort",
-        "basic-bfs-bidirectional"
-      ]
-    },
-    "graph-bellman-ford": {
-      "prerequisites": [
-        "graph-dijkstra-heap"
-      ],
-      "related": [
-        "graph-spfa",
-        "graph-dijkstra-heap",
-        "graph-johnson"
-      ]
-    },
-    "graph-spfa": {
-      "prerequisites": [
-        "graph-bellman-ford"
-      ],
-      "related": [
-        "graph-bellman-ford",
-        "graph-dijkstra-heap",
-        "graph-dag-shortest-path"
-      ]
-    },
-    "graph-floyd": {
-      "prerequisites": [
-        "graph-dijkstra-heap"
-      ],
-      "related": [
-        "graph-johnson",
-        "graph-dijkstra-heap",
-        "dp-bitmask-hamilton",
-        "graph-dag-shortest-path"
-      ]
-    },
-    "graph-johnson": {
-      "prerequisites": [
-        "graph-floyd",
-        "graph-bellman-ford"
-      ],
-      "related": [
-        "graph-floyd",
-        "graph-bellman-ford"
-      ]
-    },
-    "graph-kruskal": {
-      "prerequisites": [
-        "ds-uf-basic"
-      ],
-      "related": [
-        "graph-prim",
-        "ds-uf-basic",
-        "graph-bipartite-hungarian"
-      ]
-    },
-    "graph-prim": {
-      "prerequisites": [
-        "graph-dijkstra-heap"
-      ],
-      "related": [
-        "graph-kruskal",
-        "graph-dijkstra-heap"
-      ]
-    },
-    "graph-centroid": {
-      "prerequisites": [
-        "graph-topo-sort"
-      ],
-      "related": [
-        "graph-hld-segtree",
-        "graph-lca-doubling"
-      ]
-    },
-    "graph-lca-doubling": {
-      "prerequisites": [
-        "graph-topo-sort"
-      ],
-      "related": [
-        "graph-lca-tarjan",
-        "graph-lca-hld",
-        "graph-centroid"
-      ]
-    },
-    "graph-lca-tarjan": {
-      "prerequisites": [
-        "ds-uf-basic",
-        "graph-lca-doubling"
-      ],
-      "related": [
-        "graph-lca-doubling",
-        "graph-lca-hld",
-        "ds-uf-basic",
-        "graph-tarjan-cut-vertex",
-        "graph-tarjan-scc",
-        "ds-prefix-sum-tree",
-        "ds-diff-tree"
-      ]
-    },
-    "graph-lca-hld": {
-      "prerequisites": [
-        "graph-lca-doubling"
-      ],
-      "related": [
-        "graph-lca-doubling",
-        "graph-lca-tarjan",
-        "graph-hld-segtree",
-        "ds-splay"
-      ]
-    },
-    "graph-hld-segtree": {
-      "prerequisites": [
-        "ds-segtree-basic",
-        "graph-lca-hld"
-      ],
-      "related": [
-        "graph-lca-hld",
-        "ds-diff-tree",
-        "ds-prefix-sum-tree",
-        "graph-centroid"
-      ]
-    },
-    "graph-topo-sort": {
-      "prerequisites": [],
-      "related": [
-        "graph-dijkstra-heap",
-        "dp-tree-dance",
-        "graph-tarjan-scc",
-        "graph-scc-condensation",
-        "graph-scc-dag-dp"
-      ]
-    },
-    "graph-dag-shortest-path": {
-      "prerequisites": [
-        "graph-topo-sort"
-      ],
-      "related": [
-        "graph-dijkstra-heap",
-        "graph-floyd",
-        "graph-spfa",
-        "graph-tarjan-scc",
-        "graph-scc-condensation",
-        "graph-scc-dag-dp"
-      ]
-    },
-    "graph-tarjan-cut-vertex": {
-      "prerequisites": [],
-      "related": [
-        "graph-tarjan-scc",
-        "graph-lca-tarjan",
-        "graph-tarjan-bridge",
-        "graph-e-dcc-condensation",
-        "graph-bipartite-dfs-coloring"
-      ]
-    },
-    "graph-tarjan-bridge": {
-      "prerequisites": [],
-      "related": [
-        "graph-tarjan-cut-vertex",
-        "graph-tarjan-scc",
-        "graph-scc-condensation",
-        "graph-e-dcc-condensation"
-      ]
-    },
-    "graph-tarjan-scc": {
-      "prerequisites": [
-        "graph-topo-sort"
-      ],
-      "related": [
-        "graph-topo-sort",
-        "graph-lca-tarjan",
-        "graph-dag-shortest-path",
-        "graph-scc-condensation",
-        "graph-tarjan-cut-vertex",
-        "graph-tarjan-bridge",
-        "graph-bipartite-dfs-coloring",
-        "graph-scc-dag-dp"
-      ]
-    },
-    "graph-scc-condensation": {
-      "prerequisites": [
-        "graph-tarjan-scc",
-        "graph-topo-sort"
-      ],
-      "related": [
-        "graph-tarjan-scc",
-        "graph-dag-shortest-path",
-        "graph-topo-sort",
-        "graph-e-dcc-condensation",
-        "graph-tarjan-bridge",
-        "graph-scc-dag-dp"
-      ]
-    },
-    "graph-e-dcc-condensation": {
-      "prerequisites": [
-        "graph-tarjan-bridge"
-      ],
-      "related": [
-        "graph-tarjan-bridge",
-        "graph-scc-condensation",
-        "graph-tarjan-cut-vertex"
-      ]
-    },
-    "graph-bipartite-dfs-coloring": {
-      "prerequisites": [],
-      "related": [
-        "graph-tarjan-scc",
-        "graph-tarjan-cut-vertex",
-        "basic-permutation-dfs",
-        "graph-bipartite-hungarian"
-      ]
-    },
-    "graph-bipartite-hungarian": {
-      "prerequisites": [
-        "graph-bipartite-dfs-coloring"
-      ],
-      "related": [
-        "graph-bipartite-dfs-coloring",
-        "graph-kruskal",
-        "basic-divide-conquer-merge-inversion"
-      ]
-    },
-    "io-fast-io": {
-      "prerequisites": [],
-      "related": []
-    },
-    "math-quick-pow-basic": {
-      "prerequisites": [],
-      "related": [
-        "math-quick-pow-highprecision",
-        "math-lcm-pair-count",
-        "basic-digit-power-cycle-self",
-        "math-matrix-linear-recurrence",
-        "ds-trie-01-max-xor",
-        "math-matrix-multiplication",
-        "math-matrix-quick-pow",
-        "math-gcd-lcm",
-        "math-sieve-eratosthenes",
-        "math-euler-phi",
-        "math-modular-inverse",
-        "math-crt",
-        "exam-bit-operation"
-      ]
-    },
-    "math-quick-pow-highprecision": {
-      "prerequisites": [
-        "math-quick-pow-basic"
-      ],
-      "related": [
-        "math-quick-pow-basic",
-        "basic-high-precision"
-      ]
-    },
-    "math-matrix-multiplication": {
-      "prerequisites": [],
-      "related": [
-        "math-quick-pow-basic",
-        "math-matrix-quick-pow",
-        "math-matrix-linear-recurrence"
-      ]
-    },
-    "math-matrix-quick-pow": {
-      "prerequisites": [
-        "math-matrix-multiplication",
-        "math-quick-pow-basic"
-      ],
-      "related": [
-        "math-matrix-multiplication",
-        "math-quick-pow-basic",
-        "math-matrix-linear-recurrence"
-      ]
-    },
-    "math-matrix-linear-recurrence": {
-      "prerequisites": [
-        "math-matrix-quick-pow"
-      ],
-      "related": [
-        "math-matrix-quick-pow",
-        "math-matrix-multiplication",
-        "math-quick-pow-basic"
-      ]
-    },
-    "math-gcd-lcm": {
-      "prerequisites": [],
-      "related": [
-        "math-lcm-pair-count",
-        "math-quick-pow-basic",
-        "math-sieve-eratosthenes",
-        "math-euler-phi",
-        "math-linear-sieve-phi",
-        "math-crt"
-      ]
-    },
-    "math-sieve-eratosthenes": {
-      "prerequisites": [
-        "math-gcd-lcm"
-      ],
-      "related": [
-        "math-gcd-lcm",
-        "math-quick-pow-basic",
-        "math-euler-phi",
-        "math-linear-sieve-phi",
-        "math-linear-sieve-divisor-count",
-        "math-linear-sieve-divisor-sum"
-      ]
-    },
-    "math-euler-phi": {
-      "prerequisites": [
-        "math-gcd-lcm",
-        "math-sieve-eratosthenes"
-      ],
-      "related": [
-        "math-gcd-lcm",
-        "math-sieve-eratosthenes",
-        "math-quick-pow-basic",
-        "math-linear-sieve-phi",
-        "math-linear-sieve-divisor-count",
-        "math-linear-sieve-divisor-sum",
-        "math-modular-inverse"
-      ]
-    },
-    "math-linear-sieve-phi": {
-      "prerequisites": [
-        "math-euler-phi",
-        "math-sieve-eratosthenes"
-      ],
-      "related": [
-        "math-euler-phi",
-        "math-sieve-eratosthenes",
-        "math-gcd-lcm",
-        "math-linear-sieve-divisor-count",
-        "math-linear-sieve-divisor-sum",
-        "math-modular-inverse"
-      ]
-    },
-    "math-linear-sieve-divisor-count": {
-      "prerequisites": [
-        "math-sieve-eratosthenes",
-        "math-linear-sieve-phi"
-      ],
-      "related": [
-        "math-linear-sieve-phi",
-        "math-sieve-eratosthenes",
-        "math-euler-phi",
-        "math-linear-sieve-divisor-sum"
-      ]
-    },
-    "math-linear-sieve-divisor-sum": {
-      "prerequisites": [
-        "math-sieve-eratosthenes",
-        "math-linear-sieve-phi",
-        "math-linear-sieve-divisor-count"
-      ],
-      "related": [
-        "math-linear-sieve-phi",
-        "math-linear-sieve-divisor-count",
-        "math-sieve-eratosthenes",
-        "math-euler-phi"
-      ]
-    },
-    "math-modular-inverse": {
-      "prerequisites": [
-        "math-quick-pow-basic",
-        "math-euler-phi",
-        "math-gcd-lcm"
-      ],
-      "related": [
-        "math-quick-pow-basic",
-        "math-euler-phi",
-        "math-linear-sieve-phi",
-        "math-crt"
-      ]
-    },
-    "math-crt": {
-      "prerequisites": [
-        "math-modular-inverse",
-        "math-gcd-lcm",
-        "math-quick-pow-basic"
-      ],
-      "related": [
-        "math-modular-inverse",
-        "math-gcd-lcm",
-        "math-quick-pow-basic"
-      ]
-    },
-    "math-lcm-pair-count": {
-      "prerequisites": [
-        "math-gcd-lcm",
-        "math-quick-pow-basic"
-      ],
-      "related": [
-        "math-gcd-lcm",
-        "math-quick-pow-basic",
-        "math-stars-and-bars"
-      ]
-    },
-    "math-stars-and-bars": {
-      "prerequisites": [],
-      "related": [
-        "basic-combination-dfs",
-        "math-lcm-pair-count"
-      ]
-    },
-    "basic-permutation-dfs": {
-      "prerequisites": [],
-      "related": [
-        "basic-combination-dfs",
-        "basic-meet-in-middle-binary-search",
-        "basic-bfs-bidirectional",
-        "graph-bipartite-dfs-coloring"
-      ]
-    },
-    "basic-combination-dfs": {
-      "prerequisites": [],
-      "related": [
-        "basic-permutation-dfs",
-        "basic-meet-in-middle-binary-search",
-        "math-stars-and-bars",
-        "basic-bfs-bidirectional"
-      ]
-    },
-    "basic-meet-in-middle-binary-search": {
-      "prerequisites": [
-        "basic-combination-dfs"
-      ],
-      "related": [
-        "basic-meet-in-middle-two-pointer",
-        "basic-permutation-dfs",
-        "basic-combination-dfs"
-      ]
-    },
-    "basic-meet-in-middle-two-pointer": {
-      "prerequisites": [
-        "basic-combination-dfs"
-      ],
-      "related": [
-        "basic-meet-in-middle-binary-search"
-      ]
-    },
-    "basic-bfs-bidirectional": {
-      "prerequisites": [],
-      "related": [
-        "basic-permutation-dfs",
-        "basic-combination-dfs",
-        "graph-dijkstra-heap"
-      ]
-    },
-    "str-hash": {
-      "prerequisites": [],
-      "related": [
-        "str-minimal-representation",
-        "ds-prefix-sum-1d",
-        "basic-digit-power-cycle-self",
-        "ds-trie",
-        "str-kmp",
-        "str-sunday"
-      ]
-    },
-    "str-minimal-representation": {
-      "prerequisites": [
-        "str-hash"
-      ],
-      "related": [
-        "str-hash",
-        "basic-two-pointer-cycle",
-        "str-kmp"
-      ]
-    },
-    "str-kmp": {
-      "prerequisites": [],
-      "related": [
-        "str-hash",
-        "str-minimal-representation",
-        "str-sunday",
-        "ds-trie"
-      ]
-    },
-    "str-sunday": {
-      "prerequisites": [],
-      "related": [
-        "str-kmp",
-        "str-hash"
-      ]
-    },
-    "basic-divide-conquer-merge-inversion": {
-      "prerequisites": [],
-      "related": [
-        "ds-bit-point-range",
-        "basic-interval-merge",
-        "basic-divide-conquer-closest-pair",
-        "graph-bipartite-hungarian",
-        "basic-quickselect-kth",
-        "basic-radix-sort-k",
-        "basic-shell-sort"
-      ]
-    },
-    "basic-divide-conquer-closest-pair": {
-      "prerequisites": [
-        "basic-divide-conquer-merge-inversion"
-      ],
-      "related": [
-        "basic-divide-conquer-merge-inversion"
-      ]
-    },
-    "ds-prefix-sum-tree": {
-      "prerequisites": [
-        "ds-prefix-sum-1d",
-        "graph-lca-doubling"
-      ],
-      "related": [
-        "ds-prefix-sum-2d",
-        "ds-diff-1d",
-        "graph-lca-tarjan",
-        "graph-hld-segtree",
-        "ds-diff-tree"
-      ]
-    },
-    "ds-diff-tree": {
-      "prerequisites": [
-        "ds-diff-1d",
-        "graph-lca-doubling"
-      ],
-      "related": [
-        "ds-prefix-sum-tree",
-        "ds-diff-1d",
-        "graph-lca-tarjan",
-        "graph-hld-segtree",
-        "ds-diff-2d"
-      ]
-    },
-    "basic-quickselect-kth": {
-      "prerequisites": [
-        "basic-divide-conquer-merge-inversion"
-      ],
-      "related": [
-        "basic-divide-conquer-merge-inversion",
-        "ds-block-decomposition",
-        "ds-splay",
-        "ds-dual-heap",
-        "basic-radix-sort-k"
-      ]
-    },
-    "ds-monostack-histogram": {
-      "prerequisites": [
-        "ds-stack-prefix-max",
-        "ds-monoqueue-1d"
-      ],
-      "related": [
-        "ds-stack-prefix-max",
-        "ds-monoqueue-1d",
-        "ds-monoqueue-2d",
-        "ds-dual-heap"
-      ]
-    },
-    "basic-radix-sort-k": {
-      "prerequisites": [
-        "basic-divide-conquer-merge-inversion"
-      ],
-      "related": [
-        "basic-quickselect-kth",
-        "basic-divide-conquer-merge-inversion",
-        "basic-shell-sort"
-      ]
-    },
-    "basic-shell-sort": {
-      "prerequisites": [],
-      "related": [
-        "basic-radix-sort-k",
-        "basic-divide-conquer-merge-inversion"
-      ]
-    },
-    "exam-bit-operation": {
-      "prerequisites": [],
-      "related": [
-        "math-quick-pow-basic",
-        "ds-bit-point-range",
-        "basic-digit-power-cycle-self"
-      ]
-    },
-    "graph-scc-dag-dp": {
-      "prerequisites": [
-        "graph-tarjan-scc",
-        "graph-scc-condensation",
-        "graph-topo-sort"
-      ],
-      "related": [
-        "graph-scc-condensation",
-        "graph-tarjan-scc",
-        "graph-dag-shortest-path",
-        "graph-topo-sort"
-      ]
-    }
-  },
-  "subSubcategories": {
-    "数据结构|栈|前缀最值": {
-      "description": "通过辅助数组记录从栈底到各位置的最大值，实现O(1)最值查询。"
-    },
-    "数据结构|栈|单调栈": {
-      "description": "维护栈内元素单调性（递增或递减），当新元素破坏单调性时弹出栈顶。每个元素最多入栈出栈各一次，总复杂度O(n)。"
-    },
-    "数据结构|并查集|基础": {
-      "description": "基础并查集，仅路径压缩或按秩合并，适用于简单的连通性维护。"
-    },
-    "数据结构|并查集|带权": {
-      "description": "带权并查集，在路径压缩时维护节点间的权值关系（如距离、偏移量），适用于食物链等关系传递问题。"
-    },
-    "数据结构|并查集|扩展域": {
-      "description": "扩展域并查集（种类并查集），通过为每个实体建立多个域（如自身、敌人、猎物）来处理复杂的对立/关系约束。"
-    },
-    "数据结构|前缀和与差分|一维": {
-      "description": "一维序列上的前缀和与差分，支持O(1)区间求和与O(1)区间修改。"
-    },
-    "数据结构|前缀和与差分|二维": {
-      "description": "二维矩阵上的前缀和与差分，支持O(1)子矩阵求和与O(1)子矩阵修改。"
-    },
-    "数据结构|前缀和与差分|树上": {
-      "description": "树结构上的前缀和与差分，利用LCA实现路径点权/边权的O(1)查询与修改。"
-    },
-    "动态规划|背包问题|01背包": {
-      "description": "每件物品最多选一次的背包问题，是所有背包变体的基础。涵盖标准版、二维费用、路径记录、方案计数等扩展。"
-    },
-    "动态规划|背包问题|完全背包": {
-      "description": "每件物品可选无限次的背包问题，通过01背包的逆序遍历改为正序遍历即可转换。"
-    },
-    "动态规划|背包问题|多重背包": {
-      "description": "每件物品有数量上限的背包问题，需用二进制优化或单调队列优化将O(nm)降为O(nm log s)或O(nm)。"
-    },
-    "动态规划|背包问题|分组背包": {
-      "description": "物品分为若干组，每组最多选一件的背包问题，是泛化背包模型，需在组内做互斥决策。"
-    },
-    "动态规划|线性DP|LCS": {
-      "description": "最长公共子序列与最长公共子串问题，通过二维状态转移实现O(nm)求解，可扩展路径还原。"
-    },
-    "动态规划|线性DP|LIS": {
-      "description": "最长上升子序列问题，朴素DP为O(n²)，二分优化为O(n log n)，树状数组优化可同时计数方案数。"
-    },
-    "动态规划|线性DP|经典模型": {
-      "description": "线性DP中的经典问题，包括编辑距离、最大子段和、数字三角形等基础模型，是DP入门必学。"
-    },
-    "动态规划|状态压缩DP|路径问题": {
-      "description": "用状压DP求解路径覆盖类问题，如Hamilton路径、旅行商问题(TSP)。状态为已访问点集+当前位置，转移枚举前驱点。"
-    },
-    "图论|最短路|单源最短路": {
-      "description": "求从单一源点到其他所有顶点的最短路径。Dijkstra适用于非负权图，Bellman-Ford和SPFA可处理负权边。"
-    },
-    "图论|最短路|全源最短路": {
-      "description": "求所有顶点对之间的最短路径。Floyd基于传递闭包O(n³)，Johnson结合Dijkstra与Bellman-Ford处理含负权的全源问题。"
-    },
-    "图论|最短路|DAG最短路": {
-      "description": "在有向无环图上通过拓扑排序求最短路，时间复杂度O(n+m)，是所有最短路算法中最优的，且支持负权边。"
-    },
-    "图论|连通分量|强连通分量": {
-      "description": "有向图中极大的强连通子图（SCC），分量内任意两点互相可达。Tarjan算法通过一次DFS即可求解，缩点后原图变为DAG，是处理有向图环结构的核心工具。"
-    },
-    "图论|连通分量|边双连通分量": {
-      "description": "无向图中极大的边双连通子图（E-DCC），分量内没有桥（割边），任意两点至少有两条边不相交的路径。删去所有桥后各连通块即为E-DCC，缩点后得到一棵树。"
-    },
-    "基础算法|搜索|DFS": {
-      "description": "深度优先搜索（DFS）是最基础的搜索算法，沿着一条路径深入直到无法继续再回溯。常用于排列生成、组合生成、回溯等问题，是图论搜索和动态规划状态转移的基础。"
-    },
-    "基础算法|搜索|BFS": {
-      "description": "广度优先搜索（BFS）按层遍历，常用于最短路径、层次遍历等问题。双向BFS从起点和终点同时搜索，大幅减少搜索空间。"
-    },
-    "基础算法|搜索|折半搜索": {
-      "description": "Meet in the Middle（折半搜索）将搜索空间分成两半分别枚举，再合并结果，将指数级复杂度从O(2^n)降至O(n·2^(n/2))，是解决中等规模子集类问题的核心技巧。"
-    }
-  }
 }
