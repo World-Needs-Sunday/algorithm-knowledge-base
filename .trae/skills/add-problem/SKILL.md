@@ -121,7 +121,7 @@ node build.js
 
 ```
 【改动】problems/<id>.md（新建）、题目专辑\<分类>\<题名>\代码.cpp（搬运）
-【验证】node tools/lint.js → error 0 / warning N；node build.js → 109 知识点 / 21 题目；样例已编译实测：输入 … → 输出 …
+【验证】node tools/lint.js → error 0 / warning N；node build.js → X 知识点 / Y 题目；样例已编译实测：输入 … → 输出 …
 【需要你本人做】确认 oj/problemId 是否正确；补充官方样例（如果我只拿到部分）
 【待确认】<我判断过的地方>
 ```

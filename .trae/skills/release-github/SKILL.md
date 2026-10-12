@@ -29,7 +29,7 @@ node tools/lint.js --quiet    # 只看汇总
 node build.js
 ```
 
-输出例：`109 个知识点 / 20 个题目 / 128 个代码文件`。
+输出例：`X 个知识点 / Y 个题目 / Z 个代码文件`（以实际输出为准，别照抄旧数字）。
 若数量与你的预期不符（比如刚加了 1 条却没变），说明 frontmatter 有问题，回 Step 1 看警告。
 
 ## Step 3 · 运行时可访问性自检（发布前必做）
@@ -59,6 +59,23 @@ git -c core.quotepath=false ls-files --others --exclude-standard
 `AGENTS.md`、`README.md`、`PROJECT_FRAMEWORK.md`、`tools/`、`templates/`、`docs/`、`.trae/`
 
 > 这些目前都未跟踪。是否公开取决于你（体积很小，且不含隐私；`.ssh/` 已在 `.gitignore` 里，不会上传）。
+
+### 同步说明文件里的规模数字（README / AGENTS / 框架）
+
+`README.md`、`AGENTS.md`、`PROJECT_FRAMEWORK.md`、`docs/让AI了解本站-提示词.md` 里**写死了「知识点 N 篇 / 题目 M 道」**，新增/删除条目后会过期。发布前用门禁末尾那行真实数量核对，不一致就更新（只改数字）：
+
+```bash
+node tools/lint.js --quiet   # 末尾打印「📊 知识点 111 篇 · 题目 22 道 …」
+```
+
+要更新的位置（搜索旧数字，如 `109`、`20`）：
+
+- `README.md` —— 「当前规模：知识点 **N** 篇 · 题目 **M** 道 · **8** 个大类」
+- `AGENTS.md` —— 「知识点：`content/*.md`（N 篇）｜题目：`problems/*.md`（M 道）」
+- `PROJECT_FRAMEWORK.md` —— §0 速览「内容从哪来」一行 + §2 目录树注释里的 `（N 篇）`/`（M 道）`
+- `docs/让AI了解本站-提示词.md` —— 「现在有 N 个知识点、M 道题目」
+
+> 顺手核对「8 个大类」是否仍成立（只有新增/合并大类才变）。**只改数字，别动其它表述。**
 
 ## Step 4 · 本地预览（可选但推荐）
 
@@ -142,7 +159,7 @@ git push --force-with-lease origin master  # 谨慎：会改写远端历史
 
 ```
 【改动】本次提交：content/xxx.md（新增）、data.js 等产物（重建）；commit <sha>
-【验证】node tools/lint.js → error 0 / warning N；node build.js → 109 知识点 / 20 题目；已 push 到 master
+【验证】node tools/lint.js → error 0 / warning N；node build.js → X 知识点 / Y 题目；已 push 到 master
 【需要你本人做】约 10 分钟后打开线上地址 Ctrl+F5 确认；确认是否把 tools/docs/.trae 一并入库
 【待确认】favicon.svg 已补入库（此前未跟踪导致线上无图标）
 ```

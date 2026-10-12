@@ -11,7 +11,7 @@
 | 问题 | 答案 |
 |---|---|
 | 网站是什么 | 纯静态算法/知识点查询站（单文件 `index.html` + 三个构建产物），GitHub Pages 托管 |
-| 内容从哪来 | `content/*.md`（知识点 109 篇）、`problems/*.md`（题目 20 道）、各分类目录下的 `.cpp`（你本人写的代码） |
+| 内容从哪来 | `content/*.md`（知识点 111 篇）、`problems/*.md`（题目 22 道）、各分类目录下的 `.cpp`（你本人写的代码） |
 | 怎么生成网页数据 | `node build.js` → `data.js` + `problems_data.js` + `code_data.js` |
 | 改了内容怎么验证 | `node tools/lint.js`（**error 必须为 0**）→ `node build.js` → 浏览器 Ctrl+F5 |
 | 什么绝对不能做 | ① 代写 `.cpp` 实现 ② 手改三个产物 ③ 不过门禁就交付 |
@@ -41,8 +41,8 @@
 ├── README.md               # 项目说明（人/AI 入口）
 ├── AGENTS.md               # 三条铁律 + 入口指引
 ├── PROJECT_FRAMEWORK.md    # 本文件
-├── content/                # 知识点源文件（109 篇，平铺）
-├── problems/               # 题目源文件（20 道，平铺）
+├── content/                # 知识点源文件（111 篇，平铺）
+├── problems/               # 题目源文件（22 道，平铺）
 ├── 动态规划/ 数据结构/ 图论/ 数学/ 字符串/ 基础算法/ 输入,输出/   # 知识点 .cpp
 ├── 题目专辑/                # 题目 .cpp
 ├── templates/              # kp-template.md / problem-template.md

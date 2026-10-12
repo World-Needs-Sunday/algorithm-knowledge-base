@@ -95,7 +95,7 @@ node build.js
 
 ```
 【改动】content/xxx.md 第 N 行：<改前> → <改后>（依据：…）
-【验证】node tools/lint.js → error 0 / warning N；node build.js → 109 知识点 / 20 题目
+【验证】node tools/lint.js → error 0 / warning N；node build.js → X 知识点 / Y 题目
 【需要你本人做】<例如：这条结论我无法验证，请你确认>
 【待确认】<我做了判断的地方 + 回退方式>
 ```

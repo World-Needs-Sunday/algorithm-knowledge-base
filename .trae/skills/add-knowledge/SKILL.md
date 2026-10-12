@@ -129,7 +129,7 @@ node build.js               # 产物：109 → 110 之类
 
 ```
 【改动】content/<id>.md（新建）、<大类>\<子分类>\<算法名>\Untitled1.cpp（搬运）、knowledge_graph.json（+1 条目）
-【验证】node tools/lint.js → error 0 / warning N；node build.js → 110 知识点 / 20 题目
+【验证】node tools/lint.js → error 0 / warning N；node build.js → X 知识点 / Y 题目
 【需要你本人做】确认 category/subcategory 是否合适；代码是否需要删掉调试输出
 【待确认】<我判断过的地方 + 回退方式>
 ```
