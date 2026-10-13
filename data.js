@@ -369,6 +369,30 @@ const KNOWLEDGE_DATA = [
         ]
     },
     {
+        "id": "basic-random-sa-permutation",
+        "category": "基础算法",
+        "subcategory": "随机化",
+        "subSubcategory": "",
+        "title": "模拟退火 · 区间退火（排列退火）",
+        "content": "## 算法原理\n\n解决的问题：**排列 / 顺序的最优化**。典型应用是洛谷 P2210「Haywire」：$n$ 头奶牛，每头恰好有 3 个好友，把它们排成一列（位置 $1\\sim n$），两头好友之间的电线长度等于它们**位置差的绝对值**，求总电线长度的最小值：\n\n$$\nf(p)=\\sum_{(i,j)\\in E}\\left|\\mathrm{pos}(i)-\\mathrm{pos}(j)\\right|\n$$\n\n决策对象是一个 $1\\sim n$ 的排列 $p$。上一篇「点退火」直接在连续坐标上挪 $(x,y)$，在这类问题里用不上；要在**排列空间**里做邻域搜索，也就是区间退火（排列退火）。\n\n与点退火的核心区别，记三句话：\n\n1. 点退火里，温度 $t$ 既管**扰动步长**、又管**接受劣解的概率**，两件事耦合，参数很敏感。\n2. 区间退火里，扰动是**独立性的事件**——随机交换两个元素（或翻转一段），与 $t$ 完全无关。\n3. 温度 $t$ 只出现在接受概率 $\\exp(-\\Delta E/t)$ 里，**只管「要不要接受一个更差的解」**。\n\n于是「选哪个新状态」与「接不接受」解耦：$t$ 初值取大一点也没关系，降温系数粗一点（0.99）也能收敛，参数远不如点退火那么挑。这正是区间退火好用、好调的原因。\n\n抽象模板：\n\n```\n初始化排列 cur（例如 恒等排列）与全局最优 best\nfor (t = t0; t >= t_min; t *= k):\n    x, y = 随机选两个不同位置\n    Δ = 交换 x、y 后的能量 - cur 的能量（增量计算）\n    if Δ < 0 或 exp(-Δ/t) > random(): 真正执行交换\n    若 cur 更优则更新 best\n输出 best\n```\n\n## 核心公式 / 状态定义与转移方程\n\n**状态**：排列 `cur_arr`，其中 `cur_arr[i]` 表示**奶牛 $i$ 所在的位置**（下标是奶牛、值是位置，天然是 $1\\sim n$ 的排列）；当前能量 `curE`。另有全局最优 `best_arr / bestE`，退火途中接受劣解也不会丢掉已找到的最优解。\n\n**目标函数**（P2210）：\n\n$$\nf(p)=\\sum_{(i,j)\\in E}\\left|\\mathrm{pos}(i)-\\mathrm{pos}(j)\\right|\n$$\n\n**扰动（转移）**：随机取两个不同下标 $x,y$，交换 `cur_arr[x]` 与 `cur_arr[y]`。两种常见扰动：\n\n- **交换元素（swap）**：实现简单、增量计算方便、邻域粒度适中，排列退火的默认选择，本代码用的就是它。\n- **区间翻转（reverse，2-opt 式）**：随机选 $[l,r]$ 整体反转，改动幅度大，适合 TSP 这类需要大范围重排的问题，但增量计算麻烦、跳变可能过大。\n\n**增量计算（关键优化）**：交换 $a,b$ 后，只有与 $a$、$b$ 相连的边受影响。设交换前 $a$ 在位置 $pos_a$、$b$ 在位置 $pos_b$，则交换后的能量\n\n$$\nE' = E - \\sum_{i\\in adj(a),\\,i\\ne b}\\Big(\\left|pos_a-pos_i\\right|-\\left|pos_b-pos_i\\right|\\Big)\n- \\sum_{i\\in adj(b),\\,i\\ne a}\\Big(\\left|pos_b-pos_i\\right|-\\left|pos_a-pos_i\\right|\\Big)\n$$\n\n$i\\ne b$、$i\\ne a$ 是为了跳过公共边 $a\\!-\\!b$：交换后 $|pos_a-pos_b|$ 不变，无需改动，也避免重复计算。单次评估复杂度从 $O(n)$ 降到 $O(\\deg(a)+\\deg(b))$。\n\n**Metropolis 接受准则**：$\\Delta E=E'-E$，接受概率\n\n$$\nP(\\text{接受})=\\begin{cases}1, & \\Delta E\\le 0\\\\[2pt] e^{-\\Delta E/t}, & \\Delta E>0\\end{cases}\n$$\n\n**降温策略**：$t_0=20000$，每步 $t\\gets t\\cdot 0.99$，直到 $t<10^{-8}$；外层由 `clock()` 卡 $TL=0.9$ 秒反复整轮退火。\n\n## 逐行代码解析\n\n### 模块一：全局变量与 `init`（数据结构 + 初始化）\n\n```cpp\n#include<bits/stdc++.h>\nusing namespace std;\nconst double TL = 0.9;\nvector<int> cur_arr, best_arr;//cur_arr[i]表示 奶牛i所在的位置\nvector<vector<int>> edges;\nlong long curE = 0, bestE = 0;\nmt19937 gen;\nvoid init(int n)\n{\n\tcur_arr.assign(n + 1, 0);\n\tbest_arr.assign(n + 1, 0);\n\tfor (int i = 1; i <= n; i++) best_arr[i] = i;\n\tedges.assign(n + 1, vector<int>());\n\tcurE = 0, bestE = 0;\n\tgen.seed(time(nullptr));\n}\n```\n\n- `cur_arr[i]` 存「奶牛 $i$ 的位置」，下标是奶牛、值是位置，天然就是一个排列；交换两个奶牛的位置就是 `swap(cur_arr[x], cur_arr[y])`。\n- 初始排列取恒等排列（奶牛 $i$ 在位置 $i$）：模拟退火理论上与初值无关，随便一个合法排列即可，恒等排列最好写。\n- `gen.seed(time(nullptr))` 只在 `init` 里播一次种；引擎是全局的，后续所有随机数都从它生成。\n\n### 模块二：`cala` 增量计算交换后的能量\n\n```cpp\nlong long cala(int a, int b, vector<int>& idx)\n{\n\tlong long ans = curE;\n\tfor (int i : edges[a])\n\t{\n\t\tif (i != b)\n\t\t{\n\t\t\tans -= abs(idx[a] - idx[i]);\n\t\t\tans += abs(idx[b] - idx[i]);\n\t\t}\n\t}\n\tfor (int i : edges[b])\n\t{\n\t\tif (i != a)\n\t\t{\n\t\t\tans -= abs(idx[b] - idx[i]);\n\t\t\tans += abs(idx[a] - idx[i]);\n\t\t}\n\t}\n\treturn ans;\n}\n```\n\n- 函数用**全局的 `curE` 作底**做增量：先减掉 $a$、$b$ 在旧位置对自己各条边的贡献，再加上换到对方位置后的新贡献，其余边不动，所以不用 $O(n)$ 全量重算。\n- `if (i != b)` / `if (i != a)` 跳过公共边 $a\\!-\\!b$：交换前后 $|pos_a-pos_b|$ 不变，不需要也不能重复计算。\n- 本题每头奶牛度数恰为 3，所以单次调用是 $O(1)$；若每次全量重算则是 $O(n)$，$n$ 大时差很多。\n\n### 模块三：`sa` 退火主体\n\n```cpp\nvoid sa(int n)\n{\n\tcur_arr = best_arr;\n\tcurE = bestE;\n\tstatic uniform_int_distribution<int> dist(1, n);\n\tstatic uniform_real_distribution<long double> prob(0.0, 1.0);\n\tfor (long double t = 20000; t >= 1e-8; t *= 0.99)\n\t{\n\t\tint x = dist(gen);\n\t\tint y = dist(gen);\n\t\twhile(x == y) y = dist(gen);\n\t\tlong long tmpE = cala(x, y, cur_arr);\n\t\tlong long delta = tmpE - curE;\n\t\tif (delta < 0 || exp((long double)-delta / t) > prob(gen))\n\t\t{\n\t\t\tcurE = tmpE;\n\t\t\tswap(cur_arr[x], cur_arr[y]);\n\t\t}\n\t\tif ((double)clock() / CLOCKS_PER_SEC > TL) break;\n\t}\n\tif (curE < bestE)\n\t{\n\t\tbestE = curE;\n\t\tbest_arr = cur_arr;\n\t}\n}\n```\n\n- `cur_arr = best_arr; curE = bestE;`：每轮从历史最优重新出发，不在劣解区域浪费迭代。\n- `while(x == y) y = dist(gen);`：保证交换的是两个不同元素，否则这一步扰动无效。\n- `if (delta < 0 || exp((long double)-delta / t) > prob(gen))`：Metropolis 准则。注意温度 $t$ **只出现在这里**，与「怎么选新状态」无关——这正是区间退火与点退火的本质区别。\n- 接受才会真正 `swap(cur_arr[x], cur_arr[y])`；`curE` 同步更新为 `tmpE`，保证「能量」和「排列」始终一致。\n- 每轮末尾只把**更优**的结果写进 `bestE/best_arr`，中途接受劣解不影响全局最优。\n\n### 模块四：`main` 读入与主循环\n\n```cpp\nint main()\n{\n\tios::sync_with_stdio(false);\n\tcin.tie(nullptr); cout.tie(nullptr);\n\n\tint n;\n\tcin >> n;\n\tinit(n);\n\tfor (int i = 1; i <= n; i++)\n\t{\n\t\tfor (int j = 1; j <= 3; j++)\n\t\t{\n\t\t\tint x;\n\t\t\tcin >> x;\n\t\t\tif (i < x) bestE += abs(i - x);\n\t\t\tedges[i].emplace_back(x);\n\t\t}\n\t}\n\twhile ((double)clock() / CLOCKS_PER_SEC <= TL) sa(n);\n\tcout << bestE;\n\n\treturn 0;\n\n}\n```\n\n- 每条好友边在输入里会出现两次（好友关系是对称的），用 `if (i < x)` 保证每条边只累加一次，初始能量是恒等排列下的目标函数值。\n- `while ((double)clock() / CLOCKS_PER_SEC <= TL) sa(n);`：在 `TL=0.9` 秒内反复整轮退火，多轮冗余稀释「单轮没转准」的风险。\n- 最终输出 `bestE`（全局最优能量），而不是 `curE`（当前能量可能因接受劣解而变差）。\n\n## 复杂度分析\n\n- **时间复杂度**：单次扰动的增量评估为 $O(\\deg(a)+\\deg(b))$，本题度数恒为 3，即 $O(1)$；一**轮**退火的降温次数为 $\\ln(T_0/T_{min})/\\ln(1/0.99)\\approx 2.8\\times 10^3$。总轮数与总迭代由 `TL = 0.9` 秒的 `clock()` 卡点硬性封顶。\n- **空间复杂度**：排列两个 `vector` 共 $O(n)$，邻接表 $O(m)$（$m$ 为边数），合计 $O(n+m)$。\n\n## 适用场景\n\n- **排列 / 顺序类最优化**：P2210 Haywire 这类「安排顺序、最小化与顺序相关的代价」，以及 TSP 等旅行商型问题。\n- **解空间离散、无法用坐标退火**：状态是一个排列或序列，点退火的连续扰动失效时，改用「交换 / 翻转」等离散邻域。\n- 注意：退火给出的是**近似最优**；对必须拿满分的精确解问题（$n$ 很大且时限紧张），优先考虑 DP 等精确算法，退火适合「够好就行」或数据有随机性的场合。\n\n## 常见陷阱与注意事项\n\n1. **忘了排除 `x == y`**：随机到的两个下标相同时交换无效，这一步会白白浪费迭代。务必用 `while(x == y)` 重新抽。\n2. **增量计算漏掉公共边**：$a\\!-\\!b$ 这条边交换后长度不变，若不加 `i != a / i != b` 过滤，会把同一条边的贡献算两次，`delta` 直接算错。\n3. **只输出 `curE` 不输出 `bestE`**：随机游走会接受劣解，最终停在的状态可能不是最优；`bestE/best_arr` 的独立维护和最终输出不能省。\n4. **边的去重**：好友关系在输入中出现两次，`i < x` 只累加一次；漏了它 `bestE` 会变成真实值的 2 倍，输出直接错。\n5. **初温与 $\\Delta E$ 量级匹配**：$t_0$ 只需覆盖 $\\Delta E$ 的量级（本题 20000）；$t_0$ 过小会让接受劣解概率趋近于 0，退化成爬山法卡在局部最优。\n6. **排列的表示约定**：本代码是「下标 = 奶牛、值 = 位置」。若换成「下标 = 位置、值 = 奶牛」，`swap` 对象和 `cala` 里的 `abs(idx[a]-idx[i])` 都要跟着改，两种表示混用必然出错。\n7. **时间卡点**：`TL=0.9` 按秒计的墙钟近似；`clock()` 在 Windows 与 Linux 的 `CLOCKS_PER_SEC` 不同，提交不同平台前先本地试跑一次确认不超时。\n\n## 对比与扩展\n\n| 维度 | 点退火（连续坐标） | 区间退火（排列） |\n|---|---|---|\n| 状态 | 坐标点，连续空间 | 排列，离散空间 |\n| 扰动 | 高斯/均匀偏移，步长正比于温度 | 交换两元素或区间翻转，与温度无关 |\n| 温度的作用 | 同时控制步长与接受概率，耦合 | 只控制接受概率，解耦 |\n| 参数敏感度 | 高，需仔细调 | 低，初温取大点、降温粗略也能收敛 |\n| 典型问题 | 费马点、平衡点（P1337） | Haywire（P2210）、TSP |\n\n- **前置/相关**：随机引擎与分布对象见「C++ 随机数生成（mt19937 与分布对象）」；点退火细节与「为什么两者参数敏感度不同」见「模拟退火 · 点退火」。\n- **扰动方式选择经验**：排列退火默认用「交换元素」；遇到回路、环等特殊结构（如 TSP 的 2-opt 邻域）再考虑区间翻转。\n- **延伸**：增量计算是排列退火的常规优化（只重算受影响部分）；同一思想在「禁忌搜索 / 遗传算法」等启发式里同样适用。",
+        "timeComplexity": "O(deg·log(T0/Tmin))",
+        "spaceComplexity": "O(n+m)",
+        "tags": [
+            "模拟退火",
+            "随机化",
+            "排列退火",
+            "增量计算",
+            "邻域搜索"
+        ],
+        "codePath": "基础算法\\随机化\\排列退火\\Untitled1.cpp",
+        "prerequisites": [
+            "basic-random-mt19937"
+        ],
+        "related": [
+            "basic-random-sa-point"
+        ]
+    },
+    {
         "id": "basic-random-sa-point",
         "category": "基础算法",
         "subcategory": "随机化",
@@ -389,7 +413,8 @@ const KNOWLEDGE_DATA = [
             "basic-random-mt19937"
         ],
         "related": [
-            "basic-random-mt19937"
+            "basic-random-mt19937",
+            "basic-random-sa-permutation"
         ]
     },
     {
@@ -414,6 +439,26 @@ const KNOWLEDGE_DATA = [
             "basic-radix-sort-k",
             "basic-divide-conquer-merge-inversion"
         ]
+    },
+    {
+        "id": "basic-ternary-search",
+        "category": "基础算法",
+        "subcategory": "分治",
+        "subSubcategory": "",
+        "title": "三分法（求单峰函数极值）",
+        "content": "## 算法原理\n\n解决的问题：在区间 $[L,R]$ 上求**单峰函数**的极值点横坐标。典型应用是洛谷 P3382 类模板题：给定一个 $n$ 次多项式，且保证其在 $[L,R]$ 上先增后减（存在唯一极大值点），求该极大值点的横坐标。\n\n核心思想：二分查找靠「中点与目标比较」排除一半区间，但求极值时**没有目标值可比较**——单点信息无法判断极值在哪一侧。三分法改成取两个等分点：\n\n$$\nm_1=L+\\frac{R-L}{3},\\qquad m_2=L+\\frac{2(R-L)}{3}\n$$\n\n比较 $f(m_1)$ 与 $f(m_2)$：\n\n- 若 $f(m_1)<f(m_2)$：$m_1,m_2$ 都在上升段，或 $m_1$ 在上升段、$m_2$ 已越过峰值。无论哪种情况，**极大值点都在 $m_1$ 的右侧**（严格证明见下），于是舍去左段，令 $L=m_1$；\n- 若 $f(m_1)\\ge f(m_2)$：对称地，极大值点在 $m_2$ 的左侧，舍去右段，令 $R=m_2$。\n\n每轮区间长度乘 $\\frac{2}{3}$，直至 $R-L$ 小于精度阈值，取中点输出。\n\n**为什么舍去是安全的**：设极大值点为 $x_0$。若 $f(m_1)<f(m_2)$，反证：假设 $x_0<m_1$，则 $m_1$ 在**下降段**上（$x_0$ 左侧上升、右侧下降），由 $m_1<m_2$ 且两者都在下降段推出 $f(m_1)>f(m_2)$，与条件矛盾。故 $x_0>m_1$，左段 $[L,m_1]$ 可以放心舍去。$f(m_1)\\ge f(m_2)$ 一侧同理。这个论证只用到了「单峰」——先严格递增、后严格递减，不要求可导。\n\n模板（求极大值；极小值把比较方向反过来即可）：\n\n```\nwhile (R - L > eps):\n    m1 = L + (R - L) / 3\n    m2 = L + (R - L) / 3 * 2\n    if f(m1) < f(m2): L = m1\n    else:             R = m2\n输出 (L + R) / 2\n```\n\n## 核心公式 / 状态定义与转移方程\n\n**区间状态**：$[L,R]$ 始终满足「极大值点 $x_0\\in[L,R]$」，这是三分法的不变量。初始为题目给定的区间；每轮按比较结果收缩到 $[m_1,R]$ 或 $[L,m_2]$。\n\n**两点位置**：\n\n$$\nm_1=L+\\frac{R-L}{3},\\qquad m_2=L+\\frac{2(R-L)}{3}\n$$\n\n**收缩规则**（求极大值）：\n\n$$\nL\\gets m_1\\ \\ (\\text{当 } f(m_1)<f(m_2)),\\qquad R\\gets m_2\\ \\ (\\text{否则})\n$$\n\n**目标函数**（本代码的多项式求值）：\n\n$$\nf(x)=\\sum_{i=0}^{n}k_i x^i\n$$\n\n代码用递推求值：`t` 依次取 $1,x,x^2,\\dots$，每步 `ans += t * k[i]`，一次乘一次加累加出 $f(x)$。\n\n**迭代次数**：每轮区间缩到原来的 $\\frac{2}{3}$，达到精度 $eps$ 需要的轮数\n\n$$\nk=\\left\\lceil \\log_{3/2}\\frac{R-L}{eps} \\right\\rceil\n$$\n\n如区间长 $1$、$eps=10^{-8}$，约 $\\log_{1.5}10^8\\approx 45$ 轮；区间更大或精度更高时也就 60~100 轮，常数极小。\n\n## 逐行代码解析\n\n### 模块一：全局系数数组与多项式求值 `fn`\n\n```cpp\n#include<bits/stdc++.h>\nusing namespace std;\nvector<long double> k;\nlong double fn(long double x,int n)\n{\n\tlong double t = 1,ans  = 0;\n\tfor (int i = 0; i <= n; i++)\n\t{\n\t\tans += t * k[i];\n\t\tt *= x;\n\t}\n\treturn ans;\n}\n```\n\n- `k[i]` 存 $x^i$ 的系数：`k[0]` 是常数项、`k[1]` 是一次项系数、`k[n]` 是最高次项系数；读入时按「从高次到低次」倒序存（见模块二）。\n- `fn` 里 `t` 维护 $x^i$ 的幂：初始 `t=1`，每轮 `ans += t*k[i]` 累加一项、`t *= x` 升到下一幂次，整体就是霍纳式逐项累加。\n- 全程 `long double`：多项式的值可能很大或很小，`long double` 比 `double` 多几位有效数字，求极值点更稳；一般题目 `double` 也够，但 `long double` 没有额外代价。\n\n### 模块二：`main` 读入与三分循环\n\n```cpp\nint main()\n{\n\tios::sync_with_stdio(false);\n\tcin.tie(nullptr); cout.tie(nullptr);\n\tint n;\n\tlong double L, R;\n\tcin >> n >> L >> R;\n\tk.assign(n + 1, 0);\n\tfor (int i = n; i >= 0; i--) cin >> k[i];\n\twhile (R - L > 1e-8)\n\t{\n\t\tlong double l = L + (R - L) / 3;\n\t\tlong double r = L + (R - L) / 3 * 2;\n\t\tif (fn(l, n) < fn(r, n)) L = l;\n\t\telse R = r;\n\t}\n\tcout << (L + R) / 2;\n\treturn 0;\n}\n```\n\n- `for (int i = n; i >= 0; i--) cin >> k[i];`：题目按 $a_n,a_{n-1},\\dots,a_0$ 给系数，倒序读入后 `k[i]` 恰好是 $x^i$ 的系数，与 `fn` 的约定对齐。\n- `long double l = L + (R - L) / 3;` 与 `r = L + (R - L) / 3 * 2`：两个三等分点。`/ 3 * 2` 乘除同级从左到右，等价于 $L+\\frac{2(R-L)}{3}$，语义正确。\n- `if (fn(l, n) < fn(r, n)) L = l; else R = r;`：三分核心比较——左点低于右点说明极值在右，舍左段；否则舍右段。\n- `while (R - L > 1e-8)`：区间长度未达到 $10^{-8}$ 就继续收缩；循环条件**必须是大步继续**（`>` 而非 `<=`），写反会变成「区间足够小时才循环」，直接死循环或一次不跑。\n- `cout << (L + R) / 2;`：默认输出 6 位有效数字。这类题只要求答案与标准值的绝对/相对误差不超过 $10^{-5}$，6 位有效数字已经覆盖，无需额外 `fixed << setprecision`。\n\n## 复杂度分析\n\n- **时间复杂度**：每轮收敛 $\\frac{2}{3}$，轮数 $O(\\log_{3/2}((R-L)/eps))$；每次调用 `fn` 是 $O(n)$。总复杂度 $O(n\\log((R-L)/eps))$，实际轮数只有几十轮，极快。\n- **空间复杂度**：只存系数数组 $k$，$O(n)$。\n\n## 适用场景\n\n- **单峰函数的极值**：凸函数（求极小）、凹函数（求极大）、以及不光滑但单峰的折线函数——三分不要求可导，只要求先单调增后单调减（或反之）。\n- **导数难求或不可导的最优化**：表达式复杂、求导再解方程成本高时，直接三分求数值解最省事。\n- 不适用：区间上有多个极值（多峰函数）——三分会把真极值所在段舍掉；此时需要模拟退火、爬山 + 随机重启等全局方法。\n\n## 常见陷阱与注意事项\n\n1. **循环条件写反**：`while (R - L > 1e-8)` 是「区间不够小就继续」；写成 `<=` 语义完全相反，常见症状是死循环或直接输出初值。\n2. **极小值与极大值的比较方向**：求极大用 `f(l) < f(r) → L = l`；求极小要把不等号反过来（`f(l) > f(r) → L = l`）。方向记混会在上升段/下降段上做出相反的收缩。\n3. **系数顺序**：题目给的是 $a_n\\to a_0$，必须倒序存入；不倒序会让 `k[i]` 张冠李戴，函数值全错但三分照样「收敛」到一个假极值。\n4. **eps 与题目精度匹配**：eps 取答案要求精度的 $10^{-3}$ 倍左右即可（如要求 $10^{-5}$ 用 $10^{-8}$）；eps 过大精度不足，过小徒增轮数，`long double` 下推到 $10^{-12}$ 以下还可能因精度耗尽而不收敛。\n5. **输出格式**：默认浮点输出是 6 位有效数字，能满足 $10^{-5}$ 以内的误差要求；只有当题目明确要求「保留 $k$ 位小数」时，才加 `fixed << setprecision(k)`。\n6. **两端点的初始化**：`L、R` 必须保证极值点在区间内部；若极值恰好在端点或区间外，三分的收缩仍会收敛到端点，但前提判断可能失效，要先确认题面保证。\n7. **对非单峰函数误用三分**：多峰函数上三分可能丢掉全局极值。判断不了单峰性时，先用足量采样观察函数形状，或改用随机化方法。\n\n## 对比与扩展\n\n| 方法 | 利用的信息 | 适用对象 | 每轮收敛 |\n|---|---|---|---|\n| 二分查找 | 中点与目标值的比较 | 单调判别式问题 | $\\frac{1}{2}$ |\n| 三分法 | 两个三等分点互相比较 | 单峰函数极值 | $\\frac{2}{3}$ |\n| 牛顿法 | 一阶/二阶导数 | 光滑可导函数 | 二次收敛 |\n\n- **三分与二分的关系**：二分排除一半、有明确目标值；三分排除三分之一、没有目标值只能靠两点互相比较。两者都是「保持不变量（解仍在区间内）、按每轮信息收缩」的区间分治。\n- **分数规划 / 凸函数优化**里三分常作子过程；「三分套三分」可推广到二维凸函数（外层三分 $x$、内层三分 $y$）。\n- **相关知识点**：本库「模拟退火」系列（`basic-random-sa-point` 等）解决的是**多峰/无单峰保证**场景下的全局优化，与三分各管一段；「快速幂 / 多项式求值」可给本知识点提供更快的霍纳求值方式。",
+        "timeComplexity": "O(n·log((R-L)/eps))",
+        "spaceComplexity": "O(n)",
+        "tags": [
+            "三分法",
+            "单峰函数",
+            "浮点二分",
+            "数值方法",
+            "多项式求值"
+        ],
+        "codePath": "基础算法\\分治\\三分法\\Untitled1.cpp",
+        "prerequisites": [],
+        "related": []
     },
     {
         "id": "basic-two-pointer-cycle",

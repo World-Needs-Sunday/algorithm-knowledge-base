@@ -1396,8 +1396,21 @@
                 "basic-random-mt19937"
             ],
             "related": [
-                "basic-random-mt19937"
+                "basic-random-mt19937",
+                "basic-random-sa-permutation"
             ]
+        },
+        "basic-random-sa-permutation": {
+            "prerequisites": [
+                "basic-random-mt19937"
+            ],
+            "related": [
+                "basic-random-sa-point"
+            ]
+        },
+        "basic-ternary-search": {
+            "prerequisites": [],
+            "related": []
         }
     }
 }
