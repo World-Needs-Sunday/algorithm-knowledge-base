@@ -40,9 +40,21 @@ $$\text{ans} = dp[W]$$
 
 ## 逐行代码解析
 
+以下按逻辑模块拆解完整代码；各模块的代码块按顺序拼接，即为 `Untitled1.cpp` 的完整实现。
+
+### 头文件与命名空间
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
+```
+
+- `#include<bits/stdc++.h>` 是竞赛常用的万能头文件，一次性引入标准库常用组件（含 `vector`、`deque`、`pair`）。
+- `using namespace std` 省去 `std::` 前缀，让 `vector`、`deque`、`pair` 等写法更简洁。
+
+### 主函数与读入、初始化
+
+```cpp
 int main()
 {
 	ios::sync_with_stdio(false);
@@ -51,10 +63,27 @@ int main()
 	cin >> n >> W;
 	vector<long long> dp(W + 1,0);
 	deque<pair<long long,long long>> que;
+```
+
+- `dp` 数组：一维滚动数组，大小 `W+1`，初始化为 `0`，统一用 `long long` 防价值溢出。
+- `que` 单调队列：`deque<pair<long long,long long>>`，存储 `(位置 j, dp[j] 值)`，维护单调递减。
+- `ios::sync_with_stdio(false)` 与 `cin.tie(nullptr);cout.tie(nullptr);` 关闭同步、解除输入输出绑定，加速大量读写。
+
+### 物品循环与读入
+
+```cpp
 	while(n--)
 	{
 		long long v,w,m;
 		cin >> v >> w >> m;
+```
+
+- 外层 `while(n--)` 逐个处理每种物品，`v` 为价值、`w` 为重量、`m` 为数量上限。
+- 每种物品在上一种物品的 `dp` 基础上继续转移，因此循环结束时 `dp` 就是「考虑全部物品」的最优解。
+
+### 同余类分组 + 单调队列转移
+
+```cpp
 		for(long long i = 0;i < w;i++)
 		{
 			que.clear(); 
@@ -67,19 +96,23 @@ int main()
 			}
 		}
 	}
+```
+
+- 同余类遍历：外层 `i` 从 `0` 到 `w-1` 枚举所有余数类，内层 `j` 以步长 `w` 遍历同余数容量（`j = i, i+w, i+2w, …`）；每类处理前 `que.clear()` 保证队列从空开始。
+- 队首出队：`(j - que.front().first) / w > m` 表示队首位置与当前容量相差超过 `m` 件物品，已滑出窗口，弹出队首；因两者同余，整除是精确的。
+- 队尾维护：`dp[j] >= que.back().second + (j - que.back().first) / w * v` 表示当前值（加上偏移量后）已不劣于队尾，弹出队尾以保持单调递减。
+- 入队与更新：先把当前原始 `dp[j]` 用 `que.emplace_back(j,dp[j])` 入队，再用队首值加偏移量更新 `dp[j]`；入队必须先于更新，否则会用上已更新值。
+
+### 输出答案
+
+```cpp
 	cout << dp[W];
 	return 0;
 } 
 ```
 
-- **`dp` 数组**：一维滚动数组，大小 $W+1$，初始化为 $0$，使用 `long long` 防溢出。
-- **`que` 单调队列**：`deque<pair<long long,long long>>`，存储 $(位置j, dp[j]值)$，维护单调递减。
-- **外层物品循环**：`while(n--)` 逐个处理每种物品。
-- **同余类遍历**：外层 `i` 从 $0$ 到 $w-1$，枚举所有余数类。内层 `j` 以步长 $w$ 遍历同余数容量（$j = i, i+w, i+2w, \ldots$）。
-- **队首出队**：`(j - que.front().first) / w > m` 表示队首位置距离当前位置超过 $m$ 件物品，已超出窗口范围。
-- **队尾维护**：`dp[j] >= que.back().second + (j - que.back().first) / w * v` 表示当前值已不劣于队尾元素（考虑偏移量后），弹出队尾保持单调递减。
-- **入队与更新**：先将当前 $dp[j]$ 原始值入队，然后用队首值加上偏移量更新 $dp[j]$。
-- **输出**：`dp[W]` 即为最大价值。
+- `dp[W]` 即容量 `W` 下的最大价值，直接输出作为答案。
+- `return 0;` 正常结束程序。
 
 ## 复杂度分析
 
@@ -98,6 +131,7 @@ int main()
 - **入队时机**：先将原始 $dp[j]$ 入队，再用队首更新 $dp[j]$。顺序不能颠倒，否则会用到已更新的值。
 - **`long long` 类型**：价值和偏移量乘积可能很大，务必使用 `long long`。
 - **队列清空**：处理每种物品的每个同余类前需 `que.clear()`，确保队列从空开始。
+- **重量为 $0$ 的物品**：当 $w = 0$ 时同余类循环 `for(i = 0; i < w; i++)` 一次都不执行，该物品会被整体跳过、价值漏算；一般约定输入合法（$w \ge 1$），否则应单独处理 $w=0$ 的情况。
 
 ## 对比与扩展
 

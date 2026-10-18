@@ -40,6 +40,10 @@ $$\text{ans} = dp[W]$$
 
 ## 逐行代码解析
 
+下面按逻辑阶段把整段代码拆成 5 个模块：头文件与全局变量 → main 与读入 → 读入并二进制拆分 → 01背包转移 → 输出。
+
+### 头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
@@ -47,12 +51,29 @@ int N , W;
 vector<long long> dp;
 vector<pair<long long , long long>> A;
 /*洛谷P1776*/
+```
+
+- `N`、`W` 分别为物品种类数与背包容量，声明为全局变量，方便在 `main` 与各循环中直接使用。
+- `dp` 是一维滚动数组，大小为 $W+1$、初始化为 $0$，使用 `long long` 防溢出；`dp[j]` 表示容量 $j$ 下能达到的最大价值。
+- `A` 存储拆分后的打包物品，每个 `pair` 的 `first` 为打包价值（$u \times k$），`second` 为打包重量（$w \times k$）。
+
+### main 与读入
+
+```cpp
 int main()
 {
 	ios::sync_with_stdio(false);
 	cin.tie(nullptr); cout.tie(nullptr);
 	cin >> N >> W;
 	dp.resize(W + 1, 0);
+```
+
+- `ios::sync_with_stdio(false)` 关闭 C++ 与 C 标准输入输出的同步，`cin.tie(nullptr)` 解除 `cin`/`cout` 绑定，用于加快 IO。
+- 读入物品种类数 `N` 与背包容量 `W` 后，把 `dp` 扩容到 $W+1$ 并全部置 $0$，保证下标 `dp[W]` 合法。
+
+### 读入物品并二进制拆分
+
+```cpp
 	for (int i = 1; i <= N; i++)
 	{
 		long long u, w, m;
@@ -64,7 +85,15 @@ int main()
 		}
 		if (m) A.emplace_back(u * m, w * m);
 	}
+```
 
+- 每次读入一种物品的价值 `u`、重量 `w`、数量 `m`；三者用 `long long`，因为乘以 $k$ 后数值可能很大。
+- 内层 `k` 从 $1$ 开始每次左移一位（`k <<= 1`，即翻倍），把打包物品 $(u \times k,\ w \times k)$ 存入 `A`，并从 `m` 中减去 `k`；循环条件 `k <= m` 保证每次打包不超过剩余数量。
+- 余数处理：拆分循环结束后若 `m` 仍大于 $0$，把剩余 `m` 件作为一个打包物品存入 `A`（如 $m = 13$ 拆成 $1 + 2 + 4 + 6$）。
+
+### 01背包转移
+
+```cpp
 	for (int i = 0; i < A.size(); i++)
 	{
 		for (int j = W; j >= 1; j--)
@@ -72,17 +101,22 @@ int main()
 			if (j >= A[i].second) dp[j] = max(dp[j], dp[j - A[i].second] + A[i].first);
 		}
 	}
+```
+
+- 对 `A` 里所有打包物品做标准01背包：外层遍历每个打包物品，内层容量 `j` 从 $W$ 逆序到 $1$，保证每个打包物品最多被选一次。
+- `if (j >= A[i].second)` 判断当前容量装得下该物品（$j \ge$ 打包重量），装得下才转移，避免下标越界。
+- `A[i].first` 是打包价值、`A[i].second` 是打包重量，对应转移方程 $dp[j] = \max(dp[j],\ dp[j - w_k] + v_k)$。
+
+### 输出
+
+```cpp
 	cout << dp[W];
 	return 0;
 }
 ```
 
-- **`dp` 数组**：一维滚动数组，大小 $W+1$，初始化为 $0$，使用 `long long` 防溢出。
-- **`A` 数组**：存储拆分后的打包物品，每个 `pair` 的 `first` 为打包价值（$u \times k$），`second` 为打包重量（$w \times k$）。
-- **二进制拆分循环**：`k` 从 $1$ 开始，每次左移一位（$k \ll= 1$），将 $(u \times k, w \times k)$ 存入 `A`，并从 $m$ 中减去 $k$。循环条件 `k <= m` 确保每次打包不超过剩余数量。
-- **余数处理**：拆分循环结束后若 $m > 0$，将剩余的 $m$ 件作为一个打包物品存入 `A`。
-- **01背包处理**：对所有打包物品执行标准01背包，容量 $j$ 从 $W$ 逆序到 $1$，保证每个打包物品只选一次。
-- **输出**：`dp[W]` 即为最大价值。
+- `dp[W]` 即容量 $W$ 下背包的最大价值，作为最终答案输出。
+- `return 0;` 正常结束程序。
 
 ## 复杂度分析
 

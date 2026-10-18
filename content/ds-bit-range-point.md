@@ -117,36 +117,57 @@ long long get(int i) {
 
 ## 逐行代码解析
 
+下面按函数/逻辑阶段把整份代码拆成 5 个模块。各模块的代码块按顺序拼接后，与 `Untitled1.cpp` 完全一致（仅多出行尾 `//` 注释）。
+
+### 头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 /*洛谷P3368*/
 using namespace std; 
-vector<long long> treearr;          // 存差分数组的树状数组
+vector<long long> treearr;          // 维护差分数组的树状数组
 inline int lowbit(int i)
 {
-	return i & -i;                   // 取最低位的1，决定区间长度
+	return i & -i;                  // 取最低位的 1，决定 treearr[i] 管辖的区间长度
 }
+```
 
+- `treearr` 是维护差分数组的树状数组，用 `vector<long long>` 存储，防止差分累加超出 `int` 范围。
+- `lowbit(i) = i & -i` 利用补码取 `i` 最低位的 1，它决定 `treearr[i]` 覆盖的差分区间长度，是树状数组的基石。
+- 数组只使用下标 `1..n`，`0` 号位不可用：`lowbit(0)=0` 会让 `add` 陷入死循环。
+
+### init(n) — 建树（读入并写入差分值）
+
+```cpp
 void init(int n)
 {
-	treearr.resize(n + 1,0);         // n+1 大小，下标1..n
-	long long A = 0;                 // A = a[i-1]，初始 a[0]=0
+	treearr.resize(n + 1,0);       // 申请 n+1 个元素，只用下标 1..n
+	long long A = 0;               // A = a[i-1]，初始 a[0]=0
 	for(int i = 1;i <= n;i++)
 	{
 		int x,w;
-		cin >> x;                    // 读入原值 a[i]
-		w = x - A;                   // 差分 d[i] = a[i] - a[i-1]
-		A = x;                       // 更新 A 为当前值，供下轮差分
+		cin >> x;                  // 读入原值 a[i]
+		w = x - A;                 // 差分 d[i] = a[i] - a[i-1]
+		A = x;                     // 更新 A 为当前值，供下一轮做差
 		int idx = i;
-		while(idx <= n)               // 把差分值加入 BIT 祖先链
+		while(idx <= n)            // 沿 lowbit 把差分值 w 累加到祖先链
 		{
 			treearr[idx] += w;
 			idx += lowbit(idx);
 		}
 	}
 }
+```
 
-void add(int i,int k,int n)         // 差分数组单点修改：d[i] += k
+- `treearr.resize(n+1, 0)` 只开 `n+1`：当 `r=n` 时 `add(r+1, -k, n)` 会让 `i=n+1`，`while(i<=n)` 直接跳过，不会越界。
+- `A` 保存上一个读入的原值，初始 `0` 对应 `a[0]=0`；`w = x - A` 就是差分 `d[i]`，随即 `A = x` 供下一轮使用。
+- 内层 `while(idx <= n)` 把差分值 `w` 沿 `lowbit` 累加到所有覆盖 `i` 的节点，实现单点建树（$O(n\log n)$）。
+- 关键点：写入 BIT 的是差分值 `w` 而非原值 `x`，否则 `get` 会退化成「原数组前缀和」，语义就错了。
+
+### add — 单点修改与区间修改（两个重载）
+
+```cpp
+void add(int i,int k,int n)       // 差分数组单点修改：d[i] += k
 {
 	while(i <= n)
 	{
@@ -155,23 +176,39 @@ void add(int i,int k,int n)         // 差分数组单点修改：d[i] += k
 	}
 }
 
-void add(int l,int r,int k,int n)   // 区间修改：[l,r] 加 k
+void add(int l,int r,int k,int n) // 区间修改：[l,r] 加 k
 {
-	add(l,k,n);                      // d[l] += k，使 [l,n] 都加 k
-	add(r + 1,-k,n);                 // d[r+1] -= k，把 [r+1,n] 拉回原值
+	add(l,k,n);                    // d[l] += k，使 [l,n] 都加 k
+	add(r + 1,-k,n);               // d[r+1] -= k，把 [r+1,n] 拉回原值
 }
+```
 
-long long get(int i)                // 单点查询：返回 a[i]
+- 三参 `add(i,k,n)` 在差分数组的 `i` 位置 `+k`，沿 `lowbit` 向上更新所有覆盖 `i` 的祖先节点。
+- 四参 `add(l,r,k,n)` 用两次单点修改完成区间加：`d[l]+=k` 使 `[l,n]` 都加 `k`，`d[r+1]-=k` 再把 `[r+1,n]` 抵消回原值，两者缺一不可。
+- 两个 `add` 靠参数个数（3 个 vs 4 个）区分，调用时注意别传错参数个数导致匹配到错误的重载。
+
+### get(i) — 单点查询（差分前缀和）
+
+```cpp
+long long get(int i)              // 单点查询：返回 a[i]
 {
 	long long ans = 0;
-	while(i)
+	while(i)                       // 沿 lowbit 递减累加
 	{
-		ans += treearr[i];           // 累加差分前缀和
+		ans += treearr[i];
 		i -= lowbit(i);
 	}
-	return ans;                      // 即 a[i]
+	return ans;                    // 即 a[i]
 }
+```
 
+- `get(i)` 从 `i` 出发沿 `lowbit` 递减累加，求差分数组 `d[1..i]` 的前缀和，结果就是单点值 `a[i]`。
+- 循环条件是 `while(i)`（`i` 非 0 才继续），与 `add` 的 `while(i <= n)` 方向相反，容易写错，注意区分。
+- 返回 `long long`：差分可能为负、多次累加可能超 `int`，必须用 `long long` 承接。
+
+### main — 主流程
+
+```cpp
 int main()
 {
 	ios::sync_with_stdio(false);
@@ -183,13 +220,13 @@ int main()
 	{
 		int op;
 		cin >> op;
-		if(op == 1)                  // 区间修改
+		if(op == 1)                // 区间修改
 		{
 			int x,y,k;
 			cin >> x >> y >> k;
 			add(x,y,k,n);
 		}
-		else                         // 单点查询
+		else                       // 单点查询
 		{
 			int x;
 			cin >> x; 
@@ -199,6 +236,11 @@ int main()
 	return 0;
 }
 ```
+
+- `ios::sync_with_stdio(false)` 与 `cin.tie(nullptr)` 关闭 C/C++ 同步与输入输出绑定，加速大量 IO。
+- 先 `init(n)` 读入原数组并建成差分 BIT，再循环 `m` 次按操作类型处理。
+- `op == 1` 时读 `x,y,k` 调用区间修改；否则读 `x` 并输出 `get(x)` 完成单点查询。
+- 输出用 `'\n'` 而非 `endl`，避免每次输出都刷新缓冲区拖慢速度。
 
 **差分变换的正确性论证**：设原数组 a，差分 $d[i] = a[i] - a[i-1]$（$a[0]=0$）。做区间 `[l,r]` 加 k 后，新数组 a' 满足 $a'[i] = a[i] + k \cdot [l \leq i \leq r]$。检查差分 $d'$：当 `i = l` 时 $d'[l] = a'[l] - a'[l-1] = (a[l]+k) - a[l-1] = d[l] + k$；当 `i = r+1` 时 $d'[r+1] = a'[r+1] - a'[r] = a[r+1] - (a[r]+k) = d[r+1] - k$；其余位置差分不变。所以"区间加 k"在差分数组上等价于"$d[l] \mathrel{+}= k,\; d[r+1] \mathrel{-}= k$"，这正是代码所做的。
 

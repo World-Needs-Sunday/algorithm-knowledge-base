@@ -108,6 +108,8 @@ codePath: '数据结构\并查集\并查集(基础)\带秩优化\Untitled1.cpp'
 
 ## 逐行代码解析
 
+### 全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
@@ -115,12 +117,31 @@ using namespace std;
 vector<int> A;
 vector<int> rt;
 int n;
+```
+
+- `A` 是父节点数组，`A[i]` 指向 `i` 的父节点；根节点的 `A[i] == i`。
+- `rt` 是秩数组，`rt[i]` 记录以 `i` 为根的树的秩（未经路径压缩时的树高上界），非根节点的 `rt` 值无意义。
+- 全局 `int n;` 从未被使用（见下方 `init` 形参说明），是遗留的死代码。
+
+### init(n) —— 初始化
+
+```cpp
 void init(int n)
 {
     A.resize(n + 1);
     rt.resize(n + 1,1);
     for(int i = 1;i <= n;i++) A[i] = i;
 }
+```
+
+- `A.resize(n + 1)` / `rt.resize(n + 1,1)`：开 `n + 1` 格，只使用下标 `1..n`（0 号位废弃），与元素从 1 编号对应。
+- `rt.resize(n + 1,1)`：秩初始化为 1。每个元素初始为独立单节点树，高度为 1；若初始化为 0，会让秩比较逻辑失去一致性。
+- `for(int i = 1;i <= n;i++) A[i] = i;`：遍历 `1..n`，令每个元素父节点指向自己，各自独立成集合。
+- 这里的 `n` 是形参（实参为 `main` 里的 `N`），遮蔽了全局 `int n;`——全局那个因此成了死代码。
+
+### find(i) —— 查找（带路径压缩）
+
+```cpp
 int find(int i)
 {
     if(A[i] != i)
@@ -129,6 +150,16 @@ int find(int i)
     }
     return A[i];
 }
+```
+
+- `if(A[i] != i)`：判断 `i` 是否为根节点；不是根才继续。
+- `A[i] = find(A[i]);`：递归找到根，并把 `i` 的父节点直接更新为根（路径压缩）。
+- `return A[i];`：返回时 `A[i]` 已是根节点。
+- 路径压缩不更新 `rt`：这是刻意为之，`rt` 是"未经路径压缩时的树高上界"，保持不变不影响正确性。
+
+### unity(a, b) —— 合并（按秩）
+
+```cpp
 void unity(int a,int b)
 {
     int ra = find(a);
@@ -145,6 +176,16 @@ void unity(int a,int b)
         ++rt[ra];
     }
 }
+```
+
+- `int ra = find(a); int rb = find(b);`：先分别找到两棵树的根，注意两个 `find` 调用都会触发路径压缩。
+- `if(ra == rb) return;`：已在同一集合则无需合并，避免自环（`A[root] = root` 虽无害但浪费）。
+- 秩不同（`if(rt[ra] != rt[rb])`）：`rt[ra] > rt[rb]` 时把 `rb` 挂到 `ra` 下，否则把 `ra` 挂到 `rb` 下；矮树挂高树，高树的秩不变。
+- 秩相等（`else`）：把 `rb` 挂到 `ra` 下并 `++rt[ra]`——两棵等高树合并后新树高度必 +1。
+
+### main —— 读入与回答
+
+```cpp
 int main()
 {
     ios::sync_with_stdio(false);
@@ -167,16 +208,10 @@ int main()
 }
 ```
 
-**逐行解析**：
-
-- `vector<int> rt;`：秩数组，`rt[i]` 记录以 `i` 为根的树的秩（高度近似上界）。非根节点的 `rt` 值无意义。
-- `rt.resize(n + 1,1);`：秩初始化为 1。每个元素初始为独立单节点树，高度为 1。
-- `int ra = find(a); int rb = find(b);`：先分别找到两棵树的根。注意两个 `find` 调用都会触发路径压缩。
-- `if(ra == rb) return;`：已在同一集合则无需合并。这一步是重要的优化，避免自环（`A[root] = root` 虽无害但浪费）。
-- `if(rt[ra] != rt[rb])`：秩不同时，矮树挂高树。
-  - `if(rt[ra] > rt[rb]) A[rb] = ra;`：ra 更高，将 rb 挂到 ra 下。ra 的秩不变（矮树挂上来不增加高度）。
-  - `else A[ra] = rb;`：rb 更高，将 ra 挂到 rb 下。
-- `else { A[rb] = ra; ++rt[ra]; }`：秩相等时，将 rb 挂到 ra 下，ra 的秩加 1。因为两棵等高树合并，新树高度 = 原高度 + 1。
+- `ios::sync_with_stdio(false)` 与 `cin.tie(nullptr); cout.tie(nullptr);`：关闭与 C 标准 IO 的同步、解绑 cin/cout，加速输入输出。
+- 读入 `N` 个元素、`M` 次操作后，`init(N)` 初始化 `1..N`。
+- `for(int i = 1;i <= M;i++)`：循环处理 `M` 次操作。
+- `op == 1` 时合并 `a`、`b`；否则查询两者是否同根，输出 `Y` / `N`。
 
 ## 复杂度分析
 

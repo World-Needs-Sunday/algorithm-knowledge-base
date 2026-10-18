@@ -40,54 +40,78 @@ $$\text{ans} = \max_{1 \leq j \leq n} dp[n][j]$$
 
 ## 逐行代码解析
 
+代码按功能拆成 4 个模块：头文件与全局变量、随机数据生成、DP 模板、求答案与输出。
+
+### 头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 #include<random>
 using namespace std;
-int n,m;
-vector<vector<int>> A;
+int n,m; // n 为三角形层数；m 声明后未使用
+vector<vector<int>> A; // 存三角形，后面多开两行两列防越界
+```
+
+- 要点 1：`n` 存层数，`A` 是全局二维数组，后面用 `resize` 开成 $(n+2)\times(n+2)$。
+- 要点 2：多开两行两列，使转移时的 `A[i-1][j-1]`、`A[i-1][j]` 碰到第 $0$ 行/第 $0$ 列也不会越界。
+
+### 随机数据生成（题目生成）
+
+```cpp
 int main()
 {
 	//题目生成 
-	random_device rd;
-	mt19937 gen(rd());
-	uniform_int_distribution<int> dis1(1,10);
-	uniform_int_distribution<int> dis2(1,10000);
-	n = dis1(gen);
-	A.resize(n + 2,vector<int>(n + 2,0));
-	for(int i = 1;i <= n;i++)
+	random_device rd; // 真随机种子源
+	mt19937 gen(rd()); // 梅森旋转随机数引擎
+	uniform_int_distribution<int> dis1(1,10); // 层数 n ∈ [1,10]
+	uniform_int_distribution<int> dis2(1,10000); // 每个格子数字 ∈ [1,10000]
+	n = dis1(gen); // 随机生成层数
+	A.resize(n + 2,vector<int>(n + 2,0)); // 开 (n+2)×(n+2) 并清零
+	for(int i = 1;i <= n;i++) // 逐行
 	{
-		for(int j = 1;j <= i;j++)
+		for(int j = 1;j <= i;j++) // 第 i 行有 i 个数字
 		{
-			A[i][j] = dis2(gen);
-			cout << A[i][j] << '\t';
+			A[i][j] = dis2(gen); // 随机填数
+			cout << A[i][j] << '\t'; // 打印三角形，制表符分隔
 		}
-		cout << endl;
+		cout << endl; // 每行结束换行
 	}
-	
+```
+
+- 要点 1：`dis1` 生成层数 $n$（$1\sim10$），`dis2` 生成每个格子的数字（$1\sim10000$）。
+- 要点 2：内层循环上界是 `i` 而不是 `n`，因为第 $i$ 行只有 $i$ 个数字。
+- 要点 3：`A.resize(n + 2, vector<int>(n + 2, 0))` 先开空间再赋值，两个维度都多开 2，避免 `j-1` 越界。
+
+### DP 模板（核心转移）
+
+```cpp
 	//模板
-	vector<vector<int>> dp(n + 2,vector<int>(n + 2 , 0));
-	for(int i = 1;i <= n;i++)
+	vector<vector<int>> dp(n + 2,vector<int>(n + 2 , 0)); // dp 表初始化为 0
+	for(int i = 1;i <= n;i++) // 从上到下逐行
 	{
-		for(int j = 1;j <= i;j++)
+		for(int j = 1;j <= i;j++) // 第 i 行只有 i 列有效
 		{
-			dp[i][j] = max(dp[i - 1][j - 1] , dp[i - 1][j]) + A[i][j];
+			dp[i][j] = max(dp[i - 1][j - 1] , dp[i - 1][j]) + A[i][j]; // 左上方/正上方取大 + 当前值
 		}
-	} 
-	int ans = 0;
-	for(int i = 1;i <= n;i++) ans = max(ans,dp[n][i]);
-	cout << ans;
+	}
+```
+
+- 要点 1：`dp[i][j]` 表示从顶部走到 $(i,j)$ 的最大路径和，初值全 $0$，第 $0$ 行和越界位置自动为 $0$。
+- 要点 2：核心转移 `max(dp[i-1][j-1], dp[i-1][j]) + A[i][j]`，从左上方和正上方取较大者再加当前数字。
+- 要点 3：`dp` 同样开 $(n+2)\times(n+2)$，使 $j>i-1$ 时 `dp[i-1][j]` 落到 $0$，自动处理"正上方越界"。
+
+### 求答案与输出
+
+```cpp
+	int ans = 0; // 答案初值 0（本题数据全正，安全）
+	for(int i = 1;i <= n;i++) ans = max(ans,dp[n][i]); // 最后一行取最大值
+	cout << ans; // 输出答案
 	return 0;
 }
 ```
 
-- **随机数据生成**：使用 `mt19937` 随机数生成器，`dis1` 生成行数 $n$（$1$ 到 $10$），`dis2` 生成每个格子的数字（$1$ 到 $10000$）。
-- **`A` 数组**：大小 $(n+2) \times (n+2)$，多开两行两列以避免边界判断。`A[i][j]` 存第 $i$ 行第 $j$ 列的数字。
-- **`dp` 表**：大小 $(n+2) \times (n+2)$，初始化为 $0$。第 $0$ 行和越界位置自动为 $0$。
-- **外层循环 `i`**：从 $1$ 到 $n$，逐行处理。
-- **内层循环 `j`**：从 $1$ 到 $i$（第 $i$ 行有 $i$ 个数字），逐列处理。
-- **核心转移**：`max(dp[i-1][j-1], dp[i-1][j]) + A[i][j]`，从左上方和正上方取较大值加当前数字。
-- **答案**：遍历最后一行 `dp[n][i]`（$i$ 从 $1$ 到 $n$）取最大值。
+- 要点 1：终点是最后一行的任意列，所以要遍历 `dp[n][1..n]` 取最大，而不是 `dp[n][n]`。
+- 要点 2：`ans` 初值取 $0$ 只在数字全正时正确；若数字可为负，应初始化为 $-\infty$ 或 `dp[n][1]`。
 
 ## 复杂度分析
 
@@ -109,3 +133,12 @@ int main()
 ## 对比与扩展
 
 与从左上到右下的矩阵路径DP（如最小路径和）类似，区别在于三角形的结构（第 $i$ 行有 $i$ 个元素）。可扩展为求最小路径和（`max` 改 `min`）、带障碍的路径（障碍位置 `dp` 值为 $-\infty$）、允许向左走的变种等。空间优化可用一维滚动数组（逆序遍历 $j$ 避免覆盖）。
+
+- **自底向上的写法**：也可以反过来从最后一行向上倒推，把状态定义为 $dp[i][j]$ 表示「从 $(i,j)$ 出发走到最底层的最大路径和」。转移时原地累加，$dp[i][j]$ 加上正下方 $dp[i+1][j]$ 与右下方 $dp[i+1][j+1]$ 中的较大值，最后答案直接就是 $dp[1][1]$，免去了最后一行取最大值这一步边界处理。倒推写法如下：
+
+```
+for i = n-1 到 1:
+    for j = 1 到 i:
+        dp[i][j] += max(dp[i+1][j], dp[i+1][j+1])
+ans = dp[1][1]
+```

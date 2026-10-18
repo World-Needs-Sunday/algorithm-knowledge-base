@@ -104,16 +104,35 @@ long long get(int i) {
 
 ## 逐行代码解析
 
+### 头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 /*洛谷P3374*/
 vector<long long> treearr;          // 一维数组充当树，用 long long 防溢出
+```
+
+- `treearr` 是唯一的核心数组，用 `vector<long long>` 且下标从 1 开始；`long long` 防止 n 个元素求和溢出 int。
+- 0 号位不用：`lowbit(0)=0`，若把 0 当起点，`add` 里的 `i += lowbit(i)` 会永远停在 0 形成死循环。
+- `#include<bits/stdc++.h>` 万能头 + `using namespace std` 是竞赛常用写法，省去逐个包含头文件。
+
+### lowbit(i) — 取最低位 1
+
+```cpp
 inline int lowbit(int i)
 {
 	return i & -i;                   // 补码技巧，取最低位的1
 }
+```
 
+- `i & -i` 利用补码（`-i = ~i + 1`）只保留 `i` 二进制最低位的那个 1 所代表的值，例如 `lowbit(12)=4`。
+- 这个值同时决定了 `treearr[i]` 管辖的区间长度，是建树、修改、查询三个操作共同的基石。
+- 声明为 `inline` 减少函数调用开销，位运算本身是 $O(1)$。
+
+### init(n) — 建树
+
+```cpp
 void init(int n)
 {
 	treearr.resize(n + 1,0);         // 大小 n+1，下标1..n，0号不用
@@ -129,7 +148,16 @@ void init(int n)
 		}
 	}
 }
+```
 
+- `resize(n+1,0)` 开到 n+1，因为要用到下标 n；循环 `i` 从 1 到 n（含 n），0 号位跳过。
+- 每读入一个 `a[i]=x`，从 `idx=i` 沿 `idx += lowbit(idx)` 向上走，把 x 累加到所有覆盖位置 i 的祖先节点上。
+- 不能只写 `treearr[i]=x`：那样只填了叶子，祖先节点会缺数据；必须一路向上累加。
+- 这种逐元素建树总复杂度 $O(n\log n)$。
+
+### add(i, k, n) — 单点修改
+
+```cpp
 void add(int i, int k,int n)        // 单点修改：a[i] += k
 {
 	while(i <= n)                    // 不越界
@@ -138,7 +166,14 @@ void add(int i, int k,int n)        // 单点修改：a[i] += k
 		i += lowbit(i);              // 跳到下一个覆盖 i 的祖先
 	}
 }
+```
 
+- 给 `a[i]` 加上 k：从 i 出发，先把 k 累加到当前节点，再 `i += lowbit(i)` 跳到下一个覆盖 i 的祖先。
+- 循环条件 `i <= n` 保证下标不越界；`i += lowbit(i)` 每次都让最低位 1 进位、数值严格增大，迟早超过 n 而终止，至多 $O(\log n)$ 步。
+
+### get(i) — 前缀和查询
+
+```cpp
 long long get(int i)                // 前缀和查询 sum[1..i]
 {
 	long long ans = 0;
@@ -149,6 +184,15 @@ long long get(int i)                // 前缀和查询 sum[1..i]
 	}
 	return ans;
 }
+```
+
+- 求 `sum[1..i]`：每步累加 `treearr[i]`（它正好覆盖区间 $[i-\text{lowbit}(i)+1,\; i]$），再 `i -= lowbit(i)` 剥掉最低位的 1，跳到前一段。
+- 循环条件 `while(i)`：`i` 的 popcount 每步严格递减，迟早归 0 终止；这也是下标必须从 1 开始的原因。
+- 返回类型用 `long long`，防止 n 个 int 求和溢出。
+
+### main — 读入与调度
+
+```cpp
 int main()
 {
 	ios::sync_with_stdio(false);     // 关同步，加速 cin
@@ -164,10 +208,13 @@ int main()
 		else cout << get(y) - get(x - 1) << '\n'; // 操作2：查询 [x,y] 的和
 	}
 	return 0;	
-} 
+}
 ```
 
-**关于 while 循环为何一定终止**：`add` 中 `i += lowbit(i)` 每次都让 `i` 的二进制最低位 1 进位，数值严格增大，迟早超过 `n`；`get` 中 `i -= lowbit(i)` 每次剥掉一个 1，`i` 的 popcount 严格递减，迟早归 0。两条路径长度都不超过 `i` 的二进制位数，即 $O(\log n)$。
+- `ios::sync_with_stdio(false)` 关同步、`cin.tie(nullptr)` 解绑，加速大量输入输出。
+- 先读入 n、m，再 `init(n)` 建树；之后循环 m 次处理操作。
+- `op==1` 调用 `add(x,y,n)` 做单点修改；否则输出 `get(y)-get(x-1)`，即区间和 = 两个前缀和相减。
+- 当 `x=1` 时 `get(0)` 因 `while(0)` 不进循环而返回 0，查询 `[1,y]` 依然正确，无需特判。
 
 ## 复杂度分析
 
@@ -197,3 +244,10 @@ int main()
 - **求逆序对**：按值域建 BIT，从右往左扫，每次查询比当前值小的元素个数，累计即得逆序数，$O(n \log n)$。
 - **BIT + 二分求第 k 小**：在 BIT 上二分，利用每个节点维护的区间长度做前缀和判断，可在 $O(\log n)$ 内找到前缀和第一次达到 k 的位置，常用于动态求第 k 小。
 - **差分 BIT（见下一篇）**：把"区间修改 + 单点查询"通过差分数组转化为"单点修改 + 前缀和查询"，仍用同一套 BIT 框架，体现树状数组对偶的灵活性。
+- **值域过大需先离散化**：按值域建 BIT 求逆序对时，BIT 的下标范围就是值域本身；若 $a_i$ 高达 $10^9$，直接开 $O(\max a_i)$ 大小的数组会爆空间、无法分配。做法是先把数组去重排序，再用每个值在有序序列中的名次 $1\sim m$（$m$ 为不同值个数，$m\le n$）替换原值，值域即压缩到 $[1,m]$，BIT 数组只需开 $m+1$。离散化排序是 $O(n\log n)$，不改变整体复杂度；去重后相等元素取同名次，也符合"严格大于才计逆序对"的计数要求。
+
+```text
+b = a 去重后排序                                    // 有序唯一值序列，长度 m
+对每个 a[i]：rank[i] = lower_bound(b, a[i]) - b + 1 // 名次 ∈ [1, m]
+按 rank 建 BIT（数组大小 m+1）统计逆序对
+```

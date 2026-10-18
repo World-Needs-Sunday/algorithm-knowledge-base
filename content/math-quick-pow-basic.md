@@ -33,42 +33,62 @@ $$\text{ans} \leftarrow \text{ans} \times \text{gap}_i \pmod{q}$$
 
 ## 逐行代码解析
 
+### 头文件与命名空间
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
+```
 
-long long fastpow(long long a, long long b, long long q)
+- `#include<bits/stdc++.h>`：一次性引入几乎所有标准库头文件，是竞赛环境的常用写法。
+- `using namespace std`：省略 `std::` 前缀，让 `cin`、`cout` 等可以直接书写。
+
+### fastpow 函数 — 边界与初始化
+
+```cpp
+long long fastpow(long long a,long long b,long long q)
 {
-	if(b == 0) return 1;          // a^0 = 1 的边界处理
-	long long ans = 1;             // 累积答案，初始为乘法单位元
-	long long gap = a;             // 当前底数，初始为 a = a^{2^0}
+	if(b == 0) return 1;  // a^0 = 1 的边界处理
+	long long ans = 1;    // 累积答案，初始为乘法单位元
+	long long gap = a;    // 当前底数，初始为 a = a^{2^0}
+```
+
+- `if(b == 0) return 1`：处理指数为 $0$ 的边界情况。实际上 `while(b)` 在 $b=0$ 时不进入，会直接返回 `ans=1`，此行可省略但保留使语义更清晰。
+- `ans = 1`：乘法单位元，作为累积答案的初始值。
+- `gap = a`：`gap` 始终维护 $a^{2^i} \bmod q$，其中 $i$ 为当前已处理的二进制位数；初始 $i=0$ 时 `gap = a = a^{2^0}`。
+
+### fastpow 函数 — 主循环
+
+```cpp
 	while(b)
 	{
-		if(b & 1)                  // 当前最低位为 1，乘入对应 a^{2^i}
-			ans = (ans * gap) % q;
-		gap = (gap * gap) % q;     // 底数平方：a^{2^i} -> a^{2^{i+1}}
-		b >>= 1;                   // 右移一位，处理下一位
+		if(b & 1) ans = (ans * gap) % q;   // 当前最低位为 1，乘入对应 a^{2^i}
+		gap = (gap * gap) % q;             // 底数平方：a^{2^i} -> a^{2^{i+1}}
+		b >>= 1;                           // 右移一位，处理下一位
 	}
 	return ans;
 }
+```
 
-int main()
+- `if(b & 1) ans = (ans * gap) % q`：检查 $b$ 的最低位，为 $1$ 则把该项 $a^{2^i}$ 乘入答案；取模确保 `ans` 始终在 $[0, q)$ 范围内。
+- `gap = (gap * gap) % q`：将底数从 $a^{2^i}$ 平方为 $a^{2^{i+1}}$，为下一轮做准备，是快速幂"倍增"思想的核心。
+- `b >>= 1`：右移一位，丢弃已处理的最低位，使下一次 `b & 1` 检查的是更高位。
+- 参数与返回值均为 `long long`：两个 `long long` 相乘最大约 $q^2 \approx 10^{18}$，仍落在 `long long` 范围（$\approx 9.2 \times 10^{18}$）内，避免溢出。
+
+### main 函数
+
+```cpp
+int main() 
 {
-	long long a, b, q;
+	long long a,b,q;
 	cin >> a >> b >> q;
-	cout << a << "^" << b << " mod " << q << "=" << fastpow(a, b, q);
+	cout << a << "^" << b << " mod " << q << "=" << fastpow(a,b,q);
 	return 0;
 }
 ```
 
-**关键解析：**
-
-- `if(b == 0) return 1`：处理指数为 $0$ 的边界情况。实际上 `while(b)` 循环在 $b=0$ 时不进入，直接返回 `ans=1`，此行可省略但保留使语义更清晰。
-- `long long gap = a`：`gap` 始终维护 $a^{2^i} \bmod q$，其中 $i$ 为当前已处理的二进制位数。初始 $i=0$ 时 `gap = a = a^1 = a^{2^0}`。
-- `if(b & 1) ans = (ans * gap) % q`：检查 $b$ 的最低位。若为 $1$，则该项 $a^{2^i}$ 需要乘入答案。取模确保 `ans` 始终在 $[0, q)$ 范围内。
-- `gap = (gap * gap) % q`：将底数从 $a^{2^i}$ 平方为 $a^{2^{i+1}}$，为下一轮做准备。这是快速幂"倍增"思想的核心。
-- `b >>= 1`：右移一位，丢弃已处理的最低位，使下一次 `b & 1` 检查的是更高位。
-- 参数与返回值均为 `long long`：两个 `long long` 相乘可能达到 $q^2 \approx 10^{18}$，刚好在 `long long` 范围内（$\approx 9.2 \times 10^{18}$），避免溢出。
+- `cin >> a >> b >> q`：读入底数 `a`、指数 `b` 与模数 `q`。
+- 输出格式为 `a^b mod q=` 后接 `fastpow(a, b, q)` 的结果，便于直接观察计算过程。
 
 ## 复杂度分析
 
@@ -85,6 +105,7 @@ int main()
 3. **底数为负**：当 $a < 0$ 时，`a % q` 在 C++ 中可能为负数，应先做 `(a % q + q) % q` 归一化到 $[0, q)$。
 4. **$q = 1$ 的退化**：任何数模 $1$ 均为 $0$，`fastpow(a, b, 1)` 应返回 $0$。代码中 `ans` 初始为 $1$ 但首次乘法后取模即变为 $0$，结果正确但需注意初始值。
 5. **递归 vs 迭代**：递归写法逻辑等价但存在栈开销，在 $b$ 极大时（虽然不太可能超过 $64$ 层）无实际问题，但迭代写法常数更小、更安全。
+6. **模数 $q = 0$ 会除零**：`a % q`、`ans % q` 在 $q = 0$ 时是未定义行为（除零）。本模板假设 $q \ge 2$（模意义下 $q = 1$ 退化已在第 4 条说明）；若 $q$ 可能为 0，需在入口处特判。
 
 ## 对比与扩展
 

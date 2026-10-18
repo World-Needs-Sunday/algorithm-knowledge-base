@@ -3,7 +3,7 @@ id: prob-p5657-gray-code
 title: 'P5657 [CSP-S 2019] 格雷码 — 递归构造与位运算公式'
 oj: '洛谷'
 problemId: 'P5657'
-difficulty: '中等'
+difficulty: '入门'
 category: '数学'
 tags: ["格雷码", "数学", "位运算", "递归", "构造", "CSP-S"]
 timeComplexity: 'O(n)'
@@ -268,11 +268,15 @@ int main() {
 
 以下是你写的迭代版本代码的详细解析：
 
+### 头文件
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 ```
 - 引入全部标准库头文件，使用标准命名空间。
+
+### main 与输入输出加速
 
 ```cpp
 int main()
@@ -282,6 +286,8 @@ int main()
 ```
 - 关闭 C++ 流与 C 流的同步，解除 cin 与 cout 的绑定，加速输入输出。
 - 本题 $n \le 64$，输出最多 64 位，优化并非必须，但是好习惯。
+
+### 变量声明
 
 ```cpp
     unsigned long long n, k, t = 0;
@@ -293,6 +299,8 @@ int main()
   - `t`：状态变量，表示**上一位的值**（即当前位的"基准"），初始为 0
 - 使用 `unsigned long long` 是因为 $n$ 可达 64，$k$ 最大为 $2^{64} - 1$，有符号 `long long` 只能到 $2^{63} - 1$。
 
+### 逐位处理循环
+
 ```cpp
     for (int i = n - 1; i >= 0; i--)
     {
@@ -300,11 +308,15 @@ int main()
 - 从最高位（第 $n-1$ 位）到最低位（第 0 位）逐位处理。
 - 格雷码的输出顺序是从高位到低位，所以循环从高位开始。
 
+### 构造掩码
+
 ```cpp
         unsigned long long j = ((unsigned long long)1 << i);
 ```
 - 构造掩码：只有第 $i$ 位是 1，其余位是 0。
 - `(unsigned long long)1` 确保移位在 64 位无符号整数上进行，避免溢出。
+
+### k 的第 i 位为 1（右半）
 
 ```cpp
         if (k & j)
@@ -317,6 +329,8 @@ int main()
   - 输出 `t ^ 1`：将基准翻转（因为右半部分是逆序的）
   - 更新 `t = 1`：下一位的基准变为 1
 
+### k 的第 i 位为 0（左半）
+
 ```cpp
         else
         {
@@ -328,6 +342,8 @@ int main()
 - 如果 $k$ 的第 $i$ 位是 0（在左半部分）：
   - 直接输出 `t`（保持基准不变，正序）
   - 更新 `t = 0`：下一位的基准变为 0
+
+### 返回
 
 ```cpp
     return 0;

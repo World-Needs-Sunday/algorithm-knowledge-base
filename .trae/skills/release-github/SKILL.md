@@ -65,7 +65,7 @@ git -c core.quotepath=false ls-files --others --exclude-standard
 `README.md`、`AGENTS.md`、`PROJECT_FRAMEWORK.md`、`docs/让AI了解本站-提示词.md` 里**写死了「知识点 N 篇 / 题目 M 道」**，新增/删除条目后会过期。发布前用门禁末尾那行真实数量核对，不一致就更新（只改数字）：
 
 ```bash
-node tools/lint.js --quiet   # 末尾打印「📊 知识点 111 篇 · 题目 22 道 …」
+node tools/lint.js --quiet   # 末尾打印「📊 知识点 X 篇 · 题目 Y 道 …」，以这里为准
 ```
 
 要更新的位置（搜索旧数字，如 `109`、`20`）：

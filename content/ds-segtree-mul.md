@@ -105,6 +105,8 @@ my_down(1):  先传 mul_lazy=2
 
 ## 逐行代码解析
 
+### 头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h> 
 using namespace std;
@@ -113,7 +115,10 @@ vector<long long> mul_lazy;   // 乘法标记，初值 1
 vector<long long> sum_lazy;   // 加法标记，初值 0
 ```
 
-三个全局数组分别存区间和、乘法标记、加法标记。mul_lazy 与 sum_lazy 的初值由 init 函数设定。
+- 三个全局数组分别存区间和（tree）、乘法标记（mul_lazy）、加法标记（sum_lazy），都用 long long 防止取模前的中间乘积溢出。
+- mul_lazy 与 sum_lazy 的初值（1 和 0）由 init(n,m) 里 resize 设定，这里只声明。
+
+### init（建树）
 
 ```cpp
 void init(int rt,int l,int r,int m,const vector<long long>& A)
@@ -143,7 +148,11 @@ void init(int n,int m)
 }
 ```
 
-`mul_lazy.resize(4*n+1,1)` 是关键：乘法单位元为 1，写成 0 会导致全树归零。输入 A[i] 读入后立即 `%m`，避免后续运算溢出。
+- 两个 init 是重载：外层 `init(n,m)` 分配三个 4n+1 数组并读入 A，内层 `init(rt,l,r,m,A)` 递归建树、回溯时 pushup 取模。
+- `mul_lazy.resize(4*n+1,1)` 是关键：乘法单位元为 1，写成 0 会导致全树归零；sum_lazy 的加法单位元为 0。
+- 输入 A[i] 读入后立即 `%m`，避免后续运算溢出。
+
+### my_down（标记下传）
 
 ```cpp
 void my_down(int rt,int l,int r,int mid,int m)
@@ -174,7 +183,11 @@ void my_down(int rt,int l,int r,int mid,int m)
 }
 ```
 
-这是全模板最核心的函数。两个 if 块的顺序不可交换：必须先处理乘法标记，再处理加法标记。乘法块中 `sum_lazy[child] *= mul_lazy[rt]` 是最易漏的一行——它把子节点原有的加法标记也按比例放大，因为后续的乘法应当作用在"加法之前"。
+- 这是全模板最核心的函数：两个 if 块的顺序不可交换，必须先处理乘法标记，再处理加法标记。
+- 乘法块中 `sum_lazy[child] *= mul_lazy[rt]` 是最易漏的一行——它把子节点原有的加法标记也按比例放大，因为后续的乘法应作用在"加法之前"。
+- 左子长度为 `mid-l+1`，右子为 `r-mid`；`(rt<<1)|1` 等价于 `(rt<<1)+1`。
+
+### add_sum / add_mul（区间加与区间乘）
 
 ```cpp
 void add_sum(int rt,int l,int r,int ml,int mr,int m,long long k)
@@ -210,7 +223,11 @@ void add_mul(int rt,int l,int r,int ml,int mr,int m,long long k)
 }
 ```
 
-对比 add_sum 与 add_mul：add_sum 只改 `sum_lazy`，add_mul 同时改 `mul_lazy` 和 `sum_lazy`。这是因为乘法会影响"已经登记但未下传的加法"，而加法不会影响乘法。
+- 两者骨架相同："不相交直接返回 → 先 my_down → 完全包含就地更新并 return → 否则递归后 pushup"。
+- add_sum 只改 `sum_lazy`（加法不影响已有乘法标记）；add_mul 同时改 `mul_lazy` 和 `sum_lazy`，其中 `sum_lazy[rt] *= k` 最易错。
+- 区别原因：乘法会影响"已登记但未下传的加法"，而加法不会影响乘法。
+
+### myget（区间查询）
 
 ```cpp
 long long myget(int rt,int l,int r,int ml,int mr,int m)
@@ -223,7 +240,10 @@ long long myget(int rt,int l,int r,int ml,int mr,int m)
 }
 ```
 
-查询函数结构与普通线段树一致，区别仅在 my_down 多了一个 mid 和 m 参数。
+- 查询结构同普通线段树，区别仅在 my_down 多了 mid 和 m 参数。
+- 先 my_down 再判断完全包含，保证返回的 tree[rt] 已应用所有历史标记。
+
+### main（读入与操作分发）
 
 ```cpp
 int main()
@@ -236,15 +256,33 @@ int main()
 	{
 		int op;
 		cin >> op;
-		if(op == 1) { /* 区间乘 */ int x,y; long long k; cin >> x >> y >> k; add_mul(1,1,n,x,y,m,k); }
-		else if(op == 2) { /* 区间加 */ int x,y; long long k; cin >> x >> y >> k; add_sum(1,1,n,x,y,m,k); }
-		else { /* 区间查询 */ int x,y; cin >> x >> y; cout << myget(1,1,n,x,y,m) << '\n'; }
+		if(op == 1)          // 区间乘
+		{
+			int x,y;
+			long long k;
+			cin >> x >> y >> k;
+			add_mul(1,1,n,x,y,m,k);
+		}
+		else if(op == 2)     // 区间加
+		{
+			int x,y;
+			long long k;
+			cin >> x >> y >> k;
+			add_sum(1,1,n,x,y,m,k);
+		}
+		else                 // 区间查询
+		{
+			int x,y;
+			cin >> x >> y;
+			cout << myget(1,1,n,x,y,m) << '\n';
+		}
 	}
 	return 0;
 }
 ```
 
-主程序根据 op 分发：op=1 区间乘、op=2 区间加、op=3 区间查询。
+- 主程序根据 op 分发：op=1 区间乘、op=2 区间加、op=3 区间查询。
+- 先读入 n、q 与模数 m 并建树，再逐条处理 q 个操作。
 
 ## 复杂度分析
 

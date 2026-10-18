@@ -33,50 +33,53 @@ $$\text{output}(x) = \begin{cases} \text{'-'} + \text{output}(-x) & \text{if } x
 
 ## 逐行代码解析
 
-```cpp
-#include<bits/stdc++.h>
-using namespace std;
+本段按模块拆分讲解，代码与 `codePath` 指向的 `.cpp` 完全一致（仅额外加了行尾注释）。
 
-// 快速读入整数
+### 头文件与全局
+
+```cpp
+#include<bits/stdc++.h> 
+using namespace std;
+```
+
+- `#include<bits/stdc++.h>`：万能头文件，一次包含几乎所有标准库，竞赛中省去逐个头文件包含。
+- `using namespace std;`：引入标准命名空间，使 `getchar` / `putchar` 等可直接书写。
+
+### read() 快速读入函数
+
+```cpp
 inline int read()
 {
-	int x = 0, f = 1;          // x 累积结果，f 符号标志（默认正）
-	char ch = getchar();
-	while (ch < '0' || ch > '9') {    // 跳过非数字字符
-		if (ch == '-') f = -1;        // 检测负号
-		ch = getchar();
-	}
-	while (ch >= '0' && ch <= '9') {  // 逐位解析数字
-		x = x * 10 + ch - 48;        // 累加当前位
-		ch = getchar();
-	}
-	return x * f;                     // 返回带符号结果
-}
-
-// 快速输出整数
-inline void write(long long x)
-{
-	static char buf[30];              // 静态缓冲区，复用内存
-	int p = 0;
-	if (x < 0) { putchar('-'); x = -x; }  // 处理负数
-	if (x == 0) buf[p++] = '0';      // 特判 0
-	while (x) {                       // 逐位提取（低位在前）
-		buf[p++] = x % 10 + 48;
-		x /= 10;
-	}
-	while (p--) putchar(buf[p]);      // 逆序输出（高位在前）
+	int x=0,f=1;char ch=getchar();           // x 累积结果，f 符号标志（默认正）
+	while (ch<'0'||ch>'9'){if (ch=='-') f=-1;ch=getchar();}   // 跳过非数字字符，检测负号
+	while (ch>='0'&&ch<='9'){x=x*10+ch-48;ch=getchar();}      // 逐位解析数字
+	return x*f;                             // 返回带符号结果
 }
 ```
 
-**关键解析：**
-
 - `inline`：建议编译器内联展开函数，消除函数调用的栈帧创建和返回开销。在读入/输出 $10^6$ 次时，函数调用开销不可忽略。
-- `read` 中 `f = 1`：符号标志默认为正。遇到 `'-'` 时设为 $-1$，最后返回 `x * f`。这种方式比在累加时处理符号更简洁。
+- `f = 1`：符号标志默认为正，遇到 `'-'` 时设为 $-1$，最后返回 `x * f`。这种方式比在累加时处理符号更简洁。
 - `while (ch < '0' || ch > '9')`：跳过所有非数字字符，包括空格、换行、制表符等分隔符。这使 `read()` 能自动处理任意空白分隔的输入，无需关心具体分隔符。
 - `x = x * 10 + ch - 48`：将字符 ASCII 值转换为数字（`'0'` 的 ASCII 为 $48$）并逐位累加。每次乘以 $10$ 将已有数左移一位，加上当前位。
+
+### write() 快速输出函数
+
+```cpp
+inline void write(long long x)
+{
+    static char buf[30];                 // 静态缓冲区，复用内存
+    int p=0;
+    if(x<0){putchar('-');x=-x;}          // 处理负数
+    if(x==0) buf[p++]='0';               // 特判 0
+    while(x){buf[p++]=x%10+48;x/=10;}    // 逐位提取（低位在前）
+    while(p--) putchar(buf[p]);          // 逆序输出（高位在前）
+}
+```
+
 - `static char buf[30]`：静态局部变量在函数调用间保持存在（只分配一次），避免每次调用 `write` 时重新分配栈空间。`30` 位足以容纳 `long long` 的最大位数（约 $19$ 位数字加符号）。
-- `while (p--) putchar(buf[p])`：`buf` 中数字是低位在前（先提取个位、十位、...），输出时需逆序从高位到低位。`p--` 先判断 `p` 是否为 $0$ 再减一，保证输出所有位后停止。
+- `if (x < 0) { putchar('-'); x = -x; }`：先输出负号，再对绝对值进行后续处理。
 - `if (x == 0) buf[p++] = '0'`：特判 $0$ 的情况，因为 `while(x)` 在 $x=0$ 时不进入循环，`buf` 为空会导致无输出。
+- `while (p--) putchar(buf[p])`：`buf` 中数字是低位在前（先提取个位、十位、...），输出时需逆序从高位到低位。`p--` 先判断 `p` 是否为 $0$ 再减一，保证输出所有位后停止。
 
 ## 复杂度分析
 
@@ -94,6 +97,7 @@ inline void write(long long x)
 4. **与 `cin`/`cout` 混用**：若同时使用 `read()` 和 `cin`，或 `write()` 和 `cout`，可能因缓冲区不同步导致输入/输出顺序错乱。建议统一使用一套 I/O 方法，或调用 `ios::sync_with_stdio(false)` 取消同步后谨慎混用。
 5. **`getchar` 的性能**：`getchar()` 在某些编译器/平台上仍有缓冲开销。更快的写法是使用 `fread` 一次性读入全部输入到字符缓冲区，再从缓冲区逐字符解析，避免多次系统调用。
 6. **`static` 缓冲区的线程安全**：`static char buf[30]` 在多线程环境下不安全（多个线程共享同一缓冲区）。竞赛中通常单线程无影响，但在工程场景中需注意。
+7. **`read()` 输入耗尽（EOF）时死循环**：当输入提前结束时，`getchar()` 持续返回 `EOF`（通常为 `-1`），它不属于数字，第一个 `while (ch < '0' || ch > '9')` 会一直跳过并反复读取，造成死循环。竞赛中通常假设输入格式合法；若需健壮性，可在循环条件中加入 `ch != EOF` 判断。
 
 ## 对比与扩展
 

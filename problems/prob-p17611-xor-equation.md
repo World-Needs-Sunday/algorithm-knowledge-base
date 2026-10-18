@@ -204,11 +204,15 @@ $$k = \frac{-F(y)}{128 \cdot S}$$
 
 ## 六、逐行代码解析
 
+### 头文件
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 ```
 - 引入全部标准库。
+
+### check 函数签名
 
 ```cpp
 __int128 check(const vector<__int128>& dp, int m, int n, __int128 sum)
@@ -221,6 +225,8 @@ __int128 check(const vector<__int128>& dp, int m, int n, __int128 sum)
   - `m`：x 的上界
   - `n`：方程的阶数（本题中未在函数内使用，作为参数保留）
   - `sum`：系数和 S
+
+### check：S = 0 分支
 
 ```cpp
     if (sum == 0)
@@ -244,6 +250,8 @@ __int128 check(const vector<__int128>& dp, int m, int n, __int128 sum)
   - 如果 `ans < 1`（即 y = 0，x 必须 ≥ 1），加 128 取 k = 1
   - 检查是否在 [1, m] 范围内，合法则直接返回
 - 遍历完都没找到，返回 -1
+
+### check：S ≠ 0 分支
 
 ```cpp
     else
@@ -275,6 +283,8 @@ __int128 check(const vector<__int128>& dp, int m, int n, __int128 sum)
 - 检查 x 是否在 [1, m] 范围内，合法则返回
 - 遍历完都没找到，返回 -1
 
+### write：__int128 输出
+
 ```cpp
 inline void write(__int128 x)
 {
@@ -292,6 +302,8 @@ inline void write(__int128 x)
 - 处理负数和零的特殊情况
 - `static char buf[42]`：静态缓冲区，42 位足够存下 __int128 的最大值
 
+### main：输入输出加速与多测
+
 ```cpp
 int main()
 {
@@ -305,6 +317,8 @@ int main()
 - 输入输出加速
 - 多组测试数据
 
+### 读入 n、m 与变量声明
+
 ```cpp
         int n, m;
         __int128 sum = 0;
@@ -317,6 +331,8 @@ int main()
 - `A`：系数数组，用 long long 读入（a_i 最大 10^18，long long 刚好）
 - `dp`：F(y) 数组，大小 128，用 __int128
 
+### 读入系数并求 sum
+
 ```cpp
         for (int i = 0; i <= n; i++)
         {
@@ -326,6 +342,8 @@ int main()
 ```
 - 读入系数
 - 同时计算 sum = a_1 + a_2 + ... + a_n（不包含 a_0）
+
+### n = 0 特判
 
 ```cpp
         if (n == 0)
@@ -339,6 +357,8 @@ int main()
   - 若 a_0 = 0：任意 x 都满足，输出最小正整数 1
   - 若 a_0 ≠ 0：无解，输出 -1
 - **为什么要特判？** 因为后面的代码有 `A[1] * i`，n=0 时 A[1] 越界
+
+### 预处理 F(y) 并调用 check
 
 ```cpp
         else

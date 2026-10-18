@@ -64,6 +64,8 @@ codePath: '数据结构\可持久化线段树\单点修改，区间求和(第一
 
 ## 逐行代码解析
 
+### 全局变量与结构体
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
@@ -78,7 +80,15 @@ int rt_idx = 0;   // 当前版本号 (root数组的写入位置)
 int nd_idx = 0;    // 节点分配计数器 (nd数组的写入位置)
 vector<node> root; // root[v] = 版本v的根节点 (存储根层信息)
 vector<node> nd;   // 所有线段树节点的存储池
+```
 
+- `node` 存 `val`（区间和或单点值，用 `long long` 防求和溢出）和 `son_l/son_r` 左右孩子下标；构造函数把两个孩子初始化为 `-1` 表示空节点。
+- `rt_idx` 是版本号指针（`root` 数组的写入位置），`nd_idx` 是节点分配计数器；`root[v]` 存版本 v 的"超级根"，`nd` 是所有线段树节点的存储池。
+- 这些全局变量是整份代码的核心状态：建树/修改/查询都靠 `nd_idx` 分配新节点、靠 `rt_idx` 递增版本号，跨函数共享。
+
+### init 建树
+
+```cpp
 // 递归建树: 在nd[rt]处建区间[l,r]的子树
 void init(int rt, int l, int r, const vector<long long>& A)
 {
@@ -110,6 +120,16 @@ void init(int n, int m)
 	root[rt_idx].val = nd[root[rt_idx].son_l].val + nd[root[rt_idx].son_r].val;
 	++rt_idx; // rt_idx 从 0 变为 1, 版本0已建好
 }
+```
+
+- 递归版 `init(rt,l,r,A)`：`l==r` 时把叶节点直接赋值为 `A[l]`；否则拆成 `[l,mid]` 和 `[mid+1,r]`，先 `++nd_idx` 分配左孩子递归建左，再分配右孩子递归建右，最后回溯 `val=左+右`。
+- 重载版 `init(n,m)`：读入 `A[1..n]`，`root.resize(m+1)` 预留版本、`nd.resize(n*4+m*ceil(log2(n)))` 按空间上界预分配节点池。
+- 关键点：顶层手动建"根层"——`root[0]` 自身不参与递归，而是分别建 `[1,mid]` 与 `[mid+1,n]` 两棵子树，再把 `root[0].val` 求和，最后 `++rt_idx` 使版本 0 就绪。
+- 易错：`n=1` 时 `mid=(1+1)>>1=1`，右区间变成 `[2,1]`（空区间），会进入 `init` 的 `else` 分支不断递归分配节点并越界——这是"手动根层分裂"写法在 `n=1` 上的边界缺陷。
+
+### insert 修改
+
+```cpp
 // 递归修改: 基于旧节点old, 在新节点rt处创建修改路径
 void insert(int rt, int old, int l, int r, int i, long long k)
 {
@@ -153,6 +173,16 @@ void insert(int old, int n, int i, long long k)
 	root[rt_idx].val = nd[root[rt_idx].son_l].val + nd[root[rt_idx].son_r].val; // 回溯
 	++rt_idx; // 版本号+1
 }
+```
+
+- 递归版 `insert(rt,old,l,r,i,k)`：先 `nd[rt]=nd[old]` 把旧节点整体复制到新节点（含 `val` 和两个子指针），再判断是否叶节点。
+- `l==r` 时执行覆盖赋值 `nd[rt].val=k`（P3919 是覆盖语义，不是 `+=`）并返回。
+- 非叶时按 `i<=mid` 决定走左/右：只新建被修改那一侧的子节点并递归，另一侧子指针保留从 `old` 复制来的值，实现与旧版本共享。
+- 回溯 `val=左+右` 重新求和；重载版 `insert(old,n,i,k)` 同样手动处理根层分裂，最后 `++rt_idx` 生成新版本号。
+
+### myget 查询
+
+```cpp
 // 递归单点查询: 在nd[rt]子树中查询位置i的值
 long long myget(int rt, int l, int r, int i)
 {
@@ -170,6 +200,15 @@ long long myget(int ver, int n, int i)
 	if (i <= mid) return myget(root[ver].son_l, l, mid, i);  // 手动处理根层分裂
 	else return myget(root[ver].son_r, mid + 1, r, i);
 }
+```
+
+- 递归版 `myget(rt,l,r,i)`：先做 `i<l || i>r` 的越界保护返回 0，`l==r` 返回叶节点值，否则按 `mid` 分左右递归。
+- 重载版 `myget(ver,n,i)`：在版本 `ver` 的根上手动按 `mid` 分裂，选 `son_l` 或 `son_r` 递归。
+- 易错：正确导航下不会访问到 `son=-1` 的叶节点子指针；若导航出错会 `nd[-1]` 越界，所以叶节点必须在 `l==r` 处直接返回。
+
+### main
+
+```cpp
 int main()
 {
 	ios::sync_with_stdio(false);
@@ -201,6 +240,11 @@ int main()
 	return 0;
 }
 ```
+
+- 读 `N、M` 后 `init(N,M)` 建版本 0；循环 M 次，每次读 `v`（基于的版本号）和 `op`。
+- `op==1` 读 `idx、k`，调用 `insert(v,N,idx,k)` 创建新版本；`op==2` 读 `x`，输出 `myget(v,N,x)` 后执行 `root[rt_idx++]=root[v]` 复制版本 v 作为新版本号。
+- 易错：P3919 要求查询也产生递增版本号，`root[rt_idx++]=root[v]` 不能省略，否则后续版本号错位。
+- 易错：`root` 只 `resize` 到 `m+1`，但 `rt_idx` 从 1 涨到 `m+1`，写入下标最大为 `m`（`root[0..m]` 共 m+1 个），恰好不越界。
 
 ## 复杂度分析
 

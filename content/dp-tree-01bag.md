@@ -39,6 +39,10 @@ $$\text{ans} = dp[\text{root}][V]$$
 
 ## 逐行代码解析
 
+按功能把代码拆成 5 个模块，逐个模块讲解。
+
+### 头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
@@ -47,26 +51,53 @@ int N , V , root;
 vector<pair<int,int>> A;
 vector<vector<int>> son;
 vector<vector<int>> dp;
+```
+
+- **`A` 数组**：`A[i].first` 存节点 $i$ 的重量，`A[i].second` 存价值。
+- **`son` 数组**：邻接表，`son[p]` 存节点 $p$ 的所有子节点。
+- **`dp` 表**：二维数组 $(N+1)\times(V+1)$，`dp[idx][j]` 表示以 `idx` 为根的子树中重量不超过 $j$ 时的最大价值。
+
+### dfs：初始化当前节点
+
+```cpp
 void dfs(int idx)
 {
-	for(int i = A[idx].first;i <= V;i++) dp[idx][i] = A[idx].second;
+	for(int i = A[idx].first;i <= V;i++) dp[idx][i] = A[idx].second; // 容量够就填当前节点自身价值，体现依赖关系
+```
+
+- 先假设"只选当前节点自己"：只要容量 $i \ge w_{\text{idx}}$（即 `A[idx].first`），就把 `dp[idx][i]` 设为价值 `A[idx].second`；容量不够的部分保持 $0$。
+- 这一步体现依赖关系——子节点能累加价值的前提是父节点已被选中，所以先把父节点自身的价值铺满。
+
+### dfs：合并子树（树上分组背包）
+
+```cpp
 	for(int i : son[idx])
 	{
 		dfs(i);
-		for(int j = V ; j > A[idx].first ; j--)
+		for(int j = V ; j > A[idx].first ; j--) // 逆序枚举容量，防止同一子树被重复合并
 		{
-			for(int k = 1;j - k >= A[idx].first;k++)
+			for(int k = 1;j - k >= A[idx].first;k++) // 分给子树 i 的容量 k，预留父节点重量
 			{
 				dp[idx][j] = max(dp[idx][j - k] + dp[i][k] , dp[idx][j]);
 			}
 		}
 	}
 }
+```
+
+- 对每个子节点 `i` 先递归 `dfs(i)`，拿到子树的 `dp[i][]`，再把它合并进当前节点。
+- 外层 `j` 从 $V$ **逆序**到 `A[idx].first + 1`：逆序是为了防止同一子树被重复合并；下界预留当前节点的重量。
+- 内层 `k` 从 $1$ 到 `j - A[idx].first`：把容量 $k$ 分给子树 `i`，剩下 `j-k` 留给当前节点和已合并的子树。
+- 转移 `dp[idx][j] = max(dp[idx][j-k] + dp[i][k], dp[idx][j])`，即"把子树按容量 $k$ 并进来"与"不并"取更大值。
+
+### main：读入与建树
+
+```cpp
 int main()
 {
 	ios::sync_with_stdio(false);
 	cin.tie(nullptr);cout.tie(nullptr);
-	
+
 	cin >> N >> V;
 	dp.resize(N + 1,vector<int>(V + 1,0));
 	A.resize(N + 1);
@@ -78,21 +109,23 @@ int main()
 		if(p == -1) root = i;
 		else son[p].emplace_back(i);
 	}
-	dfs(root);
-	cout << dp[root][V];
-	return 0;	
-} 
 ```
 
-- **`A` 数组**：`A[i].first` 存节点 $i$ 的重量，`A[i].second` 存价值。
-- **`son` 数组**：邻接表存储子节点列表，`son[p]` 存节点 $p$ 的所有子节点。
-- **`dp` 表**：二维数组 $(N+1) \times (V+1)$，`dp[idx][j]` 表示以 `idx` 为根的子树中重量不超过 $j$ 时的最大价值。
-- **`dfs` 函数**：
-  - **初始化**：`for(int i = A[idx].first; i <= V; i++) dp[idx][i] = A[idx].second;` —— 只要容量够选当前节点，`dp` 值就是该节点价值，体现依赖关系。
-  - **遍历子节点**：对每个子节点 `i`，先递归 `dfs(i)` 处理子树，然后合并。
-  - **合并转移**：外层 `j` 从 $V$ 逆序到 $A[\text{idx}].\text{first} + 1$（预留当前节点重量），内层 `k` 从 $1$ 到 $j - A[\text{idx}].\text{first}$（分配给子树的容量），转移 `dp[idx][j-k] + dp[i][k]`。
-- **根节点**：`p == -1` 表示该节点无父节点，即为根。
-- **输出**：`dp[root][V]` 即为以根为起点的最大价值。
+- 前两行关闭 C/C++ 输入输出同步、解绑 `cin/cout`，加快读入速度。
+- `dp / A / son` 都开成 $(N+1)$ 大小，下标从 $1$ 到 $N$，与"父节点标记 $-1$"区分开，避免下标 $0$ 冲突。
+- 逐点读入重量、价值、父节点 `p`：`p == -1` 表示无父节点，即为根；否则把自己挂到 `son[p]` 的子节点列表里。
+
+### main：求解与输出
+
+```cpp
+	dfs(root);
+	cout << dp[root][V];
+	return 0;
+}
+```
+
+- 从根节点 `root` 开始 DFS，后序遍历整棵树完成所有合并。
+- `dp[root][V]` 即以根为起点的最大价值，直接输出。
 
 ## 复杂度分析
 
@@ -111,6 +144,7 @@ int main()
 - **根节点的识别**：`p == -1` 标记根节点，题目保证只有一个根。
 - **DFS的递归深度**：树可能为链状，递归深度达 $N$，需注意栈溢出（可改用迭代或手动栈）。
 - **复杂度优化**：本实现为 $O(N \times V^2)$，可通过"左子树大小 + 右子树大小"的前缀和技巧优化到 $O(N \times V)$，但实现更复杂。
+- **根节点缺失的兜底**：`root` 默认初始值为 $0$，若输入中没有任何 `p == -1`（根缺失），会误对 `dfs(0)` 调用。应读入后检查 `root` 是否为 $0$ 并视为非法输入，或约定输入保证有且仅有一个根。
 
 ## 对比与扩展
 

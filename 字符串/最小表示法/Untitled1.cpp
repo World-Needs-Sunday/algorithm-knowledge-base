@@ -11,45 +11,47 @@ using namespace std;
 
 int fn(string str)
 {
+	int n = str.size();
+	if (n == 0) return 0;
+
+	str += str;
 	int i = 0;
 	int j = 1;
-	int n = str.size();
-	str += str;
-	while(i < n && j < n)
+
+	while (i < n && j < n)
 	{
 		int k = 0;
-		while(str[i + k] == str[j + k] && k < n) k++;
-		if(k == n) return -1;
-		if(str[i + k] < str[j + k])
+		while (k < n && str[i + k] == str[j + k]) k++;
+
+		if (k == n) break; 
+
+		if (str[i + k] < str[j + k])
 		{
 			j = j + k + 1;
-			if(j == i) j++;
+			if (j == i) j++;
 		}
 		else
 		{
 			i = i + k + 1;
-			if(i == j) i++;
+			if (i == j) i++;
 		}
 	}
-	return min(i,j);
-} 
+
+	return min(i, j);
+}
 int main()
 {
 	string str;
 	cin >> str;
 	int idx = fn(str);
-	if(idx == -1) 
-	{
-		cout << "有重复" <<endl; 
-		return -1;
-	}
-	for(int i = 0;i < str.size();i++) cout << str[(i + idx) % str.size()];
+	int n = str.size();
+	for (int i = 0; i < n; i++) cout << str[(i + idx) % n];
 	return 0;
 }
 
 
 
-/* 暴力的做法 
+/* 暴力的做法
 bool cmp(const string& str,int i,int j,int n)
 {
 	for(int idx = 0;idx < n;idx++)

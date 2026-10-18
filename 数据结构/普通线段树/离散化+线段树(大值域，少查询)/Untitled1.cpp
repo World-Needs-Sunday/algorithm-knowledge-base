@@ -9,24 +9,15 @@ inline unsigned long long getsum(int l, int r)
 {
 	return ((unsigned long long)l + r) * ((unsigned long long)r - l + 1) / 2;
 }
-vector<unsigned long long> tree;
-vector<unsigned long long> lazy;
+vector<unsigned long long> tree, lazy;
 vector<T> A;
-vector<int> myleft;
-vector<int> myright;
-inline int getleft(int i)
-{
-	return lower_bound(myleft.begin(), myleft.end(), i) - myleft.begin();
-}
-inline int getright(int i)
-{
-	return lower_bound(myright.begin(), myright.end(), i) - myright.begin();
-}
+vector<int> myleft, myright;
 int init(int n, int m)
 {
 	vector<int> dis;
-	A.resize(m + 1);
-	dis.emplace_back(1);
+	dis.reserve(2 * m + 2);
+	A.assign(m + 1, {});
+	dis.emplace_back(0);
 	dis.emplace_back(n);
 	for (int i = 1; i <= m; i++)
 	{
@@ -48,6 +39,10 @@ int init(int n, int m)
 	dis.erase(unique(dis.begin(), dis.end()), dis.end());
 
 	int cnt = 0;
+	if (!myleft.empty()) myleft.clear();
+	if (!myright.empty()) myright.clear();
+	myleft.reserve(2 * dis.size() + 2);
+	myright.reserve(2 * dis.size() + 2);
 	myleft.emplace_back(0);
 	myright.emplace_back(0);
 	for (int i = 0; i < dis.size(); i++)
@@ -63,8 +58,8 @@ int init(int n, int m)
 		}
 		++cnt;
 	}
-	tree.resize(cnt * 4 + 1);
-	lazy.resize(cnt * 4 + 1);
+	tree.assign(cnt * 4 + 1, 0);
+	lazy.assign(cnt * 4 + 1, 0);
 	return cnt;
 }
 void down(int i, int l, int r)

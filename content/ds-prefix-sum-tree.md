@@ -188,36 +188,46 @@ long long find_sum(int a, int b)
 
 ## 逐行代码解析
 
+以下按代码逻辑阶段拆成 6 个模块：全局变量 → `dfs` 预处理 → `init` 跳表 → `find_fa`(LCA) → `find_sum`(路径和) → `main`(读入与查询)。各模块代码块按顺序拼接即完整 `.cpp`。
+
+### 全局变量与头文件
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-int N, M, S, sz;
-vector<long long> A, sum;
-vector<vector<int>> edges, ST;
-vector<int> fa, h;
+int N, M, S, sz;                 // N:节点数 M:查询数 S:根节点 sz:跳表最大层数
+vector<long long> A, sum;        // A:点权 sum:树上前缀和（long long 防溢出）
+vector<vector<int>> edges, ST;   // edges:邻接表 ST:倍增跳表
+vector<int> fa, h;               // fa:父节点 h:深度
 ```
 
-- `N`：节点数，`M`：查询数，`S`：根节点，`sz`：倍增跳表最大层数
-- `A`：节点权值，`sum`：树上前缀和
-- `edges`：邻接表，`ST`：倍增跳表，`fa`：父节点数组，`h`：深度数组
+- `N`：节点数，`M`：查询数，`S`：根节点，`sz`：倍增跳表最大层数。
+- `A` 存点权、`sum` 存树上前缀和，两者都用 `long long`，路径点权和可能超过 `int` 上限。
+- `ST[i][k]` 表示从节点 `i` 向上跳 $2^k$ 步到达的祖先；`fa`、`h` 分别存父节点与深度。
+
+### dfs：预处理前缀和、深度与父节点
 
 ```cpp
 int dfs(int rt, int rh)
 {
     int ans = rh;
-    h[rt] = rh;
+    h[rt] = rh;                        // 记录当前节点深度
     for (int i : edges[rt])
     {
-        if (fa[i]) continue;       // 已访问（fa[i] != 0）
-        fa[i] = rt;
-        sum[i] = sum[rt] + A[i];   // 前缀和 = 父节点前缀和 + 当前权值
-        ans = max(dfs(i, rh + 1), ans);
+        if (fa[i]) continue;           // 已访问（fa[i] != 0），跳过父节点回边
+        fa[i] = rt;                    // 记录父节点
+        sum[i] = sum[rt] + A[i];       // 前缀和 = 父节点前缀和 + 当前点权
+        ans = max(dfs(i, rh + 1), ans); // 递归子树，取最大深度
     }
     return ans;
 }
 ```
 
-DFS 遍历：跳过已访问的节点（`fa[i] != 0`），记录父节点、深度和前缀和。返回最大深度。
+- 无向树用 `fa[i] != 0` 判断是否已访问，避免沿父边回走（隐含节点从 1 开始编号）。
+- 递归时先记父节点再算 `sum[i] = sum[rt] + A[i]`，保证前缀和自上而下累加。
+- 返回值 `ans` 是整棵树的最大深度，供 `init()` 计算跳表层数 `sz`。
+
+### init：初始化数组与倍增跳表
 
 ```cpp
 void init()
@@ -225,58 +235,93 @@ void init()
     fa.resize(N + 1, 0);
     h.resize(N + 1, 0);
     sum.resize(N + 1, 0);
-    fa[S] = S; sum[S] = A[S];     // 根的前缀和 = 自身权值，父节点指向自身
-    int q = dfs(S, 1);
+    fa[S] = S, sum[S] = A[S];                  // 根父节点指向自身，根前缀和 = 自身点权
+    int q = dfs(S, 1);                         // 从根 DFS，返回最大深度
     sz = 1;
-    while (q > ((long long)1 << sz)) ++sz;   // 计算跳表层数
-    ST.resize(N + 1, vector<int>(sz + 1, S));
-```
-
-初始化：根节点的 `fa[S] = S`（指向自身，作为跳表的终止哨兵），`sum[S] = A[S]`。根据最大深度计算跳表层数 `sz`，使得 $2^{\text{sz}} \ge \text{maxDepth}$。
-
-```cpp
+    while (q > ((long long)1 << sz)) ++sz;     // 求最小 sz 使 2^sz >= q
+    ST.resize(N + 1, vector<int>(sz + 1, S));  // 跳表先全部初始化为 S（越界回根）
+    for (int i = 1; i <= N; i++) ST[i][0] = fa[i]; // 跳 1 步 = 父节点
     for (int k = 1; k <= sz; k++)
     {
         for (int i = 1; i <= N; i++)
         {
-            ST[i][k] = ST[ST[i][k - 1]][k - 1];
+            ST[i][k] = ST[ST[i][k - 1]][k - 1]; // 跳 2^k = 跳两次 2^(k-1)
         }
     }
 }
 ```
 
-倍增跳表递推：跳 $2^k$ 步 = 先跳 $2^{k-1}$ 步，再从那里跳 $2^{k-1}$ 步。
+- `fa[S] = S` 是跳表的终止哨兵：根再往上跳仍停在根，避免越界。
+- 先填 `ST[i][0] = fa[i]`，再用 `ST[i][k] = ST[ST[i][k-1]][k-1]` 递推整张跳表。
+- `while (q > (1LL << sz)) ++sz` 保证 $2^{\text{sz}} \ge \text{maxDepth}$，深度对齐时跳跃步数才够用。
+
+### find_fa：倍增求 LCA
+
+```cpp
+int find_fa(int a, int b)
+{
+    if (h[a] < h[b]) swap(a, b);   // 保证 a 更深
+    int tmp = h[a] - h[b];         // 深度差
+    for (int i = 0; i <= sz; i++)  // 按二进制拆深度差，把 a 抬到与 b 同层
+    {
+        if (tmp & 1) a = ST[a][i];
+        tmp >>= 1;
+    }
+    if (a == b) return a;          // b 是 a 的祖先（或 a == b）
+
+    for (int i = sz; i >= 0; i--)  // 从高到低同时上跳，避免越过 LCA
+    {
+        if (ST[a][i] != ST[b][i])
+        {
+            a = ST[a][i];
+            b = ST[b][i];
+        }
+    }
+    return fa[a];                  // 最终 a、b 的父节点就是 LCA
+}
+```
+
+- 深度对齐循环 `i <= sz`：用 `tmp & 1` 判断第 $i$ 位是否为 1，每轮 `tmp >>= 1`，逐位跳跃。
+- 第二个循环从 `sz` 递减：仅当 `ST[a][i] != ST[b][i]` 才一起跳，保证不会越过 LCA。
+- 循环结束后 `a`、`b` 停在 LCA 的两个子节点处，返回 `fa[a]` 即 LCA。
+
+### find_sum：路径点权和查询
 
 ```cpp
 long long find_sum(int a, int b)
 {
-    int g_fa = find_fa(a, b);
-    if (g_fa != S)
-        return sum[a] + sum[b] - sum[g_fa] - sum[fa[g_fa]];
-    return sum[a] + sum[b] - sum[g_fa];
+    int g_fa = find_fa(a, b);       // LCA
+    if (g_fa != S) return sum[a] + sum[b] - sum[g_fa] - sum[fa[g_fa]];
+    return sum[a] + sum[b] - sum[g_fa]; // LCA 为根：只减一次 sum[lca]
 }
 ```
 
-路径和公式分两种情况：LCA 非根时减去 LCA 和其父节点的前缀和；LCA 为根时只减去 LCA 的前缀和。
+- LCA 非根：`sum[a] + sum[b] - sum[g_fa] - sum[fa[g_fa]]`，去掉两条根路径在 LCA 及其祖先处的重复累加。
+- LCA 为根：只减 `sum[g_fa]`；因 `fa[S] = S`，若再减 `sum[fa[S]]` 会多减一次根权值。
+- 返回类型与 `sum` 一致为 `long long`，避免中间结果溢出。
+
+### main：读入、预处理与回答查询
 
 ```cpp
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(nullptr); cout.tie(nullptr);
+    //N:点的数量,M:测试案例数量,S:根节点
     cin >> N >> M >> S;
     A.resize(N + 1);
     edges.resize(N + 1);
-    for (int i = 1; i <= N; i++) cin >> A[i];
-    for (int i = 1; i < N; i++)
+    for (int i = 1; i <= N; i++) cin >> A[i]; // 读入点权
+    for (int i = 1; i < N; i++)               // 树有 N-1 条边
     {
         int a, b;
         cin >> a >> b;
-        edges[a].emplace_back(b);
+        edges[a].emplace_back(b);             // 无向边，双向建图
         edges[b].emplace_back(a);
     }
-    init();
-    while (M--)
+    init();                                    // 预处理前缀和 + 跳表
+
+    while (M--)                                // 回答 M 次查询
     {
         int a, b;
         cin >> a >> b;
@@ -286,7 +331,9 @@ int main()
 }
 ```
 
-读入树结构（无向边），调用 `init()` 预处理，然后逐个回答路径和查询。
+- 读入点权后读 $N-1$ 条无向边，双向加入邻接表。
+- `init()` 完成 DFS 与跳表预处理，随后循环回答 $M$ 次路径和查询。
+- 关闭 C/C++ 输入输出同步并解除 `cin`/`cout` 绑定，加速大数据读写。
 
 ## 复杂度分析
 
@@ -346,6 +393,9 @@ int main()
 6. **LCA 查询的边界情况**
    - $a = b$ 时直接返回 $a$（深度对齐后 `a == b`）
    - $a$ 是 $b$ 的祖先时，深度对齐后 `a == b` 也正确返回
+
+7. **链状树递归 DFS 易栈溢出**
+   - 退化成一条链的树（深度 $n$）递归 DFS 可能爆栈，需改用迭代 DFS 或增大栈空间
 
 ## 对比与扩展
 

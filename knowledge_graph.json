@@ -108,11 +108,17 @@
         "数据结构|堆": {
             "description": "基于优先队列的数据结构，通过堆的堆顶操作维护动态序列的最值或第k值。对顶堆用大根堆和小根堆协作维护第k小。"
         },
+        "数据结构|其他数据结构": {
+            "description": "不便归入常规类别的数据结构，如珂朵莉树（ODT，基于 set 的区间推平暴力结构，随机数据下极高效）。"
+        },
         "数据结构|栈": {
             "description": "基于栈的数据结构，通过辅助数组或单调性维护实现高效查询。涵盖前缀最值栈（O(1)最值查询）和单调栈（直方图最大矩形、下一个更大/更小元素等）。"
         },
         "数据结构|字典树": {
             "description": "将若干字符串按公共前缀组织成一棵多叉树，插入和查询均沿字符逐层下行，单次操作 O(|S|)。支持前缀计数、字符串检索、自动补全等，是AC自动机的基础结构。"
+        },
+        "数据结构|笛卡尔树": {
+            "description": "中序遍历等于原序列、同时满足堆性质的二叉树；单调栈 O(n) 构建，常用于静态区间最值查询（RMQ 转 LCA）、最值贡献统计与按最值分割的分治。"
         },
         "图论|最短路": {
             "description": "求解图中单源或全源最短路径。涵盖Dijkstra（非负权）、Bellman-Ford（含负权）、Floyd（全源）、Johnson（全源含负权）等算法。"
@@ -140,6 +146,9 @@
         },
         "图论|二分图": {
             "description": "顶点可划分为两个不交集合的无向图，等价于图中无奇环。染色法（DFS/BFS）是最常用的判定方法，通过交替染色检测冲突。是最大匹配、最小顶点覆盖等问题的基础。"
+        },
+        "图论|网络流": {
+            "description": "在网络中求解最大流、最小割与费用流问题。核心是增广路思想与 Dinic（BFS分层+DFS阻塞流+反向边）、SPFA费用流等算法，是最小割最大流定理的载体。"
         },
         "字符串|字符串哈希": {
             "description": "将字符串映射为数值，通过多项式滚动哈希实现O(n+m)的子串匹配。注意双哈希防碰撞。"
@@ -179,6 +188,42 @@
         },
         "初赛笔记|位运算": {
             "description": "CSP 初赛位运算核心考点：补码表示、三大恒等式、异或性质与应用、代数定律、移位运算、lowbit操作、状压集合、运算符优先级、有符号/无符号坑、大小关系不等式链、常数与进制转换。不涉及代码实现，侧重公式记忆与考场速算。"
+        },
+        "基础算法|倍增": {
+            "description": "通过预处理 2^k 规模的信息，把线性逐位处理优化为按二进制位跳跃。是 ST 表、LCA 倍增、快速幂、后缀数组等算法的共同思想基础。"
+        },
+        "图论|图论基础": {
+            "description": "图、有向/无向、度、路径、环、连通性、简单图等基本概念与性质，是后续所有图论算法（最短路、MST、SCC、网络流等）的基础。"
+        },
+        "图论|图的存储": {
+            "description": "邻接矩阵、邻接表（vector）、链式前向星、边集数组四种存图方式的取舍、实现与适用场景。"
+        },
+        "图论|树论基础": {
+            "description": "树的性质、DFS 序、欧拉序、直径、重心等树的基础结构知识，是树形 DP、LCA、树链剖分等的前置。"
+        },
+        "动态规划|期望DP": {
+            "description": "以期望值为状态的动态规划，常结合概率转移、倒推（逆推）与高斯消元处理成环的期望方程组。"
+        },
+        "基础算法|离线操作": {
+            "description": "把询问/操作统一收集后离线处理的思想，如离线倒序、离线排序、莫队、整体二分等，常用来规避在线维护的困难。"
+        },
+        "图论|虚树": {
+            "description": "在多组询问、每组涉及少量关键点的情况下，把关键点及其 LCA 按原树祖先关系连成的一棵压缩树，从而把树上 DP/询问复杂度从 O(n) 降到 O(k log k)。"
+        },
+        "数学|群论": {
+            "description": "群、置换、Polya 计数等抽象代数概念，用于循环计数、等价类计数等问题。"
+        },
+        "数学|线性代数": {
+            "description": "行列式、高斯消元、线性基等线性代数工具，用于线性方程组求解、异或空间、矩阵相关计数等问题。"
+        },
+        "数据结构|可持久化数据结构": {
+            "description": "能够访问历史版本的数据结构，通过共享节点实现多版本管理，如可持久化线段树、可持久化平衡树、可持久化并查集等。"
+        },
+        "数据结构|STL容器": {
+            "description": "C++ 标准库中的基础容器：队列、栈、vector、set/map 等关联式/序列式容器的用法、复杂度与常见技巧，是写代码的工具基础。"
+        },
+        "基础算法|实用工具": {
+            "description": "竞赛中常用的辅助工具：时间测试、自用头文件、pb_ds 等，用于提升开发与调试效率。"
         }
     },
     "subSubcategories": {
@@ -887,7 +932,8 @@
                 "graph-tarjan-cut-vertex",
                 "graph-tarjan-scc",
                 "ds-prefix-sum-tree",
-                "ds-diff-tree"
+                "ds-diff-tree",
+                "ds-cartesian-tree"
             ]
         },
         "graph-lca-hld": {
@@ -1187,6 +1233,249 @@
                 "math-stars-and-bars"
             ]
         },
+        "math-block-division": {
+            "prerequisites": [],
+            "related": []
+        },
+        "str-ac-automaton": {
+            "prerequisites": [
+                "str-kmp",
+                "ds-trie"
+            ],
+            "related": []
+        },
+        "str-manacher": {
+            "prerequisites": [
+                "str-hash"
+            ],
+            "related": []
+        },
+        "graph-network-flow": {
+            "prerequisites": [],
+            "related": []
+        },
+        "ds-odt": {
+            "prerequisites": [],
+            "related": []
+        },
+        "basic-doubling": {
+            "prerequisites": [],
+            "related": []
+        },
+        "basic-two-pointer": {
+            "prerequisites": [],
+            "related": []
+        },
+        "basic-greedy": {
+            "prerequisites": [],
+            "related": []
+        },
+        "basic-dfs": {
+            "prerequisites": [],
+            "related": []
+        },
+        "basic-bfs": {
+            "prerequisites": [],
+            "related": []
+        },
+        "graph-basic": {
+            "prerequisites": [],
+            "related": []
+        },
+        "graph-storage": {
+            "prerequisites": [
+                "graph-basic"
+            ],
+            "related": []
+        },
+        "graph-tree-basic": {
+            "prerequisites": [
+                "graph-basic"
+            ],
+            "related": []
+        },
+        "dp-expectation": {
+            "prerequisites": [],
+            "related": []
+        },
+        "basic-offline": {
+            "prerequisites": [],
+            "related": []
+        },
+        "graph-virtual-tree": {
+            "prerequisites": [
+                "graph-lca-doubling"
+            ],
+            "related": []
+        },
+        "math-01-fractional": {
+            "prerequisites": [],
+            "related": []
+        },
+        "math-group-theory": {
+            "prerequisites": [],
+            "related": []
+        },
+        "math-linear-algebra": {
+            "prerequisites": [
+                "math-matrix-multiplication"
+            ],
+            "related": []
+        },
+        "math-number-theory-basic": {
+            "prerequisites": [],
+            "related": []
+        },
+        "math-combinatorics": {
+            "prerequisites": [],
+            "related": []
+        },
+        "math-modular-arithmetic": {
+            "prerequisites": [],
+            "related": []
+        },
+        "ds-persistent-overview": {
+            "prerequisites": [
+                "ds-segtree-basic"
+            ],
+            "related": []
+        },
+        "ds-stl-queue": {
+            "prerequisites": [],
+            "related": []
+        },
+        "ds-stl-stack": {
+            "prerequisites": [],
+            "related": []
+        },
+        "ds-stl-vector": {
+            "prerequisites": [],
+            "related": []
+        },
+        "ds-stl-associative": {
+            "prerequisites": [],
+            "related": []
+        },
+        "ds-stl-tips": {
+            "prerequisites": [],
+            "related": []
+        },
+        "basic-timing": {
+            "prerequisites": [],
+            "related": []
+        },
+        "basic-template-header": {
+            "prerequisites": [],
+            "related": []
+        },
+        "ds-pbds": {
+            "prerequisites": [],
+            "related": []
+        },
+        "math-miller-rabin": {
+            "prerequisites": [
+                "math-quick-pow-basic"
+            ],
+            "related": [
+                "math-pollard-rho"
+            ]
+        },
+        "math-pollard-rho": {
+            "prerequisites": [
+                "math-miller-rabin"
+            ],
+            "related": [
+                "math-miller-rabin"
+            ]
+        },
+        "ds-fhq-treap": {
+            "prerequisites": [
+                "ds-splay"
+            ],
+            "related": []
+        },
+        "ds-segtree-dynamic": {
+            "prerequisites": [
+                "ds-segtree-basic"
+            ],
+            "related": []
+        },
+        "ds-segtree-weight": {
+            "prerequisites": [
+                "ds-segtree-basic"
+            ],
+            "related": []
+        },
+        "dp-rerooting": {
+            "prerequisites": [
+                "dp-tree-dance"
+            ],
+            "related": []
+        },
+        "ds-scapegoat-tree": {
+            "prerequisites": [
+                "ds-splay"
+            ],
+            "related": []
+        },
+        "dp-digit-memo": {
+            "prerequisites": [
+                "dp-digit-count"
+            ],
+            "related": []
+        },
+        "dp-grid-state": {
+            "prerequisites": [
+                "dp-bitmask-hamilton"
+            ],
+            "related": []
+        },
+        "ds-mo-team-modify": {
+            "prerequisites": [
+                "ds-mo-team"
+            ],
+            "related": []
+        },
+        "graph-kosaraju": {
+            "prerequisites": [
+                "graph-tarjan-scc"
+            ],
+            "related": []
+        },
+        "graph-boruvka": {
+            "prerequisites": [
+                "graph-kruskal"
+            ],
+            "related": []
+        },
+        "dp-tree-min-dominating": {
+            "prerequisites": [
+                "dp-tree-dance"
+            ],
+            "related": []
+        },
+        "dp-tree-bag-optimize": {
+            "prerequisites": [
+                "dp-tree-01bag"
+            ],
+            "related": []
+        },
+        "dp-tree-color-edge": {
+            "prerequisites": [
+                "dp-tree-01bag"
+            ],
+            "related": []
+        },
+        "basic-bubble-select-sort": {
+            "prerequisites": [],
+            "related": []
+        },
+        "basic-high-precision-div": {
+            "prerequisites": [
+                "basic-high-precision"
+            ],
+            "related": []
+        },
         "math-stars-and-bars": {
             "prerequisites": [],
             "related": [
@@ -1411,6 +1700,15 @@
         "basic-ternary-search": {
             "prerequisites": [],
             "related": []
+        },
+        "ds-cartesian-tree": {
+            "prerequisites": [
+                "ds-monostack-histogram",
+                "graph-lca-tarjan"
+            ],
+            "related": [
+                "graph-lca-tarjan"
+            ]
         }
     }
 }

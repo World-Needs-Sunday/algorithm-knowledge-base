@@ -585,6 +585,7 @@
 
         .badge-time { background: var(--badge-time-bg); color: var(--badge-time-text); }
         .badge-space { background: var(--badge-space-bg); color: var(--badge-space-text); }
+        .badge-source { background: #ede9fe; color: #5b21b6; }
 
         .badge-difficulty-easy { background: #dcfce7; color: #166534; }
         .badge-difficulty-medium { background: #fef9c3; color: #854d0e; }
@@ -1228,7 +1229,7 @@
                 <div class="catalog-btn" id="catalog-btn" onclick="if(currentMode==='kp'){showCatalog();}else{showProblemCatalog();}">📑 总目录</div>
             </div>
             <nav id="sidebar-nav"></nav>
-            <div class="sidebar-footer"><span id="kp-count">113</span> 个知识点</div>
+            <div class="sidebar-footer"><span id="kp-count">…</span> 个知识点</div>
         </aside>
         <main id="content"><div class="placeholder">📑 正在加载知识点总目录…</div></main>
     </div>
@@ -1762,6 +1763,9 @@
                     metaHtml += '<span class="tag">' + escHtml(tag) + '</span>';
                 });
             }
+            if (kp.source) {
+                metaHtml += '<span class="badge badge-source">👤 ' + escHtml(kp.source) + '</span>';
+            }
             metaHtml += '</div>';
 
             // Render content: 三步法保护 LaTeX（实现见 renderMarkdownWithMath）
@@ -2196,6 +2200,9 @@
                 prob.tags.forEach(function(tag) {
                     metaHtml += '<span class="tag">' + escHtml(tag) + '</span>';
                 });
+            }
+            if (prob.source) {
+                metaHtml += '<span class="badge badge-source">👤 ' + escHtml(prob.source) + '</span>';
             }
             metaHtml += '</div>';
 

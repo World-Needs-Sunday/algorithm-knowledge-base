@@ -129,65 +129,84 @@ $O(1)$ 读取前缀最大值数组的栈顶位置。由于 `sk_big[i]` 记录了
 
 ## 逐行代码解析
 
+以下按模块拆分完整实现，各代码块按顺序拼接后与 `.cpp` 完全一致。
+
+### 全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-const int nmax = 1e5;
-int sk_num[nmax], sk_big[nmax];
-int id = 0;
+const int nmax = 1e5;                 // 统一管理数组大小
+int sk_num[nmax], sk_big[nmax];       // 元素栈 / 前缀最大值栈
+int id = 0;                           // 栈指针，指向栈顶的下一个空位
 ```
 
-声明两个数组：
-- `sk_num`：元素栈，存储实际入栈的值
-- `sk_big`：前缀最大值栈，`sk_big[i]` = 从栈底到位置 $i$ 的元素最大值
-- `id`：栈指针，指向栈顶的下一个空位（初始为 0 表示空栈）
+- `sk_num`：元素栈，存储实际入栈的值；`sk_big`：前缀最大值栈，`sk_big[i]` = 从栈底到位置 $i$ 的元素最大值
+- `id`：栈指针，指向栈顶的下一个空位，初始为 0 表示空栈
+- `nmax = 1e5` 统一管理数组大小，最多支持 $10^5$ 次入栈；操作数更多时需调大或改用 `vector` 动态扩容
 
-数组大小 `nmax = 1e5`，适用于最大 $10^5$ 次入栈操作。
+### main 与读入
 
 ```cpp
 int main()
 {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
-    int t;
-    cin >> t;
-    while (t--)
-    {
-        int op;
-        cin >> op;
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+	int t;
+	cin >> t;
+	while (t--)
+	{
+		int op;
+		cin >> op;
 ```
 
-快读优化，读入操作次数 $t$，循环处理每个操作。
+- `ios::sync_with_stdio(false)` 关闭与 C 标准 IO 的同步，`cin.tie(nullptr)` 解绑，加速读入
+- 读入操作次数 $t$，每次循环读入一个操作类型 `op`，按 `1` 入栈 / `2` 出栈 / `3` 查询进入不同分支
+
+### 入栈操作（op == 1）
 
 ```cpp
-        if (op == 1)
-        {
-            int x;
-            cin >> x;
-            sk_num[id] = x;
-            if (id > 0) sk_big[id] = max(sk_big[id - 1], x);
-            else sk_big[id] = x;
-            ++id;
-        }
+		if (op == 1)
+		{
+			int x;
+			cin >> x;
+			sk_num[id] = x;                                    // 存入元素栈
+			if (id > 0) sk_big[id] = max(sk_big[id - 1], x);   // 非空：与上一个前缀最大值比较
+			else sk_big[id] = x;                               // 空栈：直接赋值
+			++id;                                              // 指针后移
+		}
 ```
 
-**入栈操作**：读入 $x$，存入 `sk_num[id]`。若栈非空，`sk_big[id]` 取 `max(sk_big[id-1], x)`；若栈空，直接赋值 $x$。最后 `id` 自增。
+- 把 $x$ 存入 `sk_num[id]`；栈非空时 `sk_big[id] = max(sk_big[id-1], x)`，栈空时 `sk_big[id] = x`
+- 必须与 `sk_big[id-1]`（前一个位置的前缀最大值）比较，不能误写为 `sk_num[id-1]`（前一个元素）
+- 最后 `++id` 后移指针；此处未检查 `id < nmax`，入栈超过 $10^5$ 次会越界
+
+### 出栈操作（op == 2）
 
 ```cpp
-        else if (op == 2) --id;
+		else if (op == 2) --id;
 ```
 
-**出栈操作**：`id` 自减，逻辑上弹出栈顶。无需清除数据，下次入栈会覆盖。
+- 仅 `--id` 前移指针，逻辑上弹出栈顶；旧数据仍留内存，下次入栈会覆盖
+- 出栈后栈内最大值自动回退为 `sk_big[id-1]`，无需重新计算
+- 未检查 `id > 0`，空栈出栈会使 `id` 变负，后续查询会越界
+
+### 查询操作（op == 3）与收尾
 
 ```cpp
-        else if (op == 3)
-        {
-            cout << "当前栈顶元素为: " << sk_num[id - 1] << '\n';
-            cout << "栈内最大元素为: " << sk_big[id - 1] << '\n';
-        }
+		else if (op == 3)
+		{
+			cout << "当前栈顶元素为: " << sk_num[id - 1] << '\n';
+			cout << "栈内最大元素为: " << sk_big[id - 1] << '\n';
+		}
+	}
+	return 0;
+}
 ```
 
-**查询操作**：输出栈顶元素 `sk_num[id-1]` 和栈内最大值 `sk_big[id-1]`，均为 $O(1)$。
+- 栈顶元素 = `sk_num[id-1]`，栈内最大值 = `sk_big[id-1]`，均为 $O(1)$ 直接索引
+- 未检查 `id > 0`，空栈查询会访问 `sk_num[-1]` 越界
+- 末尾的 `}` 依次收尾 while 循环与 main 函数，`return 0;` 正常结束
 
 ## 复杂度分析
 

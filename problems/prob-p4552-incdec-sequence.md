@@ -142,6 +142,8 @@ $$\text{方案数} = |pos - neg| + 1$$
 
 ## 逐行代码解析
 
+### 读入
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
@@ -151,22 +153,22 @@ int main()
     cin.tie(nullptr); cout.tie(nullptr);
     int n;
     cin >> n;
-```
-
-快读优化，读入数组长度 $n$。
-
-```cpp
     vector<int> A(n + 1);
     for (int i = 1; i <= n; i++) cin >> A[i];
 ```
 
-读入原数组 $A$，下标从 $1$ 开始。
+- 快读优化后读入数组长度 $n$ 与原数组 $A$（下标从 $1$ 开始）。
+
+### 原地差分
 
 ```cpp
     for (int i = n; i >= 1; i--) A[i] -= A[i - 1];
 ```
 
-**原地差分**：从后往前遍历，将 $A[i]$ 变为 $a_i - a_{i-1}$。从后向前是关键——如果从前向后，$A[i-1]$ 已经被修改为差分值，会导致后续计算错误。差分后 $A[1] = a_1$（不变），$A[i] = b[i]$（$i \ge 2$）。
+- **从后往前**遍历，把 $A[i]$ 变成 $a_i - a_{i-1}$。必须从后向前——若从前向后，$A[i-1]$ 已被改成差分值，后续会算错。
+- 差分后 $A[1]=a_1$ 不变，$A[i]=b[i]$（$i\ge 2$）。
+
+### 统计 pos / neg
 
 ```cpp
     long long pos = 0, neg = 0;
@@ -177,7 +179,10 @@ int main()
     }
 ```
 
-遍历 $b[2 \ldots n]$，累加正数之和 $pos$ 与负数绝对值之和 $neg$。注意使用 `long long`，因为 $a_i \le 2^{31}$，差分值之和可能溢出 `int`。
+- 累加 $b[2..n]$ 中的正数之和 `pos` 与负数绝对值之和 `neg`。
+- 用 `long long`：$a_i\le 2^{31}$，差分值之和可能溢出 `int`。
+
+### 输出答案
 
 ```cpp
     cout << max(pos, neg) << '\n';
@@ -186,9 +191,8 @@ int main()
 }
 ```
 
-输出两个答案：
-- 最少操作次数 $= \max(pos, neg)$
-- 方案数 $= |pos - neg| + 1$
+- 最少操作次数 $= \max(pos, neg)$。
+- 方案数 $= |pos - neg| + 1$。
 
 ## 复杂度分析
 

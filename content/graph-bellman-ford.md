@@ -18,7 +18,7 @@ Bellman-Ford 算法是求解**含负权边**图中单源最短路的经典算法
 
 算法的核心定理：若图中不存在从源点可达的负环（总权为负的环），则最短路最多经过 $n-1$ 条边。证明：若最短路经过 $\geq n$ 条边，由鸽巢原理必存在重复节点，即存在环；最短路中的环权值必为 $0$（正权环可去掉，负权环则无最短路），因此去掉环后边数 $\leq n-1$。故 $n-1$ 轮松弛后所有最短路必然收敛。
 
-本代码使用邻接表存储图，遍历所有节点的出边等价于遍历所有边。额外引入了**提前终止优化**：若某一轮松弛无任何更新（`tmp` 保持 `true`），说明所有距离已收敛，提前 `break`，避免剩余无意义的迭代轮次。
+本代码使用邻接表存储图，遍历所有节点的出边等价于遍历所有边。松弛前用 `if (A[i] == INF) continue` 跳过尚未到达的节点，防止 `INT_MAX` 参与加法运算而溢出；并额外引入了**提前终止优化**：若某一轮松弛无任何更新（`tmp` 保持 `true`），说明所有距离已收敛，提前 `break`，避免剩余无意义的迭代轮次。
 
 ## 状态定义与转移方程
 
@@ -99,6 +99,7 @@ $$\text{若第 } t \text{ 轮中所有边均未能松弛} \;\Rightarrow\; \foral
 
 - **条件**：`A[j.first] > A[i] + j.second`，即通过边 $i \to j$ 能否缩短 $A[v]$。
 - **执行**：`A[j.first] = A[i] + j.second; tmp = false;`
+- **前置判断**：遍历节点 $i$ 前先 `if(A[i] == INF) continue;`，跳过尚未到达的节点，避免 `INT_MAX + 负数` 溢出造成错误松弛。
 - **关键细节**：松弛是 Bellman-Ford 的唯一操作，每轮对所有边做一次松弛尝试。`tmp` 标记本轮是否有更新，若全轮无更新则提前终止。松弛的顺序不影响最终结果（但影响收敛速度）。
 
 ### 提前终止优化
@@ -114,10 +115,22 @@ $$\text{若第 } t \text{ 轮中所有边均未能松弛} \;\Rightarrow\; \foral
 
 ## 逐行代码解析
 
+下面按模块拆解整份代码：各模块的代码块按顺序拼接后，与 `codePath` 指向的 `.cpp` 完全一致（仅多出 `//` 注释）。
+
+### 全局变量与头文件
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 const long long INF = INT_MAX;          // 用 long long 存距离，INF 取 INT_MAX
+```
+
+- `#include<bits/stdc++.h>` 是竞赛常用万能头，一次引入 `vector`、`pair`、`iostream` 等全部所需设施。
+- `const long long INF = INT_MAX`：距离数组用 `long long` 存储，避免负权运算中的溢出。`INF` 取 `INT_MAX` 时，未到达节点若直接参与加法会溢出，因此代码在松弛前用 `if(A[i] == INF) continue` 跳过未到达节点（见「常见陷阱与注意事项」第 1 条）。
+
+### main 开头与读入建图
+
+```cpp
 int main()
 {
     ios::sync_with_stdio(false);        // 加速 I/O
@@ -132,15 +145,31 @@ int main()
         cin >> u >> v >> w;
         edges[u].emplace_back(v,w);    // 有向边 u→v，权重 w
     }
+```
 
+- `ios::sync_with_stdio(false)` 关闭 C/C++ 输入同步，`cin.tie(nullptr)` 解除与 `cout` 的绑定，显著加快大量读入。
+- `edges(n + 1)` 分配 $1 \sim n$ 编号的邻接表；循环 `i <= m` 恰好读入 $m$ 条边。
+- `edges[u].emplace_back(v, w)` 构建有向边 $u \to v$；若为无向图需再补 `edges[v].emplace_back(u, w)`。
+
+### 距离数组初始化
+
+```cpp
     vector<long long> A(n + 1,INF);     // 距离数组，long long 防负权溢出
     A[s] = 0;                           // 源点距离为 0
+```
 
+- `A` 大小为 $n+1$、初值全为 `INF`，对应「除源点外所有点初始为无穷」的状态定义。
+- `A[s] = 0` 设定源点到自身的距离为 0，作为松弛的起点。
+
+### 核心松弛循环（n−1 轮）
+
+```cpp
     for(int t = 1;t < n;t++)           // n-1 轮松弛
     {
         bool tmp = true;                // 标记本轮是否有更新
         for(int i = 1;i <= n;i++)       // 遍历每个节点
         {
+            if(A[i] == INF) continue;   // 跳过未到达节点，防 INF 溢出
             for(pair<int,int> j : edges[i])  // 遍历 i 的所有出边
             {
                 if(A[j.first] > A[i] + j.second)  // 松弛条件
@@ -152,20 +181,24 @@ int main()
         }
         if(tmp) break;                 // 本轮无更新 → 已收敛，提前退出
     }
+```
 
+- 外层 `t < n` 执行 $n-1$ 轮：最短路最多经过 $n-1$ 条边，每轮松弛使最短路边数上限 $+1$。
+- 内层双重循环遍历每个节点 $i$ 及其出边 `(j.first, j.second)`，等价于遍历全部 $m$ 条边。
+- `if(A[i] == INF) continue` 先跳过尚未到达的节点：未到达时 `A[i] = INF`，直接参与 `A[i] + j.second` 会因 `INT_MAX + 负数` 溢出而错误松弛，跳过既安全又省去无谓遍历。
+- `A[j.first] > A[i] + j.second` 是松弛判断：`j.first` 为终点 $v$、`j.second` 为边权 $w$，若经 $u$ 到 $v$ 更短则更新。
+- `bool tmp = true` 是提前终止标记：任一边被更新即置 `false`，轮末 `if(tmp) break` 表示所有最短路已收敛。
+
+### 输出与返回
+
+```cpp
     for(int i = 1;i <= n;i++) cout << A[i] << ' ';  // 输出各点最短距离
     return 0;
 }
 ```
 
-**关键解析：**
-
-- `const long long INF = INT_MAX`：距离数组用 `long long` 避免负权导致的溢出问题。但 `INF = INT_MAX` 本身仍有风险：当 `A[i] = INF` 且 `j.second` 为负数时，`A[i] + j.second` 可能溢出为正数，导致错误的松弛。更安全的做法是 `INF = 1e18` 或在松弛前加判断 `if(A[i] == INF) continue`（跳过未到达的节点）。
-- `edges[u].emplace_back(v, w)`：构建有向图邻接表。若为无向图需同时添加 `edges[v].emplace_back(u, w)`。
-- `for(int t = 1; t < n; t++)`：执行 $n-1$ 轮松弛。这是因为最短路最多经过 $n-1$ 条边（$n$ 个节点的简单路径），每轮松弛使最短路的边数上限 $+1$。
-- `bool tmp = true`：提前终止标记。若本轮遍历所有边后 `tmp` 仍为 `true`，说明没有任何距离被更新，所有最短路已收敛，后续轮次不会有变化，`break` 退出。
-- `A[j.first] > A[i] + j.second`：松弛判断。`j.first` 是终点 $v$，`j.second` 是边权 $w$。若当前 $A[v]$ 大于 $A[u] + w$，则通过 $u$ 到达 $v$ 更优。
-- 输出 `A[i]`：若某节点不可达，输出 `INF`。
+- 按 $1 \sim n$ 顺序输出每个点到源点的最短距离，以空格分隔。
+- 不可达节点的 `A[i]` 仍为 `INF`（即输出 `INT_MAX`），需根据题目约定决定是否改为特殊输出。
 
 ## 复杂度分析
 
@@ -180,7 +213,7 @@ int main()
 
 ## 常见陷阱与注意事项
 
-1. **INF 溢出**：`INF = INT_MAX` 时，松弛 `A[i] + j.second` 可能溢出。当 `A[i] = INF` 且 `j.second < 0` 时，`INT_MAX + 负数` 可能溢出为正大值，导致错误松弛。解决方案：① 将 `INF` 设为 `1e18`（`long long` 范围内安全）；② 松弛前加 `if(A[i] == INF) continue` 跳过未到达节点。
+1. **INF 溢出（本代码已处理）**：`INF = INT_MAX` 时，松弛 `A[i] + j.second` 可能溢出。当 `A[i] = INF` 且 `j.second < 0` 时，`INT_MAX + 负数` 可能溢出为正大值，导致错误松弛。本代码已在松弛前加 `if(A[i] == INF) continue` 跳过未到达节点，避免溢出；等价方案是把 `INF` 设为 `1e18`（`long long` 范围内安全）。
 2. **负环检测遗漏**：本代码仅执行 $n-1$ 轮松弛，不检测负环。若图中存在从源点可达的负环，输出的距离值无意义（会持续变小但未收敛）。需在第 $n$ 轮额外检查：若仍有松弛，则存在负环。
 3. **无向图负权**：无向图中一条负权边等价于一个负权环（来回走），因此无向图中存在负权边即存在负环，Bellman-Ford 不会收敛。
 4. **松弛顺序影响效率**：虽然松弛顺序不影响最终结果（$n-1$ 轮必收敛），但影响收敛速度。若按最短路顺序松弛，1 轮即可收敛；若逆序松弛，需 $n-1$ 轮。提前终止优化在多数情况下能自动处理这一问题。

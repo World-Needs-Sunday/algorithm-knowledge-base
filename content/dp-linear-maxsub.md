@@ -44,12 +44,23 @@ $$\text{while } q.\text{back().first} \geq \text{sum}[i-1]: \quad q.\text{pop\_b
 
 ## 逐行代码解析
 
+### 全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 int n, m;
 vector<long long> sum;
 long long ans = -0x3f3f3f3f3f3f3f3f;
+```
+
+- **`sum` 数组**：前缀和数组，大小 $n+1$，`sum[0] = 0`。`sum[i]` 表示 $A[1] + A[2] + \ldots + A[i]$。
+- **`ans` 变量**：全局最大子段和，初始化为极小值 $-0x3f3f3f3f3f3f3f3f$（`long long` 的负无穷），因为元素可能全为负。
+- **`n, m`**：序列长度与子段长度上限，声明为全局变量便于 `main` 内直接使用。
+
+### main 与读入
+
+```cpp
 int main()
 {
 	/*P1714*/
@@ -57,38 +68,51 @@ int main()
 	cin.tie(nullptr);cout.tie(nullptr);
 	cin >> n >> m;
 	sum.resize(n + 1,0);
-	for(int i = 1;i <= n;i++) 
+	for(int i = 1;i <= n;i++) // 边读入边累加前缀和
 	{
 		long long x;
 		cin >> x;
 		sum[i] = sum[i - 1] + x;
 	}
-	deque<pair<long long ,int>> que; 
+```
+
+- **`ios::sync_with_stdio(false)` 与 `cin.tie(nullptr)`**：关闭 C 风格同步、解除输入输出绑定，加速大数据量读入。
+- **`sum.resize(n + 1, 0)`**：分配 $n+1$ 个 `long long` 并清零，`sum[0] = 0` 作为空段的前缀和。
+- **循环 `for(int i = 1; i <= n; i++)`**：从 $1$ 到 $n$（含）逐个数读入，用 `sum[i] = sum[i-1] + x` 累加出前缀和。
+
+### 单调队列核心循环
+
+```cpp
+	deque<pair<long long ,int>> que;
 	for(int i = 1;i <= n;i++)
 	{
 		if(!que.empty())
 		{
-			if(i - que.front().second >= m) que.pop_front();
+			if(i - que.front().second >= m) que.pop_front(); // 队首滑出窗口则弹出
 		}
 		
-		while(!que.empty() && que.back().first >= sum[i - 1]) que.pop_back();
-		que.emplace_back(sum[i - 1],i);
+		while(!que.empty() && que.back().first >= sum[i - 1]) que.pop_back(); // 弹出不小于 sum[i-1] 的队尾，保持单调递增
+		que.emplace_back(sum[i - 1],i); // 入队左端点前缀和 sum[i-1]
 		
-		ans = max(sum[i] - que.front().first , ans);
+		ans = max(sum[i] - que.front().first , ans); // 队首即窗口内最小前缀和
 	}
-	cout << ans;
-	return 0;
-} 
 ```
 
-- **`sum` 数组**：前缀和数组，大小 $n+1$，`sum[0] = 0`。`sum[i]` 表示 $A[1] + A[2] + \ldots + A[i]$。
-- **`ans` 变量**：全局最大子段和，初始化为极小值 $-0x3f3f3f3f3f3f3f3f$（`long long` 的负无穷），因为元素可能全为负。
 - **`que` 单调队列**：`deque<pair<long long, int>>`，存储 $(前缀和值, 下标)$，维护单调递增。
-- **队首出队**：`i - que.front().second >= m` 表示队首位置距当前右端点已超过 $m$，滑出窗口。
-- **队尾维护**：弹出所有前缀和值 $\geq \text{sum}[i-1]$ 的队尾元素（因为它们更大，不可能成为后续窗口的最小值），保持单调递增。
-- **入队**：将 $(\text{sum}[i-1], i)$ 入队——注意入队的是 $\text{sum}[i-1]$（左端点的前缀和），而非 $\text{sum}[i]$。
-- **更新答案**：`sum[i] - que.front().first` 为当前右端点 $i$ 的最大子段和，更新全局 `ans`。
-- **输出**：`ans` 即为长度不超过 $m$ 的最大子段和。
+- **队首出队**：`i - que.front().second >= m` 时弹出队首——表示队首位置距当前右端点已超过 $m$，滑出窗口（条件是 $\geq$ 而非 $>$）。
+- **队尾维护 + 入队**：`while` 弹出所有前缀和值 $\geq \text{sum}[i-1]$ 的队尾元素（它们更大，不可能成为后续窗口的最小值），再入队 $(\text{sum}[i-1], i)$。注意入队的是 $\text{sum}[i-1]$（左端点的前缀和），而非 $\text{sum}[i]$。
+- **更新答案**：`sum[i] - que.front().first` 是当前右端点 $i$ 的最大子段和，更新全局 `ans`。
+
+### 输出
+
+```cpp
+	cout << ans;
+	return 0;
+}
+```
+
+- **`cout << ans`**：`ans` 即为长度不超过 $m$ 的最大子段和。
+- **`return 0`**：程序正常结束。
 
 ## 复杂度分析
 

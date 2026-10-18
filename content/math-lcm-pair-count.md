@@ -35,12 +35,21 @@ $$\text{ans} = \prod_{i=1}^{m} (2e_i + 1)$$
 
 ## 逐行代码解析
 
+### 全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 vector<pair<long long,long long>> AM;   // 存储 (质因子, 指数) 对
-long long ans;
+long long ans;                          // 全局答案计数
+```
 
+- `AM` 存放 `(质因子, 指数)` 对，由 `init` 填充后供 `dfs` 按维度枚举。
+- `ans` 为全局计数，`init` 里清零，`dfs` 到达叶子节点时累加。
+
+### init（质因数分解）
+
+```cpp
 // 质因数分解：将 n 分解为 AM = {(p1,e1), (p2,e2), ...}
 void init(long long n)
 {
@@ -54,7 +63,15 @@ void init(long long n)
 	}
 	if(n > 1) AM.emplace_back(n, 1);          // 剩余的大于 1 的因子
 }
+```
 
+- 试除法遍历 $i$ 从 $2$ 到 $\sqrt{n}$，对每个能整除 $n$ 的 $i$ 统计指数并除掉。
+- 循环上界用 `i * i <= n`，等价于 $i \le \sqrt{n}$；若循环结束后 $n > 1$，说明剩余部分是一个大于 $\sqrt{n}$ 的质因子（指数为 $1$），单独加入。
+- `ans = 0` 与 `AM.clear()` 保证每组测试数据独立，避免上一组的残留。
+
+### dfs（递归枚举指数分配）
+
+```cpp
 // DFS 枚举每个质因子的指数分配
 void dfs(long long idx, long long a, long long b)
 {
@@ -78,7 +95,17 @@ void dfs(long long idx, long long a, long long b)
 	for(long long i = 0; i < AM[idx].second; i++)
 		dfs(idx + 1, a * tmp[i], b * tmp[AM[idx].second]);
 }
+```
 
+- 递归出口 `idx == AM.size()` 表示所有质因子已分配完毕，此时 `a`、`b` 为完整的合法有序对，输出并 `++ans`。
+- `tmp[i] = tmp[i-1] * AM[idx].first`：预计算 $p^0, p^1, \ldots, p^e$，避免在 DFS 中重复计算幂值。
+- 第一段 `for(i=0; i<=e; i++)`：固定 $a$ 的指数为 $e$，$b$ 的指数取 $0 \sim e$，覆盖所有 $\alpha = e$ 的情形。
+- 第二段 `for(i=0; i<e; i++)`：固定 $b$ 的指数为 $e$，$a$ 的指数取 $0 \sim e-1$，上界为 $e-1$ 排除了 $\alpha = e$（已在第一段计数），避免 $(e, e)$ 重复。
+- `a` 和 `b` 在递归过程中累积各质因子的贡献，到达叶子节点时即为完整的 $(a, b)$ 值。
+
+### main（读入与输出）
+
+```cpp
 int main()
 {
 	ios::sync_with_stdio(false);
@@ -97,14 +124,9 @@ int main()
 }
 ```
 
-**关键解析：**
-
-- `init` 中的试除法：遍历 $i$ 从 $2$ 到 $\sqrt{n}$，对每个能整除 $n$ 的 $i$ 统计指数。若循环结束后 $n > 1$，说明剩余部分是一个大于 $\sqrt{n}$ 的质因子（指数为 $1$），单独加入。
-- `tmp[i] = tmp[i-1] * AM[idx].first`：预计算 $p^0, p^1, \ldots, p^e$，避免在 DFS 中重复计算幂值。
-- 第一段 `for(i=0; i<=e; i++)`：固定 $a$ 的指数为 $e$（`a * tmp[e]`），$b$ 的指数取 $0 \sim e$。这覆盖了所有 $\alpha = e$ 的情形。
-- 第二段 `for(i=0; i<e; i++)`：固定 $b$ 的指数为 $e$（`b * tmp[e]`），$a$ 的指数取 $0 \sim e-1$。上界为 $e-1$ 排除了 $\alpha = e$（已在第一段计数），避免 $(e, e)$ 重复。
-- `ios::sync_with_stdio(false)`：取消 C/C++ 流同步，加速大量 `cout` 输出。
-- DFS 的乘法累积：`a` 和 `b` 在递归过程中累积各质因子的贡献，到达叶子节点时即为完整的 $(a, b)$ 值。
+- `ios::sync_with_stdio(false)` 取消 C/C++ 流同步，`cin.tie(nullptr)` 解绑输入输出，加速大量 `cout` 输出。
+- 每组数据先读入 `n`，调用 `init(n)` 分解，再 `dfs(0, 1, 1)` 从 $a = b = 1$ 开始枚举。
+- 输出格式为 `Case i: ans`，`i` 从 `1` 到 `t`。
 
 ## 复杂度分析
 

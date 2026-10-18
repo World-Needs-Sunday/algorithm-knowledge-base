@@ -38,7 +38,7 @@ $$cnt[i] = \sum_{\substack{j < i,\; A[j] < A[i] \\ dp[j] + 1 = dp[i]}} cnt[j]$$
 
 $$dp[i] = \text{BIT.query}\big(rank(i) - 1\big).len + 1$$
 
-$$cnt[i] = \begin{cases} \text{BIT.query}\big(rank(i) - 1\big).cnt & \text{if query 结果非零} \\ 1 & \text{if 无前驱（query 为零）} \end{cases}$$
+$$cnt[i] = \begin{cases} \text{BIT.query}\big(rank(i) - 1\big).cnt & \text{if 有前驱（query.len > 0）} \\ 1 & \text{if 无前驱（query.len = 0）} \end{cases}$$
 
 BIT 节点合并规则（查询/更新时对 $(len_1, cnt_1)$ 与 $(len_2, cnt_2)$ 取并）：
 
@@ -116,59 +116,88 @@ BIT 结构（以 rank 为下标，存储 (len, cnt)）：
 
 ## 逐行代码解析
 
+代码按逻辑阶段拆为 6 个模块：头文件与全局、BIT 结构与构造、BIT 更新（add/insert）、BIT 查询（get）、读入与离散化、主循环与输出。各模块的代码块按顺序拼接起来就是完整的 `.cpp`。
+
+### 模块 1：头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-const int mod = 1e9 + 7;          // 方案数取模
-inline int lowbit(int x) { return x & -x; }
+const int mod = 1e9 + 7;                    // 方案数取模的模数
+inline int lowbit(int x) { return x & -x; }  // 返回 x 最低位 1 对应的值
+```
+
+- 要点 1：`mod` 是方案数取模用的模数；`lowbit(x)` 返回 $x$ 二进制最低位 $1$ 对应的值，是 BIT 所有跳转的基础。
+- 要点 2：`x & -x` 依赖补码（$-x = \sim x + 1$），例如 `lowbit(6) = 2`。符号写错（如 `x & ~x`）会让 `insert`/`get` 的循环跳不动或越界。
+
+### 模块 2：treearr 结构体与构造函数
+
+```cpp
 struct treearr
 {
-	vector<int> len;               // len[i]: BIT 节点 i 的最大 LIS 长度
-	vector<int> cnt;               // cnt[i]: BIT 节点 i 的方案数
-	int sz, ans_len, ans_cnt;     // sz: 值域大小; ans_*: 查询暂存
-
+	vector<int> len;              // len[i]: BIT 节点 i 的最大 LIS 长度
+	vector<int> cnt;              // cnt[i]: BIT 节点 i 的方案数
+	int sz,ans_len,ans_cnt;       // sz: 值域大小; ans_*: 查询暂存
 	treearr(int n)
 	{
-		len.resize(n + 1, 0);
-		cnt.resize(n + 1, 0);
+		len.assign(n + 1, 0);     // 下标从 1 开始，故开 n+1
+		cnt.assign(n + 1, 0);
 		sz = n;
 		ans_len = 0, ans_cnt = 0;
 	}
-	// 单节点合并：(num, t_cnt) 与 BIT[idx] 的 (len, cnt) 比较
-	void add(int idx, int num, int t_cnt)
+```
+
+- 要点 1：`len`、`cnt` 两个数组配合，让每个 BIT 节点维护一个 $(max\_len, count)$ 二元组，把树状数组从"前缀和"推广为"前缀最大值 + 计数"。
+- 要点 2：数组开到 `n + 1` 是因为 BIT 下标从 $1$ 开始、下标 $0$ 不使用；`sz` 记录值域大小，是 `insert` 里 `idx <= sz` 的边界依据。
+
+### 模块 3：add 与 insert（BIT 更新）
+
+```cpp
+	void add(int idx,int num,int t_cnt)          // 单节点合并
 	{
-		if (num > len[idx])              // 新长度更优 → 替换
-			len[idx] = num, cnt[idx] = t_cnt;
-		else if (num == len[idx])        // 长度相同 → 计数累加
-			cnt[idx] = (cnt[idx] + t_cnt) % mod;
-		// num < len[idx] → 忽略（已有更优）
+		if (num > len[idx]) len[idx] = num,cnt[idx] = t_cnt;           // 更优 → 替换
+		else if (num == len[idx]) cnt[idx] = (cnt[idx] + t_cnt) % mod; // 等长 → 累加
 	}
-	// BIT 单点更新（沿 lowbit 链向上传播）
-	void insert(int idx, int num, int t_cnt)
+	void insert(int idx,int num,int t_cnt)       // 沿 lowbit 链向上传播
 	{
-		while (idx <= sz)
+		while (idx <= sz)                         // 上界：不能越过值域大小 sz
 		{
 			add(idx, num, t_cnt);
 			idx += lowbit(idx);
 		}
 	}
-	// BIT 前缀查询 [1, idx] 的 (max_len, count)
-	void get(int idx)
+```
+
+- 要点 1：`add` 三种分支——`num > len` 替换（更优方案淘汰旧方案）、`num == len` 累加取模、`num < len` 忽略；这是"前缀最大值 BIT"的核心合并逻辑。
+- 要点 2：`insert` 与标准 BIT 单点更新完全一致，沿 `idx += lowbit(idx)` 向上传播；循环条件是 `idx <= sz`，误写成 `< sz` 会漏更新最后一个节点。
+- 要点 3：累加处 `(cnt[idx] + t_cnt) % mod` 的两个加数都小于 `mod`，和不超过 $2 \times 10^9 + 12$，仍在 `int` 范围内，不会溢出。
+
+### 模块 4：get（BIT 前缀查询）
+
+```cpp
+	void get(int idx)                             // 查询前缀 [1, idx]
 	{
-		ans_len = 0, ans_cnt = 0;
-		while (idx)
+		ans_len = 0, ans_cnt = 0;                  // 每次查询前清零暂存
+		while (idx)                                // idx 归 0 即遍历完 [1, idx] 全部节点
 		{
-			if (len[idx] > ans_len)          // 该节点更优
+			if (len[idx] > ans_len)
 			{
 				ans_len = len[idx];
 				ans_cnt = cnt[idx];
 			}
-			else if (len[idx] == ans_len)    // 等长 → 计数累加
-				ans_cnt = (ans_cnt + cnt[idx]) % mod;
+			else if (len[idx] == ans_len) ans_cnt = (ans_cnt + cnt[idx]) % mod; // 等长 → 累加
 			idx -= lowbit(idx);
 		}
 	}
-};
+```
+
+- 要点 1：查询沿 `idx -= lowbit(idx)` 向下合并，覆盖值域前缀 $[1, idx]$ 的所有 BIT 节点；取最大 `len`，等长则 `cnt` 相加。
+- 要点 2：循环条件写成 `while (idx)` 而非 `while (idx >= 0)`——下标减到 $0$ 表示前缀遍历完毕，再继续会越界访问 `len[0]`/`cnt[0]`。
+- 要点 3：`get` 查的是 $\le idx$ 的前缀，对应"值 $\le$ 排名 idx 的元素"；为求严格递增，调用方传入 `A[i] - 1`（值 $<$ A[i]）。
+
+### 模块 5：main 读入与离散化
+
+```cpp
 int main()
 {
 	ios::sync_with_stdio(false);
@@ -177,47 +206,46 @@ int main()
 	cin >> T;
 	while (T--)
 	{
-		int n, sz;
+		int n,sz;                        // n: 序列长度
 		cin >> n;
-		vector<int> A(n + 1);           // 原始序列
-		vector<int> tmp(n + 1);        // 离散化辅助数组
+		vector<int> A(n + 1);            // 原始序列（之后就地改为排名）
+		vector<int> tmp(n + 1);          // 离散化辅助数组
 		for (int i = 1; i <= n; i++)
 		{
 			cin >> A[i];
 			tmp[i] = A[i];
 		}
-		// 离散化：排序 + 去重
-		sort(tmp.begin() + 1, tmp.end());
-		tmp.erase(unique(tmp.begin() + 1, tmp.end()), tmp.end());
-		treearr arr(tmp.size());       // BIT 大小 = 不同值个数
+		sort(tmp.begin() + 1, tmp.end());                          // 排序
+		tmp.erase(unique(tmp.begin() + 1, tmp.end()), tmp.end());  // 去重
+		treearr arr(tmp.size());         // BIT 大小 = 去重后 tmp.size()
+```
+
+- 要点 1：`sort` 从 `begin() + 1` 开始，因为 `tmp[0]` 是未使用的占位；`sort` + `unique` + `erase` 得到去重后的有序值域。
+- 要点 2：读入下标从 $1$ 到 $n$，与离散化排名 $[1, m]$ 的 1-based 约定一致，避免后面 `get(A[i] - 1)` 退化成 `get(-1)` 越界。
+- 要点 3：`treearr arr(tmp.size())` 用去重后的 `tmp.size()` 作为 BIT 大小（含未用的 `tmp[0]`，实际为 $m+1$），比所需多一个节点但不影响正确性。
+
+### 模块 6：主循环转移与输出
+
+```cpp
 		for (int i = 1; i <= n; i++)
 		{
-			// 将 A[i] 映射到离散化后的排名 [1, m]
-			A[i] = lower_bound(tmp.begin() + 1, tmp.end(), A[i]) - tmp.begin();
-			// 查询所有值 < A[i] 的元素中，最大 LIS 长度及方案数
-			arr.get(A[i] - 1);
-			int new_len = arr.ans_len + 1;           // 在前驱最优基础上 +1
-			int new_cnt = arr.ans_cnt ? arr.ans_cnt : 1;  // 无前驱时方案数为 1
-			// 将当前元素的 (len, cnt) 插入 BIT
-			arr.insert(A[i], new_len, new_cnt);
+			A[i] = lower_bound(tmp.begin() + 1, tmp.end(), A[i]) - tmp.begin(); // 值 → 排名 [1, m]
+			arr.get(A[i] - 1);              // 查所有值 < A[i] 的前驱
+			int new_len = arr.ans_len + 1;  // 在前驱最优长度上 +1
+			int new_cnt = arr.ans_len ? arr.ans_cnt : 1;  // 无前驱时方案数为 1
+			arr.insert(A[i], new_len, new_cnt);           // 插入当前元素信息
 		}
-		// 查询整个值域 [1, m] 的全局最优
-		arr.get(tmp.size());
+		arr.get(tmp.size());                // 查询整个值域的全局最优
 		cout << arr.ans_len << ' ' << arr.ans_cnt << '\n';
 	}
 	return 0;
 }
 ```
 
-**关键解析：**
-
-- `struct treearr`：将树状数组从"前缀和"推广为"前缀最大值 + 计数"。`len` 和 `cnt` 两个数组配合，每个 BIT 节点维护一个 $(max\_len, count)$ 二元组。
-- `add` 中的三种分支：`num > len` 替换（更优方案淘汰旧方案），`num == len` 累加（等长方案合并），`num < len` 忽略（不更新）。这是"前缀最大值 BIT"的核心合并逻辑。
-- `get(A[i] - 1)` 查询排名 $< rank(A[i])$ 的前缀，对应值严格小于 $A[i]$ 的所有已处理元素。用 $A[i] - 1$ 而非 $A[i]$ 保证严格递增（相同值不参与转移）。
-- `new_cnt = arr.ans_cnt ? arr.ans_cnt : 1`：当 `ans_cnt == 0` 时说明没有前驱（当前元素是已处理中最小的），此时 LIS 长度为 $1$，方案数为 $1$（自身单独构成）。当 `ans_cnt > 0` 时，方案数继承前驱的方案数（每个前驱的 LIS 方案都能接上当前元素）。
-- `arr.insert(A[i], new_len, new_cnt)`：将当前元素的信息插入 BIT 对应位置，后续元素查询时能看到它。
-- 最终 `arr.get(tmp.size())`：查询整个值域 $[1, m]$ 的全局最大长度及方案数，即整个序列的 LIS 长度和方案数。
-- 离散化的 `lower_bound`：返回 `tmp` 中第一个等于 $A[i]$ 的位置，由于 `tmp` 从下标 $1$ 开始，返回值即为排名 $[1, m]$。
+- 要点 1：`lower_bound` 返回 `tmp` 中第一个等于 $A[i]$ 的位置，减去 `begin()` 得到排名 $[1, m]$（因 `tmp` 从下标 $1$ 开始）。
+- 要点 2：`arr.get(A[i] - 1)` 查询排名 $<$ `rank(A[i])` 的前缀，对应值严格小于 $A[i]$；用 $A[i]-1$ 而非 $A[i]$ 保证严格递增（相同值不参与转移）。
+- 要点 3：`new_cnt = arr.ans_len ? arr.ans_cnt : 1`——以 `ans_len` 是否大于 $0$ 判断有无前驱：`ans_len == 0` 表示无前驱（当前元素最小），LIS 长度为 $1$、方案数为 $1$（自身单独构成）；否则继承前驱方案数。用 `ans_len` 而非 `ans_cnt` 判断，避免方案数取模后恰好为 $0$ 时被误判为无前驱。
+- 要点 4：`arr.insert(A[i], new_len, new_cnt)` 把当前元素信息写入 BIT，后续元素查询时能看到它；最终 `arr.get(tmp.size())` 取整个值域的全局最大长度与方案数。
 
 ## 复杂度分析
 
@@ -233,11 +261,11 @@ int main()
 ## 常见陷阱与注意事项
 
 1. **严格递增 vs 非递减**：代码中 `get(A[i] - 1)` 查询 $rank - 1$ 保证严格递增（相同值不参与转移）。若需最长非递减子序列，应改为 `get(A[i])`（允许相同值参与转移）。
-2. **方案数的模运算**：`cnt` 的累加在 `add` 和 `get` 中都取模，但 `new_cnt = arr.ans_cnt ? arr.ans_cnt : 1` 中若 `ans_cnt` 恰好为 $0$（取模后为 $0$，实际方案数为 $mod$ 的倍数）会被误判为"无前驱"。实际竞赛中方案数 $\equiv 0 \pmod{10^9+7}$ 的概率极低，但严格来说应使用 `ans_len > 0` 判断是否有前驱。
+2. **方案数的模运算**：`cnt` 的累加在 `add` 和 `get` 中都取模。判断"是否有前驱"必须用 `ans_len`（代码中为 `new_cnt = arr.ans_len ? arr.ans_cnt : 1`），而不能用 `ans_cnt`——因为 `ans_cnt` 可能因取模后恰好为 $0$（实际方案数为 $mod$ 的倍数）而被误判为"无前驱"；`ans_len` 只可能为 $0$（无前驱）或正数（有前驱），不受取模影响。
 3. **离散化的下标起点**：`tmp` 从下标 $1$ 开始（`tmp.begin() + 1`），`lower_bound` 返回值范围为 $[1, m]$。若误从下标 $0$ 开始，`A[i]` 可能映射到 $0$，导致 `get(A[i] - 1)` 查询 `get(-1)` 越界。
 4. **BIT 大小**：BIT 大小应为离散化后的不同值个数 $m$，而非原始序列长度 $n$。当有重复值时 $m < n$，BIT 更省空间。
 5. **多组数据的初始化**：每组测试数据新建 `treearr` 对象，自动初始化 `len` 和 `cnt` 为 $0$。若改为全局数组复用，需手动清零。
-6. **`ans_cnt` 的初值**：`get` 函数中 `ans_cnt = 0`，当查询结果为空（`idx = 0` 或所有节点 `len = 0`）时返回 $(0, 0)$。主循环中通过 `arr.ans_cnt ? ... : 1` 处理此情况。
+6. **`ans_len` 与 `ans_cnt` 的初值**：`get` 函数中 `ans_len = 0, ans_cnt = 0`，当查询结果为空（`idx = 0` 或所有节点 `len = 0`）时返回 $(0, 0)$。主循环中通过 `arr.ans_len ? arr.ans_cnt : 1` 处理此情况（以 `ans_len` 判断是否有前驱）。
 
 ## 对比与扩展
 

@@ -183,92 +183,96 @@ void kmp(const string& a, const string& b)
 
 ## 逐行代码解析
 
+### 头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-vector<int> kmp_next, ans;
+vector<int> kmp_next,ans;   // kmp_next: next 数组；ans: 匹配起始位置
 ```
 
 - `kmp_next`：存储模式串的 next 数组
-- `ans`：存储所有匹配成功的起始位置
+- `ans`：存储所有匹配成功的起始位置（0-based）
+
+### init 函数（预处理 next 数组）
 
 ```cpp
 void init(const string& str)
 {
-    kmp_next.clear();
-    int m = str.size(), j = -1;
-    kmp_next.resize(m, -1);
-    for (int i = 1; i < m; i++)
-    {
-        while (j != -1 && str[i] != str[j + 1]) j = kmp_next[j];
-        if (str[i] == str[j + 1]) j++;
-        kmp_next[i] = j;
-    }
+	kmp_next.clear();
+	int m = str.size(),j = -1;          // m: 模式串长度；j: 已匹配前缀末尾下标，-1 为哨兵
+	kmp_next.resize(m,-1);              // 先全填 -1，next[0] 即 -1
+	for (int i = 1; i < m; i++)
+	{
+		while (j != -1 && str[i] != str[j + 1]) j = kmp_next[j];  // 失配：用 next 回退 j
+		if (str[i] == str[j + 1]) j++;  // 匹配：j 前进
+		kmp_next[i] = j;                // 记录 next[i]
+	}
 }
 ```
 
-- `j = -1`：初始化为哨兵，表示尚未匹配任何前缀
-- `kmp_next.resize(m, -1)`：next[0] = -1 作为初始条件
-- $i$ 从 1 开始：因为 `next[0]` 已经确定为 -1
-- `while` 循环：当前字符不匹配时，不断用 next 回退 j，直到 j=-1 或匹配成功
-- `if (str[i] == str[j+1]) j++`：匹配成功，j 前进一位
-- `kmp_next[i] = j`：记录 next[i] = j（最长相等前后缀的末尾下标）
+- `j = -1` 是哨兵初值，`kmp_next.resize(m, -1)` 同时把 `next[0]` 设为 -1 作为初始条件
+- $i$ 从 1 开始：`next[0]` 已确定为 -1，无需计算
+- `while (j != -1 && str[i] != str[j+1]) j = kmp_next[j]`：失配时不断用 next 回退 j，直到 j=-1 或匹配成功
+- `if (str[i] == str[j+1]) j++; kmp_next[i] = j;`：匹配成功则 j 前进，并记录 next[i] = j（最长相等前后缀的末尾下标）
+
+### kmp 函数（主串匹配）
 
 ```cpp
 void kmp(const string& a, const string& b)
 {
-    int n = a.size(), m = b.size();
-    int j = -1;
-    for (int i = 0; i < n; i++)
-    {
-        while (j != -1 && a[i] != b[j + 1]) j = kmp_next[j];
-        if (a[i] == b[j + 1]) j++;
-        if (j == m - 1)
-        {
-            ans.emplace_back(i - m + 1);
-            j = kmp_next[j];
-        }
-    }
+	int n = a.size(), m = b.size();
+	int j = -1;                         // j: 已匹配到模式串第 j 位
+	for (int i = 0; i < n; i++)
+	{
+		while (j != -1 && a[i] != b[j + 1]) j = kmp_next[j];  // 失配回退，i 不回退
+		if (a[i] == b[j + 1]) j++;      // 匹配成功，j 前进
+		if (j == m - 1)                 // 模式串全部匹配完
+		{
+			ans.emplace_back(i - m + 1);// 记录 0-based 起始下标
+			j = kmp_next[j];            // 回退以支持重叠匹配
+		}
+	}
 }
 ```
 
 - $i$ 遍历主串每个字符，永不回退
-- `while` 失配回退：当前位置不匹配时，利用 next 数组将模式串"滑"到最长可匹配前缀位置
-- 匹配成功后 j 前进
-- `j == m - 1`：模式串全部匹配完，找到一个匹配位置
-- `ans.emplace_back(i - m + 1)`：记录匹配起始下标（0-based）
-- `j = kmp_next[j]`：匹配成功后不从头开始，而是回退到 next[j] 继续匹配，以支持重叠匹配（例如 "AAAAA" 中找 "AA"，可找到 4 个）
+- `while (j != -1 && a[i] != b[j+1]) j = kmp_next[j]`：失配时用 next 回退，把模式串"滑"到最长可匹配前缀位置
+- 匹配成功 j 前进；`j == m - 1` 表示模式串全部匹配完，`ans.emplace_back(i - m + 1)` 记录 0-based 起始下标
+- `j = kmp_next[j]`：匹配成功后回退到 next[j] 继续匹配，支持重叠匹配（例如 "AAAAA" 中找 "AA"，可找到 4 个）
+
+### main 函数（多组测试）
 
 ```cpp
 int main()
 {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
-    int T;
-    cin >> T;
-    while (T--)
-    {
-        string p;
-        int t;
-        cin >> p >> t;
-        init(p);
-        while (t--)
-        {
-            ans.clear();
-            string s;
-            cin >> s;
-            kmp(s, p);
-            if (ans.empty()) cout << -1;
-            else for (int i : ans) cout << i << ' ';
-            cout << '\n';
-        }
-    }
-    return 0;
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+	int T;
+	cin >> T;
+	while (T--)
+	{
+		string p;
+		int t;
+		cin >> p >> t;
+		init(p);                        // 每组只预处理一次 next，多个主串复用
+		while (t--)
+		{
+			ans.clear();
+			string s;
+			cin >> s;
+			kmp(s, p);
+			if (ans.empty()) cout << -1;              // 无匹配
+			else for (int i : ans) cout << i << ' ';  // 输出所有起始位置
+			cout << '\n';
+		}
+	}
+	return 0;
 }
 ```
 
 - 多组测试用例：每组先输入模式串 $p$ 和测试次数 $t$
-- `init(p)`：预处理模式串的 next 数组
+- `init(p)`：预处理模式串的 next 数组（每组只预处理一次，多个主串复用）
 - 每组测试输入主串 $s$，调用 `kmp(s, p)` 找所有匹配
 - 无匹配输出 `-1`，否则输出所有匹配起始位置（0-based）
 

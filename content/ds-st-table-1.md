@@ -107,29 +107,58 @@ write(max(A[l][mh], A[r - (1 << mh) + 1][mh]));
 
 ## 逐行代码解析
 
+下面把整份代码按「头文件与全局变量 → init → get_h → 快速读写 → main」拆成 5 个模块。各模块的代码按顺序拼接后与 `.cpp` 完全一致，`//` 注释为讲解性补充。
+
+### 模块 1：头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 vector<vector<int>> A;          // ST 表，A[i][j] = max[a[i..i+2^j-1]]
 vector<int> T;                  // 预处理的 2 的幂次表
-void init()                     // 预处理 T 表
+```
+
+- `A` 是二维 ST 表，`A[i][j]` 存从下标 `i` 起、长度 $2^j$ 区间的最大值。
+- `T` 是递增的 2 的幂序列（$2^0,2^1,\ldots$），供 `get_h` 用二分求 $\lfloor\log_2 x\rfloor$。
+- `bits/stdc++.h` 与 `using namespace std` 是竞赛常用头文件/命名空间，省去逐个声明头文件。
+
+### 模块 2：init() — 预处理幂次表 T
+
+```cpp
+void init()
 {
-	for(int i = 1,k = 1;k <= 1000000000;++i,k <<= 1) T.emplace_back(k);
-    // 依次放入 2^0,2^1,...,2^30，共 31 个元素
+	for(int i = 1,k = 1;k <= 1000000000;++i,k <<= 1) T.emplace_back(k);  // 依次放入 2^0,2^1,...,2^29
 }
-int get_h(int i)                // 求 floor(log2(i))
+```
+
+- 循环变量 `k` 从 $1=2^0$ 开始，每轮左移一位翻倍，直到 $k > 10^9$ 停止。
+- 上界 $10^9$ 实际压入的是 $2^0$~$2^{29}$（共 30 个元素），$2^{30} > 10^9$ 不包含；覆盖竞赛常见 N 上限，若 N 更大需同步放大此上界。
+- 只执行一次，开销 $O(\log N)$，可忽略。
+
+### 模块 3：get_h(i) — 求 $\lfloor \log_2 i \rfloor$
+
+```cpp
+int get_h(int i)
 {
-	int ans = lower_bound(T.begin(),T.end(),i) - T.begin();
-    // 找 T 中第一个 >= i 的元素下标
-	if(1 << ans != i) ans -= 1;  // 若 i 不是 2 的幂，要回退一层
+	int ans = lower_bound(T.begin(),T.end(),i) - T.begin();  // 找 T 中第一个 >= i 的元素下标
+	if(1 << ans != i) ans -= 1;  // 若 i 不是 2 的幂，回退一层
 	return ans;                  // 此时 2^ans <= i < 2^(ans+1)
 }
-inline int read()               // 快速读入，避免 cin 拖慢
+```
+
+- `lower_bound` 返回第一个 `>= i` 的元素下标 `ans`，此时 $T[ans]=2^{ans}$。
+- 若 $2^{ans}=i$（`i` 恰为 2 的幂）则直接返回 `ans`；否则 `i` 介于 $2^{ans-1}$ 与 $2^{ans}$ 之间，`ans -= 1` 修正 off-by-one。
+- 这种"先找上界再回退"只需一次二分加一次比较，复杂度 $O(\log|T|)=O(\log\log N)$，实际可视为 $O(1)$。
+
+### 模块 4：read()/write() — 快速读写
+
+```cpp
+inline int read()
 {
 	int x = 0,f = 1;char ch = getchar();
 	while(ch < '0' || ch > '9')   // 跳过非数字字符
 	{
-		if(ch == '-') f = -1;      // 处理负号
+		if(ch == '-') f = -1;     // 处理负号
 		ch = getchar();
 	}
 	while(ch >= '0' && ch <= '9') // 读入数字
@@ -139,45 +168,55 @@ inline int read()               // 快速读入，避免 cin 拖慢
 	}
 	return x * f;
 }
-inline void write(int x)         // 快速输出
+inline void write(int x)
 {
     static char buf[12];
     int p=0;
     if(x<0){putchar('-');x=-x;}
     if(x==0) buf[p++]='0';
-    while(x){buf[p++]=x%10+48;x/=10;} // 逆序存数字字符
+    while(x){buf[p++]=x%10+48;x/=10;}  // 逆序存数字字符
     while(p--) putchar(buf[p]);        // 正序输出
 }
+```
+
+- `read()` 用 `getchar` 逐字符读入，避免 `cin` 关闭同步前的慢速；`f` 记录负号，读到数字时 `x = x*10 + ch-48` 累加。
+- `ch-48` 把数字字符转成数值（字符 `'0'` 的 ASCII 码是 48）。
+- `write()` 用 `%10` 逆序把每一位存进 `buf`，再倒序输出；`x==0` 特判避免空循环漏打 `0`。
+- 负号分支先输出 `-`，再对 `x` 取反后按正数处理。
+
+### 模块 5：main() — 读入、建表与查询
+
+```cpp
 int main()
 {
-	init();                       // 建 T 表
-	int N = read();int M = read(); // N 个数，M 次查询
-	int h = get_h(N);              // h = floor(log2(N))
-	A.resize(N + 1,vector<int>(h + 1)); // 二维表 (N+1) x (h+1)
+	init();                          // 建 T 表
+	int N = read();int M = read();   // N 个数，M 次查询
+	int h = get_h(N);                // h = floor(log2(N))
+	A.resize(N + 1,vector<int>(h + 1));  // 二维表 (N+1) x (h+1)
 	for(int i = 1;i <= N;i++) A[i][0] = read(); // j=0 层：长度1即原值
-	for(int j = 1;j <= h;j++)      // 逐层递推
+	for(int j = 1;j <= h;j++)         // 逐层递推
 	{
-		int k = 1 << j;            // 当前层区间长度 2^j
-		int t = j - 1;             // 子区间层数
-		for(int i = 1;i + k - 1 <= N;i++) // 起点遍历，保证不越界
-            A[i][j] = max(A[i][j - 1] , A[i + (1 << t)][j - 1]);
-        // 拼接左右两半长度 2^(j-1) 的子区间
+		int k = 1 << j;               // 当前层区间长度 2^j
+		int t = j - 1;                // 子区间层数
+		for(int i = 1;i + k - 1 <= N;i++) A[i][j] = max(A[i][j - 1] , A[i + (1 << t)][j - 1]); // 拼接左右两半
 	}
-	for(int i = 1;i <= M;i++)      // 处理每次查询
+	for(int i = 1;i <= M;i++)         // 处理每次查询
 	{
 		int l = read();
 		int r = read();
-		int sz = r - l + 1;         // 区间长度
-		int mh = get_h(sz);         // 最大的 k 使 2^k <= sz
-		write(max(A[l][mh] , A[r - (1 << mh) + 1][mh]));
-        // 左段从 l 起，右段到 r 结束，取两者 max
+		int sz = r - l + 1;           // 区间长度
+		int mh = get_h(sz);           // 最大的 k 使 2^k <= sz
+		write(max(A[l][mh] , A[r - (1 << mh) + 1][mh])); // 左段从 l 起，右段到 r 结束
 		putchar('\n');
 	}
 	return 0;
-} 
+}
 ```
 
-**关于 T表与 get_h 的工作机制**：T 是一个递增的 2 的幂序列。`lower_bound(T.begin(), T.end(), i)` 返回指向第一个 `>= i` 元素的迭代器，减去 `T.begin()` 得到下标 `ans`。此时 $T[\text{ans}] = 2^{\text{ans}}$。如果 `i` 恰好等于 $2^{\text{ans}}$（例如 `i=8`，`T[3]=8`），则 `1 << ans == i` 成立，$\lfloor \log_2 i \rfloor = \text{ans}$；否则 `i` 严格介于 $2^{\text{ans}-1}$ 与 $2^{\text{ans}}$ 之间（例如 `i=6`，$T[2]=4 < 6 < 8 = T[3]$），需要 `ans -= 1` 修正为 $\text{ans}-1$，即 $\lfloor \log_2 6 \rfloor = 2$。这种"先找上界再回退"的做法避免了在 T 上做两次二分（找 `<= i` 的最大元素），只需一次 lower_bound 加一次比较。
+- `A.resize(N+1, vector<int>(h+1))`：行下标 1~N 用 N+1 行，列下标 0~h 用 h+1 列，少一维会越界。
+- 外层循环必须枚举层级 `j`（小到大），内层枚举起点 `i`，保证 $A[i][j-1]$、$A[i+2^{j-1}][j-1]$ 先算好。
+- 内层终止条件 `i + k - 1 <= N` 保证区间右端 $i+2^j-1$ 不超过 N。
+- 查询先算 `sz = r - l + 1` 与 `mh = get_h(sz)`，再取左段 `A[l][mh]` 与右段 `A[r-(1<<mh)+1][mh]` 的 max，两段可重叠。
 
 ## 复杂度分析
 
@@ -202,6 +241,7 @@ int main()
 - **查询两段可重叠**：这是 ST 表正确性的核心，但只对幂等运算成立。不要把 ST 表用于求和、积等非幂等运算。
 - **不支持修改**：若数组需要动态修改，必须改用线段树或树状数组。ST 表一旦建好就是只读的。
 - **T 表大小**：`init` 把 2 的幂一直填到 $10^9$，足够覆盖 $N \leq 10^9$。若 N 更大需扩大上界。
+- **输入与 IO 边界**：未处理 `N=0`（空数组，`h = get_h(0) = -1` 得负维度导致越界）、`read()` 未判 EOF 会在读入失败时死循环、`write()` 对 `INT_MIN` 取负会溢出；建议约定输入满足 $N, M \ge 1$ 且数值不取 `INT_MIN`，或自行加上对应判断。
 
 ## 对比与扩展
 

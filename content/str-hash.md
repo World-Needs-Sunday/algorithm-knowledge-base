@@ -33,52 +33,83 @@ $$H(l, r) = \text{sum}[r] - \text{sum}[l-1] \times P[r-l+1] \pmod{2^{64}}$$
 
 ## 逐行代码解析
 
+### 模块一：头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-const int q = 131;          // 进制基数，经验值取质数冲突率低
+/*
+	字符串哈希 把不同的字符串映射成不同的整数。
+	把字符串映射成一个 p 进制数字。
+	对于一个长度为 n 的字符串 s，
+*/
+const int q = 131;                            // 进制基数，经验值取质数冲突率低
 const int nmax = 10010;
 vector<unsigned long long>P;
 vector<unsigned long long> sum;
+```
 
-// 查询子串 s[l..r] 的哈希值（下标从 1 开始）
-unsigned long long getstr(int l , int r)
+- 要点：`q = 131` 是进制基数，取大于字符集范围（ASCII 0\~127）的质数，能降低不同字符串映射到同一哈希值的概率，避免"进位歧义"。
+- 要点：`sum` 与 `P` 使用 `unsigned long long`，乘法溢出时自动对 $2^{64}$ 取模，等价于 `result % (2^64)` 但无需显式 `%` 运算，速度更快。
+- 要点：`nmax` 只是预留的长度上限，本实现实际用 `vector` 动态扩容，该常量并未被使用。
+- 要点：两个全局 `vector` 初始为空，必须先 `resize` 后才能按下标访问。
+
+### 模块二：getstr 查询函数
+
+```cpp
+unsigned long long getstr(int l , int r)      // 查询子串 s[l..r] 的哈希值（下标从 1 开始）
 {
 	return sum[r] - sum[l - 1] * P[r - l + 1];
 }
+```
 
+- 要点：`sum[l-1] * P[r-l+1]` 将前 $l-1$ 个字符的哈希值"左移" $r-l+1$ 位（乘以 $q^{r-l+1}$），使其位权与 `sum[r]` 对齐。
+- 要点：两者相减后剩余部分恰好是子串 $s[l..r]$ 的多项式值；无符号数减法自然回绕，等价于对 $2^{64}$ 取模。
+- 要点：下标从 1 开始，`sum[0] = 0` 作为哨兵，$l=1$ 时 `sum[l-1] = sum[0]` 合法，无需特殊处理边界。
+
+### 模块三：读入与数组初始化
+
+```cpp
 int main()
 {
 	string str;
 	cin >> str;
-	sum.resize(str.size() + 1 , 0);   // sum[0]=0，sum[i] 对应前 i 个字符
-	P.resize(str.size() + 1 , 1);     // P[0]=1
+	sum.resize(str.size() + 1 , 0);           // sum[0]=0，sum[i] 对应前 i 个字符
+	P.resize(str.size() + 1 , 1);             // P[0]=1
+```
 
-	// 预处理前缀哈希：sum[i+1] = sum[i]*q + str[i]
-	for(int i = 0;i < str.size();i++)
-		sum[i + 1] = sum[i] * q + (unsigned long long)str[i];
+- 要点：`sum` 与 `P` 都 `resize` 到 `str.size()+1`，使下标 `0..size` 均可安全访问。
+- 要点：`sum` 全部初始化为 0（`sum[0]=0` 作为哨兵），`P` 全部初始化为 1（`P[0]=1` 即 $q^0$，其余元素随后在模块四的循环中被覆盖）。
 
-	// 预处理幂次：P[i] = P[i-1] * q
-	for(int i = 1;i <= str.size();i++) P[i] = P[i - 1] * q;
+### 模块四：预处理前缀哈希与幂次
 
+```cpp
+	for(int i = 0;i < str.size();i++) sum[i + 1] = sum[i] * q + (unsigned long long)str[i];   // 预处理前缀哈希：sum[i+1] = sum[i]*q + str[i]
+	for(int i = 1;i <= str.size();i++) P[i] = P[i - 1] * q;                                   // 预处理幂次：P[i] = P[i-1] * q
+```
+
+- 要点：第一个循环按 `sum[i+1] = sum[i]*q + str[i]` 递推前缀哈希，`str[i]` 显式转为 `unsigned long long` 再相乘，避免有符号类型参与溢出的问题。
+- 要点：第二个循环按 `P[i] = P[i-1]*q` 递推幂次，`P[i]` 预存 $q^i$，供 `getstr` 做高位对齐使用。
+- 要点：边界上第一个循环 `i < str.size()` 填出 `sum[1..size]`，第二个循环 `i <= str.size()` 填出 `P[1..size]`，两者下标范围一致、一一对应。
+
+### 模块五：处理查询
+
+```cpp
 	int k;
 	cin >> k;
 	for(int i = 0;i < k;i++)
 	{
 		int l , r;
 		cin >> l >> r;
-		cout << getstr(l,r) << endl;  // O(1) 输出子串哈希
+		cout << getstr(l,r) << endl;          // O(1) 输出子串哈希
 	}
-	return 0;
+	return 0;	
 }
 ```
 
-**关键解析：**
-
-- `const int q = 131`：进制基数选 131（或 13331）这类大于字符集范围的质数，能降低不同字符串映射到同一哈希值的概率。字符 ASCII 范围为 0\~127，基数 131 保证每个字符在该进制下"位权"不产生歧义。
-- `sum` 与 `P` 使用 `unsigned long long`：乘法溢出时自动对 $2^{64}$ 取模，等价于 `result % (2^64)` 但无需显式 `%` 运算，速度更快。
-- `getstr(l, r)` 中的 `sum[l-1] * P[r-l+1]`：将前 $l-1$ 个字符的哈希值"左移" $r-l+1$ 位（乘以 $q^{r-l+1}$），使其位权与 `sum[r]` 对齐。两者相减后，剩余部分恰好是子串 $s[l..r]$ 的多项式值。
-- 下标从 1 开始：`sum[0] = 0` 作为哨兵，保证当 $l=1$ 时 `sum[l-1] = sum[0]` 合法，无需特殊处理边界。
+- 要点：读入查询次数 `k`，每次读入区间 `l、r` 后调用 `getstr` 输出子串哈希，单次查询 $O(1)$。
+- 要点：循环变量 `i` 从 0 到 `k-1`，共执行 `k` 次查询。
+- 要点：程序返回 0 正常结束。
 
 ## 复杂度分析
 

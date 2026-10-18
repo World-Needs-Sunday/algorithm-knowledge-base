@@ -169,6 +169,8 @@ $$d(i, j) = d'(i, j) - h[i] + h[j]$$
 
 ## 逐行代码解析
 
+### 头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
@@ -177,12 +179,26 @@ int n, m;
 vector<vector<pair<int, long long>>> edges;  // 邻接表 edges[u]={(v,w),...}
 vector<vector<long long>> ans;               // ans[i][j]=重赋权图上 i→j 最短路
 vector<long long> h;                         // 势能函数 h[v]=dist(0,v)
+```
 
+- `edges` 是邻接表，`edges[u]` 存 u 的所有出边 `(v, w)`；`ans[i][j]` 存重赋权图上的 i→j 最短路，`h` 存势能函数。
+- `INF = 1e17` 用 `long long` 且取 $10^{17}$，避免 `INT_MAX` 加负权时 `h[u] + w` 可能变成负大值导致逻辑错误。
+
+### get_w 重赋权函数
+
+```cpp
 inline long long get_w(int u,int v,long long w)
 {
     return w + h[u] - h[v];     // 重赋权: w'(u,v) = w + h[u] - h[v] >= 0
 }
+```
 
+- 重赋权公式 $w'(u,v)=w+h[u]-h[v]$，由三角不等式恒 $\geq 0$，是把负权图转成非负权图、让 Dijkstra 生效的关键一步。
+- 只在 `dij()` 松弛时被调用，是 $O(1)$ 的加减法；`h[u]`、`h[v]` 已在 `init_h()` 中预处理完毕。
+
+### init_h 求势能与负环检测
+
+```cpp
 bool init_h()                   // 求 h[] + 负环检测，返回 true 表示有负环
 {
     h.resize(n + 1, INF);
@@ -222,7 +238,16 @@ bool init_h()                   // 求 h[] + 负环检测，返回 true 表示�
     }
     return id1;                              // n+1 轮后仍有节点 → 负环
 }
+```
 
+- 外层 `for (int i = 0; i <= n; ++i)` 是 $n+1$ 轮而非 $n-1$ 轮：总节点数为 $n+1$（含虚拟节点），$n$ 轮求最短路 + $1$ 轮负环检测。
+- `stack1`/`stack2` 双栈设计：`stack1` 存当前轮待处理节点，`stack2` 存本轮被更新节点（下一轮处理）；`vis[]` 防止同一节点同轮内重复入 `stack2`，转移时立即重置。
+- `if (!id2) return false;`：某轮无任何节点被更新说明距离已收敛，提前返回无负环。
+- `return id1`：返回类型为 `bool`，`id1` 作为 `int` 隐式转换——非零为 `true`（有负环）、零为 `false`（无负环）。
+
+### dij 逐源 Dijkstra
+
+```cpp
 void dij(int i)                              // 重赋权图上从 i 跑 Dijkstra
 {
     priority_queue<pair<long long, int>,
@@ -251,7 +276,15 @@ void dij(int i)                              // 重赋权图上从 i 跑 Dijkstr
         }
     }
 }
+```
 
+- `priority_queue` 配 `greater` 实现小根堆，存 `(距离, 节点)` 对；`vis[]` 标记已确定最短路的节点，用 `if (vis[u]) continue;` 惰性删除同一节点多次入堆的情况。
+- `ans[i][i] = 0;` 自身距离为 0，其余节点保持 `INF`。
+- 松弛时调用 `get_w()` 取得重赋权后的非负边权，若 `ans[i][v] > wu + w_uv` 则更新并入堆。
+
+### main 读入与主流程
+
+```cpp
 int main()
 {
     ios::sync_with_stdio(false);
@@ -288,15 +321,10 @@ int main()
 }
 ```
 
-**关键解析：**
-
-- `edges[0].emplace_back(i, 0)`：虚拟节点的建边是 Johnson 算法的核心前提。没有它，`h[v]` 可能保持 `INF`（不可达），重赋权公式失去意义。
-- `for (int i = 0; i <= n; ++i)`：外层 $n+1$ 轮而非 $n-1$ 轮，因为总节点数为 $n+1$（含虚拟节点）。$n+1$ 轮 = $n$ 轮求最短路 + $1$ 轮负环检测。
-- `stack1`/`stack2` 双栈设计：`stack1` 存当前轮待处理节点，`stack2` 存本轮被更新节点（即下一轮待处理）。`vis[]` 防止同一节点同轮内重复入 `stack2`，收集后立即重置。
-- `return id1`：函数返回类型为 `bool`，`id1` 作为 `int` 隐式转换——非零为 `true`（有负环），零为 `false`（无负环）。
-- `get_w(u,v,edges[u][j].second)`：在 Dijkstra 松弛时调用，将原图边权转为重赋权后的非负权。这一步是 $O(1)$ 的简单加减。
-- `ans[i][j] - h[i] + h[j]`：逆变换公式。重赋权使路径长度增加 $h[i]-h[j]$，故原距离 = 重赋权距离 $- h[i] + h[j]$。
-- `INF = 1e17`：用 `long long` 且 `INF` 取 $10^{17}$，避免 `INT_MAX` 加负权时溢出。
+- `edges[0].emplace_back(i, 0)`：虚拟节点向所有真实节点连 0 权边是 Johnson 的核心前提，保证 $h[v]$ 对所有 $v$ 有定义（不会停在 `INF`）。
+- `ans.resize(n + 1, vector<long long>(n + 1, INF));`：把距离矩阵初始化为 $(n+1)\times(n+1)$ 的 `INF`。
+- `if (init_h()) cout << -1;`：存在负环时全源最短路无定义，直接输出 `-1`。
+- 逆变换 `ans[i][j] - h[i] + h[j]`（减起点 $h$、加终点 $h$），`ans[i][j] >= INF` 判定不可达输出 `"NO"`。
 
 ## 复杂度分析
 

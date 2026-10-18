@@ -3,7 +3,7 @@ id: prob-cf-sum-distinct-matrix
 title: 'Sum of Distinct Values in a Matrix — 双指针贪心与公共值名额分配'
 oj: 'Codeforces'
 problemId: 'C. Sum of Distinct Values in a Matrix'
-difficulty: '困难'
+difficulty: '中等'
 category: '贪心'
 tags: ["贪心", "双指针", "数学", "构造", "名额分配", "思维题"]
 timeComplexity: 'O(x + y)'
@@ -216,6 +216,8 @@ while b 还有元素 且 还需更多值 且 列还有名额:
 
 ## 逐行代码解析
 
+### 读入与状态变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
@@ -242,7 +244,16 @@ int main()
         int tmp = 0;                      // 公共值计数（同时占用行和列名额）
         long long sum = 0;                // 答案，用 long long 防溢出
 
-        // ===== 阶段一：双指针归并 =====
+        
+```
+
+- `idx_x/idx_y` 从**末尾往前**扫：$a,b$ 都严格递增，从大到小选才能贪到最大和。
+- `tmp` 是「公共值」计数——一个公共值同时占行、列名额各 1，是全题最容易错的状态（见下方对照表）。
+
+### 阶段一 · 双指针归并
+
+```cpp
+// ===== 阶段一：双指针归并 =====
         while (cnt_x + cnt_y + tmp < n + m - 1
                && cnt_x < n && cnt_y < m
                && idx_x > 0 && idx_y > 0)
@@ -275,7 +286,17 @@ int main()
             }
         }
 
-        // ===== 阶段二：释放公共值 =====
+        
+```
+
+- 循环上界 `cnt_x + cnt_y + tmp < n + m - 1`：总数上限是 $n+m-1$（行/列必有交叉冲突，见常见陷阱 6）。
+- 两个内层 `while` 用 `vis` 跳过已选值——两数组有交集，同一值可能两边都遇到（陷阱 4）。
+- `arr_x[idx_x] == arr_y[idx_y]` 时两边一起收、`tmp++`；否则谁大收谁，对应 `cnt_x++` / `cnt_y++`。
+
+### 阶段二 · 释放公共值
+
+```cpp
+// ===== 阶段二：释放公共值 =====
         // 如果 a 耗尽了，把 tmp 转化为纯行值，腾出列名额
         if (idx_x == 0 && cnt_x < n)
         {
@@ -289,7 +310,16 @@ int main()
             tmp -= t; cnt_y += t;
         }
 
-        // ===== 阶段三：单边继续补充 =====
+        
+```
+
+- 一边数组耗尽后，公共值占的「对面名额」就浪费了，必须把 `tmp` 转化成纯值释放（陷阱 2）。
+- 释放上限是**对面的剩余容量**：行 `n - cnt_x`、列 `m - cnt_y`，别写反（陷阱 3）。
+
+### 阶段三 · 单边补充与输出
+
+```cpp
+// ===== 阶段三：单边继续补充 =====
         // a 还有剩余，继续选行值
         while (idx_x > 0
                && tmp + cnt_x + cnt_y < n + m - 1
@@ -323,18 +353,8 @@ int main()
 }
 ```
 
-### 关键变量对照表
-
-| 变量 | 含义 |
-|------|------|
-| `cnt_x` | 纯行值的数量（只来自 $a$） |
-| `cnt_y` | 纯列值的数量（只来自 $b$） |
-| `tmp` | 公共值的数量（来自 $a \cap b$，占用双名额） |
-| `cnt_x + tmp` | 已用行名额 |
-| `cnt_y + tmp` | 已用列名额 |
-| `cnt_x + cnt_y + tmp` | 已选不同值的总数 |
-
----
+- 另一边耗尽后，只用剩余一边继续补到名额满；`tmp + cnt_x < n` 才是行的真实已用量（陷阱 1）。
+- `sum` 用 `long long`：总和最大约 $4\times10^{10}$，超过 `int`（陷阱 5）。
 
 ## 复杂度分析
 

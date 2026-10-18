@@ -3,7 +3,7 @@ id: prob-csps2020-program-fill-2
 title: 'CSP-S 2020 程序填空2 — 子序列最大异或分值（高低位分拆状压DP）'
 oj: 'CSP-S'
 problemId: '2020 程序填空2'
-difficulty: '提高'
+difficulty: '其他'
 category: '动态规划'
 tags: ["动态规划", "状态压缩DP", "异或", "popcount", "高低位分拆", "预付费技巧", "子序列"]
 timeComplexity: 'O(n · 2^{B})'

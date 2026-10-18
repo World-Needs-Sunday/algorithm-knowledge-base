@@ -110,31 +110,60 @@ write(max(A[l][mh], A[r - (1 << mh) + 1][mh]));
 
 ## 逐行代码解析
 
+### 头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 vector<vector<int>> A;          // ST 表，A[i][j] = max[a[i..i+2^j-1]]
 vector<int> T;                  // 声明但本版本未使用（保留以兼容）
+```
+
+- `A` 是 ST 表本体，`A[i][j]` 存从下标 `i` 起、长度 $2^j$ 区间的最大值；行下标用 $1..N$，列下标用 $0..h$。
+- `T` 是版本 1 预处理幂次表留下的声明，本版本已完全不用（仅保留兼容），不占实际空间、可删除。
+
+### get_h — 内建函数求 $\lfloor \log_2 i \rfloor$
+
+```cpp
 inline int get_h(int i)         // 一行求 floor(log2(i))
 {
     return 31 - __builtin_clz((unsigned)i);
     // __builtin_clz 返回前导 0 个数；31-之 即最高位 1 的位置 = log2
 }
+```
+
+- 核心：`__builtin_clz((unsigned)i)` 返回 32 位无符号 `i` 的前导 0 个数，`31 - 之` 即最高位 1 所在的位置 $p$，恰好等于 $\lfloor \log_2 i \rfloor$。
+- 强转 `(unsigned)` 是安全惯例（即使 `i` 为负也按无符号位模式计算）；调用前必须保证 `i ≥ 1`，因为 `__builtin_clz(0)` 是未定义行为。
+- 该函数通常被编译为单条 `BSR`/`LZCNT` 指令，严格 $O(1)$、常数极小（验证：x=1→0、x=6→2、x=8→3）。
+- 相比版本 1 的 `init` + `lower_bound` + off-by-one 修正，无预处理、无修正；代价是依赖 GCC/Clang，MSVC 需改用 `_BitScanReverse`。
+
+### read — 快速读入
+
+```cpp
 inline int read()               // 快速读入
 {
-	int x = 0,f = 1;char ch = getchar();
-	while(ch < '0' || ch > '9')   // 跳过非数字
-	{
-		if(ch == '-') f = -1;
-		ch = getchar();
-	}
-	while(ch >= '0' && ch <= '9') // 累加数字
-	{
-		x = x * 10 + ch - 48;
-		ch = getchar();
-	}
-	return x * f;
+    int x = 0,f = 1;char ch = getchar();
+    while(ch < '0' || ch > '9')   // 跳过非数字
+    {
+        if(ch == '-') f = -1;
+        ch = getchar();
+    }
+    while(ch >= '0' && ch <= '9') // 累加数字
+    {
+        x = x * 10 + ch - 48;
+        ch = getchar();
+    }
+    return x * f;
 }
+```
+
+- 第一个 `while` 跳过空白与符号，遇到 `-` 置符号位 `f = -1`，用于读取负数。
+- 第二个 `while` 逐位累加，`x = x * 10 + ch - 48` 把字符数字（ASCII 码减 48）转成整数值。
+- `f` 默认 1，最后 `return x * f` 统一处理正负号。
+
+### write — 快速输出
+
+```cpp
 inline void write(int x)         // 快速输出
 {
     static char buf[12];
@@ -144,41 +173,55 @@ inline void write(int x)         // 快速输出
     while(x){buf[p++]=x%10+48;x/=10;}
     while(p--) putchar(buf[p]);
 }
-int main()
-{
-	int N = read();int M = read(); // N 个数，M 次查询
-	int h = get_h(N);              // h = floor(log2(N))
-	A.resize(N + 1,vector<int>(h + 1)); // 二维表 (N+1) x (h+1)
-	for(int i = 1;i <= N;i++) A[i][0] = read(); // j=0 层即原值
-	for(int j = 1;j <= h;j++)      // 逐层递推
-	{
-		int k = 1 << j;            // 当前层区间长度 2^j
-		int t = j - 1;             // 子区间层数
-		for(int i = 1;i + k - 1 <= N;i++) // 起点遍历，保证不越界
-            A[i][j] = max(A[i][j - 1] , A[i + (1 << t)][j - 1]);
-        // 拼接左右两半长度 2^(j-1) 的子区间
-	}
-	for(int i = 1;i <= M;i++)      // 处理每次查询
-	{
-		int l = read();
-		int r = read();
-		int sz = r - l + 1;         // 区间长度
-		int mh = get_h(sz);         // 最大的 k 使 2^k <= sz
-		write(max(A[l][mh] , A[r - (1 << mh) + 1][mh]));
-        // 左段从 l 起，右段到 r 结束，取两者 max
-		putchar('\n');
-	}
-	return 0;
-} 
 ```
 
-**关于 `__builtin_clz` 在位级别的工作机制**：CPU 通常提供"找最高位 1"的硬件指令，如 x86 的 `BSR`（Bit Scan Reverse）和 `LZCNT`（Leading Zero Count）。GCC 的 `__builtin_clz` 会被编译为这些单周期指令，效率远高于软件实现的二分查找。对一个 32 位无符号整数 `x`，设其二进制中最高位的 1 位于第 $p$ 位（最低位为第 0 位），则第 $p+1$ 位到第 31 位全为 0，前导 0 个数就是 $31 - p$。所以 $31 - \text{\_\_builtin\_clz}(x) = 31 - (31 - p) = p = \lfloor \log_2 x \rfloor$。几个验证示例：
-- $x = 1$（`0...0001`），最高位 1 在第 0 位，$\text{\_\_builtin\_clz}(1) = 31$，$31 - 31 = 0 = \lfloor \log_2 1 \rfloor$ ✓
-- $x = 6$（`0...0110`），最高位 1 在第 2 位，$\text{\_\_builtin\_clz}(6) = 29$，$31 - 29 = 2 = \lfloor \log_2 6 \rfloor$ ✓
-- $x = 8$（`0...1000`），最高位 1 在第 3 位，$\text{\_\_builtin\_clz}(8) = 28$，$31 - 28 = 3 = \lfloor \log_2 8 \rfloor$ ✓
-- $x = 10^9$（约 $2^{30}$），最高位 1 在第 29 位附近，结果约 29。
+- 负数先输出 `-` 再取反；`x == 0` 必须特判，否则 `while(x)` 直接跳过、什么也不输出。
+- `while` 把 `x` 的各位从低位到高位逆序写入 `buf`，最后 `while(p--)` 反向输出，得到正确的数字顺序。
+- `buf[12]` 足够容纳 `int` 的至多 10 位十进制 + 负号。
 
-**与版本 1 的对比**：版本 1 需要 `init()` 预处理 T 表（$O(\log N)$）+ 每次 `get_h` 做 `lower_bound` 二分（$O(\log \log N)$），且有一处容易出错的 off-by-one 修正 `if (1 << ans != i) ans -= 1`。版本 2 用一行内建函数替代，无预处理、无修正、单指令完成，代码更短、更不易错、常数更小。代价是依赖 GCC 内建函数，可移植性略差（MSVC 需用 `_BitScanReverse` 等替代）。
+### main — 读入与建表
+
+```cpp
+int main()
+{
+    int N = read();int M = read(); // N 个数，M 次查询
+    int h = get_h(N);              // h = floor(log2(N))
+    A.resize(N + 1,vector<int>(h + 1)); // 二维表 (N+1) x (h+1)
+    for(int i = 1;i <= N;i++) A[i][0] = read(); // j=0 层即原值
+    for(int j = 1;j <= h;j++)      // 逐层递推
+    {
+        int k = 1 << j;            // 当前层区间长度 2^j
+        int t = j - 1;             // 子区间层数
+        for(int i = 1;i + k - 1 <= N;i++) // 起点遍历，保证不越界
+            A[i][j] = max(A[i][j - 1] , A[i + (1 << t)][j - 1]); // 拼接左右两半 2^(j-1) 子区间
+    }
+```
+
+- `h = get_h(N)` 即 $\lfloor \log_2 N \rfloor$，是第二维的上界（$2^j$ 不能超过 $N$）。
+- `A.resize(N + 1, vector<int>(h + 1))`：行开 $0..N$、列开 $0..h$；列必须开到 `h` 而不是 `h-1`，否则最后一层越界。
+- $j=0$ 层直接读入原值；外层先枚举长度层 `j`（小到大），保证 `A[i][j-1]` 与 `A[i+(1<<t)][j-1]` 都已算好。
+- 内层终止条件 `i + k - 1 <= N`（`k = 2^j`）保证区间右端 $i + 2^j - 1$ 不越界，写成 `i <= N` 会越界。
+
+### main — 区间查询
+
+```cpp
+    for(int i = 1;i <= M;i++)      // 处理每次查询
+    {
+        int l = read();
+        int r = read();
+        int sz = r - l + 1;         // 区间长度
+        int mh = get_h(sz);         // 最大的 k 使 2^k <= sz
+        write(max(A[l][mh] , A[r - (1 << mh) + 1][mh])); // 左段从 l 起，右段到 r 结束取 max
+        putchar('\n');
+    }
+    return 0;
+}
+```
+
+- `sz = r - l + 1` 是区间长度；`mh = get_h(sz)` 使 $2^{mh} \le sz$ 且 $2^{mh+1} > sz$。
+- 左段 `A[l][mh]` 覆盖 $[l, l+2^{mh}-1]$，右段 `A[r-(1<<mh)+1][mh]` 覆盖 $[r-2^{mh}+1, r]$，两者并集覆盖整个 $[l,r]$。
+- 两段可能重叠，但 `max` 是幂等运算（$\max(x,x)=x$），重叠不影响结果——这是查询 $O(1)$ 成立的关键。
+- 单次查询只做两次数组访问 + 一次 `max` + 一次 `__builtin_clz`，严格 $O(1)$。
 
 ## 复杂度分析
 
@@ -204,6 +247,7 @@ int main()
 - **查询两段可重叠**：这是 ST 表正确性的核心，但只对幂等运算成立。不要把 ST 表用于求和、积等非幂等运算。
 - **不支持修改**：若数组需要动态修改，必须改用线段树或树状数组。ST 表一旦建好就是只读的。
 - **依赖 GCC 内建函数**：`__builtin_clz` 是 GCC/Clang 扩展，MSVC 需用 `_BitScanReverse` 替代；若需跨编译器可移植，回到版本 1 的手动表法。
+- **`write` 对 `INT_MIN` 取负溢出**：`x = -x` 在 `x` 为 `-2147483648`（即 INT_MIN）时是未定义行为（其相反数无法表示为 `int`）。竞赛数据通常不会给到 INT_MIN，可假设输入合法；若需严谨可特判 INT_MIN 直接输出字符串或用 `long long` 中转。
 
 ## 对比与扩展
 

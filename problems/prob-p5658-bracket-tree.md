@@ -284,11 +284,15 @@ if (ch[fa[i]] == '(' && sk[top] != fa[i])
 
 ## 六、逐行代码解析
 
+### 头文件
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 ```
 - 引入全部标准库。
+
+### 全局变量
 
 ```cpp
 vector<char> ch;
@@ -305,6 +309,8 @@ int top;
 - `top`：栈顶指针（0 表示空栈）
 - 使用 `long long` 是因为方案数可能很大，防止溢出
 
+### init：初始化
+
 ```cpp
 void init(int n)
 {
@@ -318,12 +324,16 @@ void init(int n)
 ```
 - 初始化所有数组，大小为 $n+1$（节点编号从 1 开始）。
 
+### 栈的 push / pop
+
 ```cpp
 inline void push(int x) { sk[++top] = x; }
 inline void pop() { --top; }
 ```
 - 栈的 push 和 pop 操作，用数组模拟栈。
 - `inline` 建议编译器内联，减少函数调用开销。
+
+### dfs：当前节点是 '('
 
 ```cpp
 void dfs(int i)
@@ -341,6 +351,8 @@ void dfs(int i)
   - `dp[i] = 0`：以左括号结尾不可能有合法串
   - 递归处理所有子节点
   - `pop()`：**回溯关键**，离开节点时弹出，恢复栈的状态
+
+### dfs：当前节点是 ')'
 
 ```cpp
     else // 当前字符是 ')'
@@ -369,6 +381,8 @@ void dfs(int i)
     - `push(t)`：**回溯关键**，将暂时弹出的左括号重新压回栈中
   - 如果栈空：当前右括号无法匹配，dp[i] 保持 0，直接向下递归
 
+### 父节点特判
+
 ```cpp
         if (ch[fa[i]] == '(' && sk[top] != fa[i]) 
             dp[i] += 1 + dp[fa[fa[i]]];
@@ -379,6 +393,8 @@ void dfs(int i)
   - 这是一个边界处理，防止某些特殊情况下的遗漏
   - `sk[top] != fa[i]` 是关键：确保不会和上面的栈匹配逻辑重复计数
   - 注意：在标准的栈匹配实现中，这个特判通常是冗余的，但加上更保险
+
+### dfs2：前缀和
 
 ```cpp
 void dfs2(int i)
@@ -394,6 +410,8 @@ void dfs2(int i)
 - 从根开始，自顶向下累加
 - `dp[j] += dp[i]`：子节点的 k 值 = 自己的单点 dp + 父节点的 k 值
 - 执行完后，`dp[i]` 就变成了题目要求的 $k_i$
+
+### main：建图
 
 ```cpp
 int main()
@@ -417,6 +435,8 @@ int main()
 - 输入并建图：
   - 读入每个节点的括号字符
   - 读入每个节点的父节点，构建邻接表 `son` 和父节点数组 `fa`
+
+### main：两遍 DFS 与答案
 
 ```cpp
     dfs(1);

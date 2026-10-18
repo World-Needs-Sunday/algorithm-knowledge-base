@@ -1,6 +1,6 @@
 #include<bits/stdc++.h>
 using namespace std;
-void read_mat(vector<vector<long long>>& mat,int n,int m)
+void read_mat(vector<vector<long long>>& mat, int n, int m)
 {
 	mat.assign(n + 1, vector<long long>(m + 1, 0));
 	for (int i = 1; i <= n; i++)
@@ -13,11 +13,12 @@ void read_mat(vector<vector<long long>>& mat,int n,int m)
 }
 void write_mat(const vector<vector<long long>>& mat)
 {
-	if (mat.empty())
+	if (mat.size() <= 1 || mat[1].size() <= 1)
 	{
-		cout << "NO mull" << ' ';
+		cout << "NO null" << '\n';
 		return;
 	}
+
 	for (int i = 1; i < mat.size(); i++)
 	{
 		for (int j = 1; j < mat[1].size(); j++)
@@ -29,7 +30,9 @@ void write_mat(const vector<vector<long long>>& mat)
 }
 vector<vector<long long>> mul_mat(const vector<vector<long long>>& A, const vector<vector<long long>>& B)
 {
-	if (A[1].size() != B.size()) return vector<vector<long long>>();
+	if (A.size() <= 1 || B.size() <= 1) return {};
+	if (A[1].size() != B.size()) return {};
+		
 	int n = A.size(), m = B[1].size();
 	vector<vector<long long>> ans(n, vector<long long>(m, 0));
 	for (int i = 1; i < n; i++)
@@ -54,7 +57,7 @@ int main()
 	read_mat(A, n, m);
 	cin >> n >> m;
 	read_mat(B, n, m);
-	ans = move(mul_mat(A, B));
+	ans = mul_mat(A, B);
 	write_mat(ans);
 	return 0;
 }

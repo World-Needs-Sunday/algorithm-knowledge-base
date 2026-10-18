@@ -68,6 +68,8 @@ codePath: '数据结构\可持久化线段树\单点修改，区间求和(第一
 
 ## 逐行代码解析
 
+### 全局变量与节点结构
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
@@ -81,7 +83,15 @@ int rt_idx = 0;   // 当前版本号
 int nd_idx = 0;    // 节点分配计数器
 vector<node> root; // 各版本的根节点
 vector<node> nd;   // 节点存储池
+```
 
+- `node` 结构体：`val` 存区间和（`long long`，防止区间和溢出），`son_l/son_r` 是左右孩子在 `nd` 池中的下标，构造时初始化为 `-1` 表示空。
+- `rt_idx` 是当前版本号，`nd_idx` 是节点分配计数器（新节点下标从 1 开始递增）。
+- `root` 存每个版本的根节点，`nd` 是全局节点池；两者都是 `vector<node>`，靠下标引用节点，不持有指针。
+
+### 建树 init（递归建树 + 顶层建树）
+
+```cpp
 // 递归建树: 在 nd[rt] 处建区间 [l,r]
 void init(int rt,int l,int r,const vector<long long>& A)
 {
@@ -113,6 +123,16 @@ void init(int n,int m)
 	root[rt_idx].val = nd[root[rt_idx].son_l].val + nd[root[rt_idx].son_r].val;
 	++rt_idx; // 版本0建好, rt_idx -> 1
 }
+```
+
+- 递归 `init(rt,l,r,A)`：`l==r` 时叶节点直接 `nd[rt].val = A[l]`；否则按 `mid=(l+r)>>1` 分治，先 `++nd_idx` 分配孩子下标再递归，回溯时 `val = 左.val + 右.val`。
+- 顶层 `init(n,m)`：`root.resize(m+1)` 预留版本槽、`nd.resize(n*40)` 预分配节点池，读入 `A[1..n]`。
+- 建版本 0 时手动建根层（左右孩子递归建树后回溯求和），最后 `++rt_idx` 使版本号前进到 1（下一次修改写入 `root[1]`）。
+- 边界：下标一律 1-based（`A` 大小为 `n+1`、叶节点取 `A[l]`）；右区间左端点是 `mid+1`，别写成 `mid`。
+
+### 修改 insert（递归修改 + 顶层修改）
+
+```cpp
 // 递归修改: 基于旧节点 old, 在新节点 rt 处创建增量路径
 void insert(int rt,int old,int l,int r,int i,long long k)
 {
@@ -152,6 +172,16 @@ void insert(int old,int n,int i,long long k)
 	}
 	++rt_idx; // 版本号递增
 }
+```
+
+- 递归 `insert`：先 `nd[rt] = nd[old]` 整体复制旧节点（val 与两个子指针），再对当前节点 `val += k`——因为所有区间包含 i 的节点，其区间和都应增加 k。
+- `i <= mid` 时只新建左孩子、右孩子沿用旧指针共享；否则对称处理右半，另一侧保持共享，未修改的子树被复用。
+- 叶节点 `l==r` 时直接 `return`（增量已施加），函数末尾没有回溯求和：与 P3919 的覆盖式不同，这是增量式实现的关键。
+- 顶层 `insert`：把 `root[rt_idx]` 复制自 `root[old]` 并 `val += k`，按 i 与 mid 关系只新建一侧子树，最后 `++rt_idx` 版本号递增。
+
+### 查询 myget（递归查询 + 顶层查询）
+
+```cpp
 // 递归区间查询: 在 nd[rt] 子树中查询 [ml,mr] 的和
 long long myget(int rt,int l,int r,int ml,int mr)
 {
@@ -172,6 +202,16 @@ long long myget(int ver,int n,int ml,int mr)
 		return myget(root[ver].son_l,l,mid,ml,mr) + myget(root[ver].son_r,mid + 1,r,ml,mr);
 	}
 }
+```
+
+- 递归 `myget` 采用标准三分支：完全不相交（`l>mr || r<ml`）返回 0；完全包含（`ml<=l && mr>=r`）直接返回 `nd[rt].val`；部分相交则递归左右子树求和。
+- 不相交判断用 `||`（任一条件成立即不相交），包含判断用 `&&`（两个边界都要满足），这两个符号方向容易写反。
+- 顶层 `myget` 全区间 `ml==1 && mr==n` 时直接返回根值（小优化，避免递归）；否则手动分裂根层后递归左右。
+- 查询不创建新版本，版本号只在修改时递增。
+
+### main
+
+```cpp
 int main()
 {
 	ios::sync_with_stdio(false);
@@ -202,6 +242,11 @@ int main()
 } 
 ```
 
+- `ios::sync_with_stdio(false)` 关同步、`cin.tie(nullptr)` 解绑，加速大量输入输出。
+- 先 `init(N,M)` 建版本 0，再循环处理 M 个操作。
+- `op==1` 是修改：读入版本 v、位置 idx、增量 k，调用 `insert(v,N,idx,k)` 创建新版本；`op==2`（else 分支）是查询：在版本 v 查询区间 [x,y] 并输出。
+- `k` 与 `val` 用 `long long`，避免大增量/区间和溢出；版本号 v 从 0 开始（版本 0 是最初状态）。
+
 ## 复杂度分析
 
 时间复杂度：建树 $O(n)$；单次修改 $O(\log n)$（沿修改路径递归 $\log n$ 层，每层 $O(1)$）；单次区间查询 $O(\log n)$（标准线段树区间查询最多访问 $O(\log n)$ 个节点）。m次操作总时间 $O(n + m \cdot \log n)$。
@@ -219,6 +264,7 @@ int main()
 - **空间预分配 n*40**：这是一个经验值而非严格上界。当n较小但m很大时（如n=10, m=10^6），n*40=400可能不足以容纳 $4n + m \cdot \log(n)$ 个节点，导致越界。建议根据实际数据范围精确计算或使用更大的上界。
 - **全区间查询优化**：`myget` 重载中 `ml==1 && mr==n` 时直接返回 `root[ver].val`，这一优化依赖根节点val维护了整个区间的和。若修改逻辑有误导致根val不正确，则全区间查询也会出错。
 - **查询不创建新版本**：与P3919不同，本模板的查询操作不执行 `root[rt_idx++] = root[v]`。版本号仅在修改时递增。若题目要求查询也产生版本号则需补充此行。
+- **n=1 时无限递归**：当 n=1 时，顶层 `init(n,m)` 手动分裂根层会递归出 `l=2, r=1` 的非法区间，而递归 `init` 的终止条件只有 `l==r`，无法收敛，导致无限递归/栈溢出。建议在建树/修改/查询入口对 n==1 单独特判，或假设输入 n≥2。
 
 ## 对比与扩展
 

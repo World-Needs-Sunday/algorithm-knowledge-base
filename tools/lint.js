@@ -56,7 +56,7 @@ function parseFrontmatter(text) {
   const m = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   if (!m) return { meta: {}, body: text, hasFrontmatter: false };
   const meta = {};
-  m[1].split('\n').forEach(line => {
+  m[1].split(/\r?\n/).forEach(line => {
     const mm = line.match(/^(\w+):\s*(.*)$/);
     if (!mm) return;
     const key = mm[1];
@@ -153,7 +153,7 @@ const MOJIBAKE = [
   ['锟斤拷', '典型乱码「锟斤拷」'],
   ['\uFFFD', '替换字符 U+FFFD（编码损坏）'],
 ];
-const DIFFICULTY_OK = ['入门', '简单', '中等', '困难', '提高', '普及'];
+const DIFFICULTY_OK = ['入门', '简单', '中等', '困难', '普及', '其他'];
 const KP_SECTIONS_REQUIRED = ['算法原理', '逐行代码解析', '复杂度分析', '常见陷阱'];
 const PROB_SECTIONS_REQUIRED = ['题目描述', '样例', '解题思路', '复杂度分析', '常见陷阱'];
 
@@ -285,7 +285,7 @@ function checkFile(kind, filename) {
     seenCodePath.set(codePath, prev);
     const ext = path.extname(codePath).toLowerCase();
     if (ext !== '.cpp') warn('W011', rel, 6, `codePath 扩展名不是 .cpp（${ext}）`);
-  } else if (kind === 'kp' && meta.category !== '初赛笔记') {
+  } else if (kind === 'kp' && meta.category !== '初赛笔记' && !meta.noCode) {
     warn('W012', rel, 6, '没有 codePath（非初赛笔记类知识点通常应附带代码）');
   }
 

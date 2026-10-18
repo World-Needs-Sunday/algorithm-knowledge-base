@@ -147,98 +147,116 @@ void my_move(int k)
 
 ## 逐行代码解析
 
+以下按模块拆分，各代码块按顺序拼接即与 `Untitled1.cpp` 完全一致。
+
+### 头文件与全局堆
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
-priority_queue<int> L;
-priority_queue<int, vector<int>, greater<int>> R;
+priority_queue<int> L;                                   // 大根堆：存较小的 k 个元素
+priority_queue<int, vector<int>, greater<int>> R;        // 小根堆：存其余元素
 ```
 
-声明两个全局堆：
-- `L`：大根堆（`priority_queue<int>` 默认是大根堆），存较小的 $k$ 个元素
-- `R`：小根堆（第三个模板参数 `greater<int>` 使其变为小根堆），存其余元素
+- `L` 是大根堆（`priority_queue<int>` 默认大根堆），堆顶是这 $k$ 个元素中最大的，即第 $k$ 小。
+- `R` 是小根堆（第三个模板参数 `greater<int>` 使其变为小根堆），堆顶是第 $k+1$ 小。
+- 两个堆都声明在全局，方便 `add` 与 `my_move` 直接访问、共享状态。
+
+### my_move — 重新平衡
 
 ```cpp
 void my_move(int k)
 {
-    while (!L.empty() && L.size() > k)
-    {
-        int x = L.top();
-        L.pop();
-        R.emplace(x);
-    }
-    while (!R.empty() && L.size() < k)
-    {
-        int x = R.top();
-        R.pop();
-        L.emplace(x);
-    }
+	while (!L.empty() && L.size() > k)   // |L| > k：把 L 堆顶（最大）移到 R
+	{
+		int x = L.top();
+		L.pop();
+		R.emplace(x);
+	}
+	while (!R.empty() && L.size() < k)   // |L| < k：把 R 堆顶（最小）移到 L
+	{
+		int x = R.top();
+		R.pop();
+		L.emplace(x);
+	}
 }
 ```
 
-重新平衡函数。注意两个 `while` 的条件互斥（一个处理 $|L| > k$，一个处理 $|L| < k$），不会同时执行。`emplace` 比 `push` 略快（直接构造，避免临时对象）。
+- 第一个 `while`：$|L| > k$ 时把 $L$ 堆顶（最大）移到 $R$，直到 $|L| = k$。
+- 第二个 `while`：$|L| < k$ 时把 $R$ 堆顶（最小）移到 $L$，直到 $|L| = k$。
+- 两个 `while` 条件互斥（一个处理 $> k$，一个处理 $< k$），不会同时执行；移动时取堆顶保证不变量不被破坏。
+- `emplace` 直接原地构造，比 `push` 略快（避免临时对象）。
+
+### add — 插入元素
 
 ```cpp
-void add(int x, int k)
+void add(int x,int k)
 {
-    if (L.empty()) { L.emplace(x); return; }
-    if (x > L.top()) R.emplace(x);
-    else L.emplace(x);
-    my_move(k);
+	if (L.empty())          // 空堆特判：避免对空堆调用 top()
+	{
+		L.emplace(x);
+		return;
+	}
+	if (x > L.top()) R.emplace(x);   // 属于"较大的一半"，放 R
+	else L.emplace(x);               // 属于"较小的一半"，放 L
+	my_move(k);
 }
 ```
 
-插入函数。与 $L.\text{top}()$ 比较决定放入哪个堆，然后平衡。空堆特判避免对空堆调用 `top()`。
+- 只需与 $L.\text{top}()$ 比较一次即可决定放哪：$x > L.\text{top}()$ 放 $R$，否则放 $L$。
+- 空堆特判 `if (L.empty())` 是必要的，避免对空堆调用 `top()`（未定义行为）。
+- 插入后调用 `my_move(k)` 重新平衡；插入最多使 $|L|$ 偏移 1，故平衡最多移动 1 个元素。
+
+### main — 读入与初始建堆
 
 ```cpp
 int main()
 {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
-    int n, k, q;
-    cin >> n >> k >> q;
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr); cout.tie(nullptr);
+	int n,k,q;
+	//n: 初始数据量 , k: 初始维护第k小 , q: 操作数
+	cin >> n >> k >> q;
+	for (int i = 1; i <= n; i++)
+	{
+		int x;
+		cin >> x;
+		add(x, k);
+	}
+	cout << "当前第k小的元素是： " << L.top() << '\n';
 ```
 
-快读优化。读入初始数据量 $n$、维护第 $k$ 小、操作数 $q$。
+- `ios::sync_with_stdio(false)` 与解绑 `cin`/`cout` 是快读优化，关闭与 C 风格 I/O 的同步。
+- 读入初始数据量 $n$、维护第 $k$ 小、操作数 $q$。
+- 循环读入 $n$ 个初始元素，每次 `add` 后自动平衡；建堆完成后 `L.top()` 即为第 $k$ 小。
+
+### main — 处理操作
 
 ```cpp
-    for (int i = 1; i <= n; i++)
-    {
-        int x;
-        cin >> x;
-        add(x, k);
-    }
-    cout << "当前第k小的元素是： " << L.top() << '\n';
-```
-
-依次插入 $n$ 个初始元素，每次插入后自动平衡。插入完成后 $L.\text{top}()$ 即为第 $k$ 小。
-
-```cpp
-    while (q--)
-    {
-        int op;
-        cin >> op;
-        if (op == 1) cout << "当前第k小的元素是： " << L.top() << '\n';
-        else if (op == 2)
-        {
-            int x;
-            cin >> x;
-            add(x, k);
-        }
-        else if (op == 3)
-        {
-            cin >> k;
-            my_move(k);
-        }
-    }
-    return 0;
+	while (q--)                           // 处理 q 次操作
+	{
+		int op;
+		cin >> op;
+		if (op == 1) cout << "当前第k小的元素是： " << L.top() << '\n';   // 查询第 k 小
+		else if (op == 2)                  // 插入新元素
+		{
+			int x;
+			cin >> x;
+			add(x, k);
+		}
+		else if (op == 3)                  // 修改 k 值并重新平衡
+		{
+			cin >> k;
+			my_move(k);
+		}
+	}
+	return 0;
 }
 ```
 
-三种操作：
-- `op = 1`：查询第 $k$ 小，$O(1)$
-- `op = 2`：插入新元素，$O(\log n)$
-- `op = 3`：修改 $k$ 值并重新平衡，$O(|size差| \cdot \log n)$
+- `op = 1`：查询第 $k$ 小，直接读 `L.top()`，$O(1)$。
+- `op = 2`：读入新元素并 `add(x, k)`，$O(\log n)$。
+- `op = 3`：读入新 $k$ 并调用 `my_move(k)` 重新平衡，$O(|size差| \cdot \log n)$。
 
 ## 复杂度分析
 
@@ -295,6 +313,10 @@ int main()
    - `emplace` 直接在容器中原位构造，`push` 先构造临时对象再移动/拷贝
    - 对于 `int` 等基本类型，两者性能无差异
    - 习惯上用 `emplace` 更统一
+
+7. **输入合法性的约定**
+   - 本模板**假设输入合法**：初始有 $n \ge 1$ 个元素、$k$ 在有效范围内（$1 \le k \le 元素总数$）、操作码 $op \in \{1,2,3\}$ 且查询/删除时堆非空。
+   - 代码不处理空堆 `top()`、$k$ 越界、非法 $op$ 这类异常——这些属于调用方的保证，竞赛模板通常省略这些防御。
 
 ## 对比与扩展
 

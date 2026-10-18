@@ -117,6 +117,8 @@ $$
 
 ## 逐行代码解析
 
+### 读入与总和
+
 ```cpp
 #include <bits/stdc++.h>
 using namespace std;
@@ -137,6 +139,13 @@ int main() {
             sum += a[i];
         }
  
+```
+
+- `a` 用下标 $1\sim n$；`sum` 用 `long long`——$a_i\le 10^9$、$n\le 10^5$，总和可达 $10^{14}$，`int` 会溢出。
+
+### 定位中间区间与端点 L/R
+
+```cpp
         long long tmp = 0;
  
         int L = min(k - 1, n - k + 1);
@@ -147,6 +156,14 @@ int main() {
             for (int i = n - k + 2; i <= k - 1; i++) tmp += a[i];
         }
  
+```
+
+- `L = min(k-1, n-k+1)`、`R = max(k, n-k+2)`：把「$k$ 靠左/靠右」两种情形统一成同一套对称坐标，配对从第 $(L,R)$ 对开始。
+- `if (n-k+2 <= k-1)`：判断中间**必留区间** $[n-k+2,\ k-1]$ 是否存在；存在就先把它们全部计入 `tmp`（这些元素无论如何都要留下）。
+
+### 中间段 + 两端配对取 min
+
+```cpp
         int len = L;
         for (int i = 0; i < len; i++) 
         {
@@ -155,6 +172,14 @@ int main() {
             tmp += min(a[l], a[r]);
         }
  
+```
+
+- `len = L`：一共要配 $L$ 对；`l = L - i` 向左收缩、`r = R + i` 向右扩张——从中间向两端展开。
+- 每对取 `min(a[l], a[r])`：为了让留下的和最小，每对里留较小的那个。
+
+### 输出答案
+
+```cpp
         long long ans = sum - tmp;
         cout << ans << '\n';
     }
@@ -162,13 +187,7 @@ int main() {
 }
 ```
 
-- `vector<long long> a(n + 1);` 用下标 $1$ 到 $n$；`sum` 用 `long long`，因为 $a_i\le 10^9$、$n\le 10^5$，总和可达 $10^{14}$，`int` 会溢出。
-- `int L = min(k - 1, n - k + 1);` 与 `int R = max(k, n - k + 2);`：统一小 $k$ 与大 $k$ 两种情形，配对从第 $(L,R)$ 对开始。
-- `if (n - k + 2 <= k - 1)`：判断中间必留区间 $[n-k+2,\ k-1]$ 是否存在，存在则先全部计入 `tmp`。
-- `for (int i = 0; i < len; i++)`：共配 $L$ 对；`l = L - i` 向左收缩、`r = R + i` 向右扩张（即从中间向两端展开），每对取 `min(a[l], a[r])` 计入 `tmp`。
-- `long long ans = sum - tmp;`：得分 = 总和 − 留下元素和。
-
----
+- `ans = sum - tmp`：得分 = 总和 − 留下元素和；因为留下的最小，得分就最大。
 
 ## 复杂度分析
 

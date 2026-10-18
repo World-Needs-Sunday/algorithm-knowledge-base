@@ -157,23 +157,49 @@ i=8, A[8]=7:
 
 ## 逐行代码解析
 
+下面把完整程序按「入口 → 读入 → 数据结构 → 主循环 → 输出」拆成 5 个模块；所有模块的代码块按顺序拼接起来就是完整程序（注释已标注各步含义）。
+
+### 模块 1：头文件与 main 入口
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 int main()
 {
+```
+
+- `bits/stdc++.h` 是万能头，一次包含 `vector`、`deque`、`pair`、`iostream` 等所需头文件，竞赛常用。
+- `using namespace std;` 省略 `std::` 前缀，让 `vector`、`deque`、`cin`、`cout` 可以直接书写。
+
+### 模块 2：读入与数组初始化
+
+```cpp
     ios::sync_with_stdio(false);
     cin.tie(nullptr);cout.tie(nullptr);
     int n,k;
     cin >> n >> k;                         // n: 数组长度, k: 窗口大小
-    vector<int> A(n + 1,0);               // 原数组（1-based）
+    vector<int> A(n + 1,0);                // 原数组（1-based）
     for(int i = 1;i <= n;i++) cin >> A[i];
-    
+```
+
+- 关闭同步流并解绑 `cin`/`cout`，避免读入大数组时超时。
+- `A` 开 `n + 1` 且下标从 `1` 开始（1-based），窗口范围是 `[i-k+1, i]`，出窗判断更直观。
+
+### 模块 3：结果数组与单调队列
+
+```cpp
     vector<int> mymax;                     // 存每个窗口的最大值
     vector<int> mymin;                     // 存每个窗口的最小值
     deque<pair<int,int>> que_max;          // 最大值队列（单调递减）
     deque<pair<int,int>> que_min;          // 最小值队列（单调递增）
+```
 
+- `deque<pair<int,int>>`：STL 双端队列，存 `(值, 下标)` 对；`front()`/`back()`/`pop_front()`/`pop_back()`/`emplace_back()` 全部 $O(1)$。
+- `que_max` 和 `que_min` 是两个独立队列，分别维护最大/最小，逻辑完全对称，只是比较方向相反（`<=` vs `>=`）。
+
+### 模块 4：主循环（出窗 + 维护单调 + 入队 + 记录）
+
+```cpp
     for(int i = 1;i <= n;i++)
     {
         // === 第一步：队首出窗 ===
@@ -187,16 +213,14 @@ int main()
             int idx = que_min.front().second;
             if(i - idx >= k) que_min.pop_front();
         }
-        
+
         // === 第二步：维护单调性（弹出队尾） ===
-        while(!que_max.empty() && que_max.back().first <= A[i])
-            que_max.pop_back();
+        while(!que_max.empty() && que_max.back().first <= A[i]) que_max.pop_back();
         que_max.emplace_back(A[i] , i);    // 第三步：入队
 
-        while(!que_min.empty() && que_min.back().first >= A[i])
-            que_min.pop_back();
+        while(!que_min.empty() && que_min.back().first >= A[i]) que_min.pop_back();
         que_min.emplace_back(A[i] , i);    // 第三步：入队
-        
+
         // === 记录结果（窗口填满后） ===
         if(i >= k)
         {
@@ -204,7 +228,16 @@ int main()
             mymin.emplace_back(que_min.front().first);
         }
     }
-    
+```
+
+- 队首出窗用 `if` 而非 `while`：每次 `i` 只增 `1`，最多一个元素过期出窗。
+- `i - idx >= k` 用 `>=` 而非 `>`：`>=` 才表示队首下标已滑出窗口，用 `>` 会多保留一个过期元素。
+- 维护单调性用 `while`：可能要连续弹出多个队尾；`que_max` 弹 `<=`（递减）、`que_min` 弹 `>=`（递增），方向弄反会导致队列无序。
+- 先弹队尾再入队，顺序不能颠倒；`i >= k` 时窗口才填满 `k` 个元素，此时 `front()` 必非空、可安全取值。
+
+### 模块 5：输出结果
+
+```cpp
     for(int i : mymin) cout << i << " ";   // 先输出所有窗口最小值
     cout << endl;
     for(int i : mymax) cout << i << " ";   // 再输出所有窗口最大值
@@ -212,14 +245,8 @@ int main()
 }
 ```
 
-**关键解析：**
-
-- `deque<pair<int,int>>`：STL 双端队列，存 `(值, 下标)` 对。`front()` 取队首，`back()` 取队尾，`pop_front()`/`pop_back()` 弹出头尾，`emplace_back()` 在尾部构造插入。全部 $O(1)$。
-- `que_max` 和 `que_min` 是**两个独立的队列**，分别维护最大值和最小值。它们的入队出队逻辑完全对称，只是比较方向相反（`<=` vs `>=`）。
-- 队首出窗用 `if` 而非 `while`：因为每次只新增一个元素（`i` 增 1），最多只有一个元素出窗，所以 `if` 足够。如果窗口大小变化或其他场景，可能需要 `while`。
-- 维护单调性用 `while`：可能需要弹出多个队尾元素才能保持单调性，所以用 `while` 循环。
-- `i >= k` 才记录结果：前 $k-1$ 个元素时窗口还没填满，队首不是完整窗口的最值。
-- 输出顺序：先输出最小值再输出最大值。题目通常要求这样的格式，可按需调换。
+- 先输出所有窗口最小值、再输出所有窗口最大值，符合题目常见格式，可按需调换。
+- 结果数量为 `n - k + 1` 个窗口。
 
 ## 复杂度分析
 
@@ -254,6 +281,7 @@ int main()
 5. **`deque` 的使用**：双端队列支持 $O(1)$ 的头尾操作，用 `std::deque` 或手写数组模拟均可。手写数组模拟在竞赛中有时更快（无 STL 开销），但 `deque` 更简洁不易错。
 6. **同时维护最大最小的开销**：本模板同时维护两个队列，时间空间常数都是两倍。如果只需要一个方向，只需保留对应队列。
 7. **值 vs 下标存储**：队列存 `(值, 下标)` 还是只存下标？存值的好处是比较时不用再访问数组（代码更直观），存下标的好处是节省内存（尤其当值的类型很大时）。竞赛中存值更常见。
+8. **未校验 $1 \le k \le n$**：当 $k > n$ 或 $k \le 0$ 时，上述逻辑会破坏（如 `i >= k` 永远不成立导致无结果，或出窗条件失效）。通常题目保证输入合法，可默认假设 $1 \le k \le n$；若需稳健处理，应在读入后加判断（如 `if(k <= 0 || k > n)` 特判或调整）。
 
 ## 对比与扩展
 

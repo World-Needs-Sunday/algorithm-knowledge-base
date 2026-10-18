@@ -249,6 +249,8 @@ void dfs_arr(int rt, int f)
 
 ## 逐行代码解析
 
+### 全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
@@ -258,9 +260,11 @@ vector<vector<int>> edges, ST;
 vector<int> fa, h;
 ```
 
-- `N`：节点数，`M`：修改次数，`S`：根节点，`sz`：倍增跳表最大层数
-- `A`：初始权值，`arr`：差分数组
-- `edges`：邻接表，`ST`：倍增跳表，`fa`：父节点数组，`h`：深度数组
+- `N` 节点数、`M` 修改次数、`S` 根节点、`sz` 倍增跳表最大层数。
+- `A` 存初始点权、`arr` 存差分值，二者都用 `long long`，因为多次路径累加可能超出 `int`。
+- `edges` 是邻接表（无向边需双向建图），`ST` 是倍增跳表，`fa` 记父节点，`h` 记深度。
+
+### 预处理（dfs 与 init）
 
 ```cpp
 int dfs(int rt, int rh)
@@ -275,11 +279,7 @@ int dfs(int rt, int rh)
     }
     return ans;
 }
-```
 
-DFS 遍历：用 `fa[i] != 0` 判断已访问，记录父节点和深度。返回最大深度用于计算跳表层数。
-
-```cpp
 void init()
 {
     fa.resize(N + 1, 0);
@@ -292,14 +292,45 @@ void init()
     ST.resize(N + 1, vector<int>(sz + 1, S));
     for (int i = 1; i <= N; i++) ST[i][0] = fa[i];
     for (int k = 1; k <= sz; k++)
+    {
         for (int i = 1; i <= N; i++)
+        {
             ST[i][k] = ST[ST[i][k - 1]][k - 1];
+        }
+    }
 }
 ```
 
-初始化：根节点 `fa[S] = S` 作为跳表终止哨兵，差分数组 `arr` 初始全 0。根据最大深度确定跳表层数 `sz`，然后倍增递推。
+- `dfs` 用 `fa[i] != 0` 判断是否访问过，边遍历边记录深度 `h` 与父节点 `fa`，返回值是整棵树的最大深度 `q`。
+- `fa[S] = S` 让根指向自身作哨兵，倍增跳表在"跳过根"时停在根，不会越界。
+- `while (q > ((long long)1 << sz)) ++sz` 保证 $2^{\text{sz}} \ge q$，跳表层数足以覆盖任意深度差。
+- 倍增递推 `ST[i][k] = ST[ST[i][k-1]][k-1]`：跳 $2^k$ 步 = 先跳 $2^{k-1}$ 步再跳 $2^{k-1}$ 步。
+
+### 路径修改（find_fa 与 find_arr）
 
 ```cpp
+int find_fa(int a, int b)
+{
+    if (h[a] < h[b]) swap(a, b);       // 保证 a 更深
+    int tmp = h[a] - h[b];
+    for (int i = 0; i <= sz; i++)      // 将 a 跳到与 b 同一深度
+    {
+        if (tmp & 1) a = ST[a][i];
+        tmp >>= 1;
+    }
+    if (a == b) return a;              // b 是 a 的祖先
+
+    for (int i = sz; i >= 0; i--)      // 两人同时向上跳
+    {
+        if (ST[a][i] != ST[b][i])
+        {
+            a = ST[a][i];
+            b = ST[b][i];
+        }
+    }
+    return fa[a];                      // 最终 a, b 的父节点就是 LCA
+}
+
 void find_arr(int a, int b, long long k)
 {
     int t_fa = find_fa(a, b);
@@ -310,7 +341,12 @@ void find_arr(int a, int b, long long k)
 }
 ```
 
-差分修改：先求 LCA，再按公式修改四个位置。`if (t_fa != S)` 是关键特判——当 LCA 是根时，`fa[S] = S`，再减 `arr[fa[S]]` 会多减一次根。
+- `find_fa` 三步求 LCA：先把较深的 `a` 按二进制位抬到与 `b` 同深，再同步向上跳到父节点不同处，最后 `fa[a]` 即 LCA。
+- 深度对齐用 `tmp & 1` 逐位判断该位要不要跳，比逐级上跳快，复杂度 $O(\log n)$。
+- `find_arr` 按公式改四处：端点 `a, b` 各 `+k`，LCA `-k`，LCA 的父节点 `-k`。
+- `if (t_fa != S)` 是根特判：LCA 为根时 `fa[S] = S`，再减 `arr[fa[S]]` 会多减一次根，必须跳过。
+
+### 子树和还原（dfs_arr）
 
 ```cpp
 void dfs_arr(int rt, int f)
@@ -324,13 +360,18 @@ void dfs_arr(int rt, int f)
 }
 ```
 
-注意此处用 `i == f` 而非 `fa[i]` 判断访问，因为 `dfs_arr` 需要支持双向遍历，传入父节点 `f` 更清晰。
+- 后序 DFS：先递归子节点，回溯时把子节点差分值累加到当前节点，等价于对每个节点求子树和。
+- 这里用 `i == f` 判断父节点而非预处理里的 `fa[i]`，因为传入父节点 `f` 更直观，也避免与 `fa` 数组混淆。
+- 还原后 `arr[i]` 是节点 `i` 的累计修改量，最终权值还要再加初始权值 `A[i]`。
+
+### 主函数 main
 
 ```cpp
 int main()
 {
     ios::sync_with_stdio(false);
     cin.tie(nullptr); cout.tie(nullptr);
+    //N:点的数量,M:修改案例数量,S:根节点
     cin >> N >> M >> S;
     A.resize(N + 1);
     edges.resize(N + 1);
@@ -356,7 +397,10 @@ int main()
 }
 ```
 
-读入树结构和初始权值，预处理后执行 $M$ 次路径修改，最后 DFS 还原子树和，输出 `arr[i] + A[i]`（差分累加值 + 初始权值）。
+- 依次读入 `N, M, S`、初始权值 `A` 和 `N-1` 条无向边（双向 `emplace_back`），再 `init()` 预处理。
+- `while (M--)` 处理 $M$ 次修改：读入路径端点 `a, b` 与增量 `k`，调用 `find_arr` 打差分标记。
+- 修改全部结束后 `dfs_arr(S, S)` 一次性还原子树和（根以自身作父节点哨兵）。
+- 最后输出 `arr[i] + A[i]`：差分累计修改量加上初始权值，才是最终点权。
 
 ## 复杂度分析
 
@@ -418,6 +462,10 @@ int main()
 6. **无向边需双向建图**
    - `edges[a].push_back(b)` 和 `edges[b].push_back(a)` 都要写
    - 还原 DFS 从根开始，必须确保树结构正确
+
+7. **链状树的递归深度与编号约定**
+   - 树退化成一条链时，递归 DFS 深度可达 $n$，$n$ 较大时可能栈溢出，应改迭代或用显式栈（或增大栈空间）
+   - 预处理用 `fa[i] != 0` 判断已访问，隐含"节点编号从 1 起、0 不是合法节点"的约定，输入需保证编号从 1 开始
 
 ## 对比与扩展
 

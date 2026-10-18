@@ -106,12 +106,25 @@ $$\text{if } A[v] > A[u] + w \;\Rightarrow\; A[v] \leftarrow A[u] + w, \;\; \tex
 
 ## 逐行代码解析
 
+下面把整段程序按逻辑拆成 5 个模块：头文件与全局变量、读入与建图、初始化、Dijkstra 主循环、输出结果。各模块代码按顺序拼接即得到完整的 `.cpp`（注释与空白不计）。
+
+### 模块一：头文件与全局变量
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 const int INF = INT_MAX;
 int main()
 {
+```
+
+- `bits/stdc++.h`：GCC 的万能头文件，竞赛常用，一次包含 STL 全部头文件（含 `<queue>`、`<vector>`、`<climits>`）。
+- `const int INF = INT_MAX`：用 `int` 能表示的最大值作为「无穷大」距离。注意它与边权相加可能溢出，见「常见陷阱」。
+- 入口 `int main()`：本代码只处理单组数据，所有变量都声明在 `main` 内部，天然避免多组数据忘记清空的问题。
+
+### 模块二：读入与建图
+
+```cpp
     ios::sync_with_stdio(false);          // 关闭 C/C++ 流同步，加速 I/O
     cin.tie(nullptr);cout.tie(nullptr);   // 解绑 cin/cout，进一步加速
 
@@ -130,11 +143,28 @@ int main()
         cin >> u >> v >> w;
         edges[u].emplace_back(v,w);       // 有向边 u→v，权重 w
     }
+```
 
+- `priority_queue<..., greater<...>>`：STL 优先队列默认是大根堆，加 `greater<>` 反转为小根堆；元素是 `pair<int,int>`，先比 `.first`（距离）再比 `.second`（节点编号），保证距离最小的在堆顶。
+- `A` 与 `edges` 都开 `n + 1` 大小、下标从 `1` 用起，与题面「节点编号从 1 开始」一致（下标 0 闲置）。
+- `for(int i = 1;i <= m;i++)`：读 `m` 条边，循环上界是边数 `m` 而不是点数 `n`，这是容易写错的地方。
+- `edges[u].emplace_back(v,w)`：只加 `u→v` 一条有向边；若为无向图需再加 `edges[v].emplace_back(u,w)`。
+
+### 模块三：初始化
+
+```cpp
     vector<bool> vis(n + 1,false);        // 标记节点是否已确定最短路
     A[s] = 0;                              // 源点距离为 0
     que.emplace(0,s);                     // 将源点入堆
+```
 
+- `vis` 记录节点是否「已确定最短路」，初始全 `false`，供堆弹出时的惰性删除使用。
+- `A[s] = 0`：源点到自身距离为 0，其余点保持 `INF`（未定）。
+- `que.emplace(0,s)`：源点 `(距离0, 节点s)` 入堆作为算法起点；`emplace` 原地构造，比 `push` 少一次拷贝/移动。
+
+### 模块四：Dijkstra 主循环
+
+```cpp
     while(!que.empty())
     {
         pair<int,int> tmp = que.top();    // 取堆顶（距离最小的未处理节点）
@@ -154,21 +184,24 @@ int main()
             }
         }
     }
+```
 
+- `pair<int,int> tmp = que.top()`：`tmp.first` 是距离、`tmp.second` 是节点，取当前距离最小的未确定节点。
+- `if(vis[tmp.second]) continue`：**惰性删除**的核心——同一节点可能有多个过期条目（如先入 $(4,2)$ 后入 $(3,2)$），弹出旧条目时 `vis` 已为 `true`，直接跳过。
+- `if(vis[i.first]) continue`：松弛前跳过已确定的邻居，减少无效入堆。
+- `if(A[i.first] > tmp.first + i.second)`：松弛条件，等价于 $A[v] > A[u] + w$；满足时更新 `A` 并把新距离入堆（旧条目不删除，交给惰性删除）。
+
+### 模块五：输出结果
+
+```cpp
     for(int i = 1;i <= n;i++) cout << A[i] << ' ';  // 输出各点最短距离
     return 0;
 }
 ```
 
-**关键解析：**
-
-- `priority_queue<..., greater<...>>`：STL 优先队列默认是大根堆，加 `greater<>` 后变为小根堆。堆中元素是 `pair<int,int>`，比较时先比 `.first`（距离），确保距离最小的节点在堆顶。
-- `edges[u].emplace_back(v, w)`：构建有向图的邻接表。若为无向图需在此行后加 `edges[v].emplace_back(u, w)`。
-- `que.emplace(0, s)`：源点入堆，距离为 $0$。`emplace` 比 `push` 省去一次移动/拷贝。
-- `if(vis[tmp.second]) continue`：**惰性删除**的核心。堆中可能有同一节点的多个条目（例如先入 $(4, 2)$ 后又入 $(3, 2)$），弹出 $(4, 2)$ 时 `vis[2]` 已为 `true`，直接跳过。
-- `A[i.first] > tmp.first + i.second`：松弛判断。`tmp.first` 是节点 $u$ 的最短距离（已确定），`i.second` 是边权 $w$。若 $A[v] > A[u] + w$ 则更新。
-- `que.emplace(A[i.first], i.first)`：将更新后的距离和新节点入堆。不删除旧条目（STL 优先队列不支持），靠惰性删除处理。
-- 输出 `A[i]`：若某节点不可达，输出 `INF`（即 `INT_MAX`）。
+- 输出循环上界是点数 `n`、从 `1` 到 `n`，与建图、初始化的下标范围保持一致。
+- 不可达节点保持 `A[i] = INF`，会直接输出 `INT_MAX`（即 2147483647）；若题目要求输出 `-1` 等特殊值需额外判断。
+- `return 0;` 与 `}`：结束 `main`，对应模块一中 `int main(){` 的收尾。
 
 ## 复杂度分析
 
@@ -185,7 +218,7 @@ int main()
 ## 常见陷阱与注意事项
 
 1. **负权边**：Dijkstra 的正确性依赖于"已确定节点的距离不会被后续更新"。若存在负权边，这一假设被打破：一个已确定的节点可能通过负权边获得更短路径。存在负权时应使用 Bellman-Ford（$O(VE)$）或 SPFA（均摊 $O(kE)$，最坏 $O(VE)$）。
-2. **INF 溢出**：`INF = INT_MAX` 时，松弛 `tmp.first + i.second` 可能溢出（`INT_MAX + w` 越界为负数）。若边权较大，应将 `INF` 设为 `1e9` 或 `0x3f3f3f3f`（约 $10^9$，加上边权不溢出），或使用 `long long`。
+2. **INF 溢出**：`INF = INT_MAX` 时，松弛 `tmp.first + i.second` 可能溢出（`INT_MAX + w` 越界为负数）。若边权较大，应将 `INF` 设为 `1e9` 或 `0x3f3f3f3f`（约 $10^9$，加上边权不溢出），或使用 `long long`。**注**：OI 常规约束下最短路长度 ≤ $(n-1)\cdot w_{\max}$，不会超过 `int`（约 $2.1\times10^9$）——用 `int` 存距离是安全的；真正要防的是「`INF` 本身与边权相加」的溢出，而非路径长度的累加。
 3. **无向图建边**：代码构建的是有向图（仅 `edges[u].emplace_back(v,w)`）。若为无向图，需同时添加 `edges[v].emplace_back(u,w)`，否则结果错误。
 4. **堆的元素顺序**：`pair` 中距离必须在 `.first`（`emplace(dist, node)`），这样 `greater<>` 才能按距离排序。若误写为 `emplace(node, dist)`，堆会按节点编号排序，完全错误。
 5. **重复入堆导致的空间**：惰性删除策略下堆可能膨胀到 $O(E)$ 大小。在极端图（如完全图）中堆占用内存较大，但不会超时。

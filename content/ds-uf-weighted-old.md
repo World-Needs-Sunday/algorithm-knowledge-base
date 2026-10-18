@@ -114,41 +114,78 @@ codePath: '数据结构\并查集\并查集(带权)\以前没有学的时候写�
 
 ## 逐行代码解析
 
+### 全局变量与头文件
+
 ```cpp
 #include <bits/stdc++.h>
 using namespace std;
 /*蓝桥1156*/
-long long N , M;
-vector<long long> A;
-vector<long long> k;
-vector<long long> sz;
+long long N , M;             // N：元素个数；M：操作次数
+vector<long long> A;         // 父节点数组
+vector<long long> k;         // 到根距离数组
+vector<long long> sz;        // 链大小数组（仅根节点有意义）
+```
+
+- `vector<long long> A;`：父节点数组，`A[i]` 记录节点 `i` 的父节点。
+- `vector<long long> k;`：距离数组，`k[i]` 记录节点 `i` 到其根的距离（链中位置偏移量）。
+- `vector<long long> sz;`：大小数组，`sz[i]` 记录以 `i` 为根的链的节点总数，仅根节点的 `sz` 有意义。
+- `N`、`M` 与三个数组统一用 `long long`，防止距离累加时溢出。
+
+### init() —— 初始化
+
+```cpp
 void init()
 {
   A.resize(N + 1 , 0);
-  for(long long i = 1;i <= N;i++) A[i] = i;
-  k.resize(N + 1 , 0);
-  sz.resize(N + 1 , 1);
+  for(long long i = 1;i <= N;i++) A[i] = i;   // 各自成链：A[i] = i
+  k.resize(N + 1 , 0);                        // 到自身（根）的距离为 0
+  sz.resize(N + 1 , 1);                       // 单节点链大小为 1
 }
+```
 
+- `k.resize(N + 1, 0);`：距离初始化为 0——每个节点到自身（根）的距离为 0。
+- `sz.resize(N + 1, 1);`：大小初始化为 1——每条初始链只有一个节点。
+- 循环范围 `1..N`：数组为 1-indexed，`A[0]` 不参与，三个数组各开 `N + 1` 个位置避免越界。
+
+### find(idx) —— 查找（带路径压缩 + 距离累加）
+
+```cpp
 long long find(long long idx)
 {
-  long long old = A[idx];
-  if(A[idx] != idx) A[idx] = find(A[idx]);
-  if(old != A[idx]) k[idx] += k[old];
+  long long old = A[idx];                     // 关键：先保存旧父节点
+  if(A[idx] != idx) A[idx] = find(A[idx]);    // 递归压缩路径
+  if(old != A[idx]) k[idx] += k[old];         // 累加旧父到新根的距离
   return A[idx];
 }
+```
 
+- `long long old = A[idx];`：**关键**——先保存旧父节点编号，后续递归会改变 `A[idx]`，必须在递归前保存。
+- `if(A[idx] != idx) A[idx] = find(A[idx]);`：递归查找根并执行路径压缩，递归返回后 `A[idx]` 已指向根。
+- `if(old != A[idx]) k[idx] += k[old];`：**核心累加**——若旧父不等于新根（即路径被压缩），把旧父到新根的距离 `k[old]`（已由递归更新）累加到 `k[idx]`，保证 `k[idx]` 始终等于 `idx` 到当前根的真实距离。
+
+### unity(x, y) —— 合并（x 链追加到 y 链末尾）
+
+```cpp
 bool unity(long long x,long long y)
 {
   long long rx = find(x);
   long long ry = find(y);
   if(rx == ry) return false;
-  k[rx] = sz[ry];
-  sz[ry] += sz[rx];
-  A[rx] = ry;
+  k[rx] = sz[ry];       // x 链根到新根的距离 = y 链大小
+  sz[ry] += sz[rx];     // 先设 k，再更新新链大小
+  A[rx] = ry;           // x 链根挂到 y 链根下
   return true;
 }
+```
 
+- `k[rx] = sz[ry];`：x 链根到新根的距离 = y 链大小，因为 x 链追加在 y 链末尾，rx 距离 ry 恰好是 y 链中所有节点的个数。
+- `sz[ry] += sz[rx];`：更新新链大小 = 原 y 链大小 + 原 x 链大小。
+- `A[rx] = ry;`：将 x 链根挂到 y 链根下，完成合并。
+- **顺序不能颠倒**：先设 `k[rx]`（用旧 sz），再更新 `sz[ry]`，否则 `k[rx]` 会取到合并后的大小。
+
+### main() —— 读入与查询
+
+```cpp
 int main()
 {
   cin >> N >> M;
@@ -163,26 +200,16 @@ int main()
       int rx = find(x);
       int ry = find(y);
       if(rx != ry) cout << -1 << endl;
-      else cout << max(k[x],k[y]) - min(k[x],k[y]) - 1 << endl;
+      else cout << max(k[x],k[y]) - min(k[x],k[y]) - 1 << endl;   // |k[x]-k[y]| - 1
     }
   }
   return 0;
 }
 ```
 
-**逐行解析**：
-
-- `vector<long long> A;`：父节点数组。使用 `long long` 防止距离累加时溢出。
-- `vector<long long> k;`：距离数组，`k[i]` 记录节点 `i` 到其根的距离（链中位置偏移量）。
-- `vector<long long> sz;`：大小数组，`sz[i]` 记录以 `i` 为根的链的节点总数。仅根节点的 `sz` 有意义。
-- `k.resize(N + 1, 0);`：距离初始化为 0——每个节点到自身（根）的距离为 0。
-- `sz.resize(N + 1, 1);`：大小初始化为 1——每条初始链只有一个节点。
-- `long long old = A[idx];`：**关键**——先保存旧父节点编号。后续递归会改变 `A[idx]`，必须在递归前保存。
-- `if(A[idx] != idx) A[idx] = find(A[idx]);`：递归查找根并执行路径压缩。递归返回后 `A[idx]` 已指向根。
-- `if(old != A[idx]) k[idx] += k[old];`：**核心累加**——若旧父不等于新根（即路径被压缩），将旧父到新根的距离 `k[old]`（已由递归更新）累加到 `k[idx]`。这保证 `k[idx]` 始终等于 `idx` 到当前根的真实距离。
-- `k[rx] = sz[ry];`：x 链根到新根的距离 = y 链大小。因为 x 链追加在 y 链末尾，rx 距离 ry 恰好是 y 链中所有节点的个数。
-- `sz[ry] += sz[rx];`：更新新链大小 = 原 y 链大小 + 原 x 链大小。
-- `A[rx] = ry;`：将 x 链根挂到 y 链根下，完成合并。
+- `p == 1` 是合并，否则是查询；`init()` 在循环前调用一次。
+- 查询时必须先 `find(x)`、`find(y)` 再读 `k[x]`、`k[y]`，否则读到的可能是过时的距离值。
+- `rx != ry` 时两节点不在同一链，输出 -1（无解）。
 - `max(k[x],k[y]) - min(k[x],k[y]) - 1`：等价于 `|k[x] - k[y]| - 1`，即两节点在链中的位置差减 1，得到中间间隔的节点数。
 
 ## 复杂度分析
@@ -204,6 +231,7 @@ int main()
 - **unity 中 k[rx] 和 sz[ry] 的更新顺序**：必须先 `k[rx] = sz[ry]`（用旧 sz），再 `sz[ry] += sz[rx]`（更新 sz）。若先更新 sz 再设 k，会导致 `k[rx]` 取到合并后的大小。
 - **数据类型**：距离累加可能超过 `int` 范围（特别是 N 较大时），使用 `long long` 更安全。
 - **查询时必须先 find 再读 k**：`k[x]` 只有在 `find(x)` 之后才是最新的。直接读取未经 `find` 的 `k[x]` 可能是过时的值。
+- **查询 x==y 会得到 -1 而非 0**：`|k[x]-k[y]|-1` 在 x==y 时为 -1，而同一元素之间应无中间节点（结果应为 0）。若题目保证查询的两元素不同可忽略；否则应加 `if(x == y)` 直接输出 0 的判断。
 
 ## 对比与扩展
 

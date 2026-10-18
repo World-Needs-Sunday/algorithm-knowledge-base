@@ -142,41 +142,65 @@ $d[l] + w$ 使从 $l$ 开始的所有前缀和都 $+w$，$d[r+1] - w$ 使从 $r+
 
 ## 逐行代码解析
 
+### 模块一：头文件与读入
+
 ```cpp
 #include<bits/stdc++.h>
 using namespace std;
 int main()
 {
-    ios::sync_with_stdio(false);
-    cin.tie(nullptr); cout.tie(nullptr);
-    int N, T;
-    cin >> N >> T;
-    vector<long long> A(N + 2);          // 开 N+2 防止 r+1 越界
-    for(int i = 1; i <= N; i++) cin >> A[i];
-    for(int i = N; i >= 1; i--) A[i] = A[i] - A[i - 1];   // 原地求差分
-    for(int i = 1; i <= T; i++)
-    {
-        int l, r;
-        long long w;
-        cin >> l >> r >> w;
-        A[l] += w;                       // 区间左端点 +w
-        A[r + 1] -= w;                    // 区间右端点后一位 -w
-    }
-    for(int i = 1; i <= N; i++)
-    {
-        A[i] += A[i - 1];                 // 前缀和还原原数组
-        cout << A[i] << ' ';
-    }
-    return 0;
+	ios::sync_with_stdio(false);
+	cin.tie(nullptr);cout.tie(nullptr);
+	int N,T;
+	cin >> N >> T;
+	vector<long long> A(N + 2);          // 开 N+2 防止 r+1 越界
+	for(int i = 1;i <= N;i++) cin >> A[i];
+```
+
+- `vector<long long> A(N + 2)`：开 $N+2$ 空间（下标 $0 \sim N+1$），因为 $r+1$ 最大为 $N+1$，需确保不越界。
+- 用 `long long` 存储：多次区间加后数值可能很大，避免溢出。
+- 下标从 $1$ 开始读入，$A[0]$ 与 $A[N+1]$ 保持默认值 $0$，充当差分计算的哨兵。
+- `ios::sync_with_stdio(false)` 与 `cin.tie(nullptr)`：关闭同步、解绑输入流，加快大量读写。
+
+### 模块二：原地求差分
+
+```cpp
+	for(int i = N;i >= 1;i--) A[i] = A[i] - A[i - 1];   // 原地求差分
+```
+
+- 在同一数组 $A$ 上原地构造差分数组：`A[i] = A[i] - A[i-1]`。
+- **必须倒序遍历**：若正序遍历，`A[i-1]` 已经被改成差分值，再算 `A[i]` 就错了；倒序保证计算 `A[i]` 时 `A[i-1]` 仍是原值。
+
+### 模块三：区间加操作
+
+```cpp
+	for(int i = 1;i <= T;i++)
+	{
+		int l,r;
+		long long w;
+		cin >> l >> r >> w;
+		A[l] += w;                       // 区间左端点 +w
+		A[r + 1] -= w;                    // 区间右端点后一位 -w
+	}
+```
+
+- `A[l] += w; A[r + 1] -= w;`：区间 $[l, r]$ 加 $w$，单次 $O(1)$，$T$ 次操作总时间 $O(T)$。
+- `r+1` 最大为 $N+1$，而数组开到 $N+2$，因此访问不会越界。
+
+### 模块四：前缀和还原并输出
+
+```cpp
+	for(int i = 1;i <= N;i++)
+	{
+		A[i] += A[i - 1];                 // 前缀和还原原数组
+		cout << A[i] << ' ';
+	}
+	return 0;
 }
 ```
 
-逐段分析：
-
-- **`vector<long long> A(N + 2)`**：开 $N+2$ 空间（下标 $0 \sim N+1$），因为 $r+1$ 最大为 $N+1$，需确保不越界。
-- **`for(int i = N; i >= 1; i--) A[i] = A[i] - A[i - 1]`**：原地构造差分数组。**倒序遍历**是关键——若正序遍历，`A[i-1]` 已经被修改为差分值，再用它算 `A[i]` 就错了。倒序保证计算 `A[i]` 时 `A[i-1]` 还是原值。
-- **`A[l] += w; A[r + 1] -= w;`**：区间加操作，$O(1)$。$T$ 次操作总时间 $O(T)$。
-- **`A[i] += A[i - 1]`**：前缀和还原，$O(n)$。还原后 `A[i]` 即为修改后的原值。
+- `A[i] += A[i-1]`：对差分数组求前缀和，还原出修改后的原值，$O(n)$。
+- 还原与输出在同一次循环内完成，累加后的 `A[i]` 即为最终答案，按空格分隔输出。
 
 ### 倒序求差分的原因
 
@@ -226,6 +250,10 @@ int main()
 
 5. **数据类型**
    - 与前缀和同理，多次区间加可能导致数值很大，使用 `long long` 防溢出。
+
+6. **未校验 l ≤ r**
+   - 代码默认输入合法（$1 \le l \le r \le N$），未校验 $l \le r$；若 $r = N+1$，`A[r+1]` 会访问 $A[N+2]$ 越界。
+   - 建议按题意假设输入合法，或加 `if (l > r) continue;` 判断。
 
 ## 扩展应用
 

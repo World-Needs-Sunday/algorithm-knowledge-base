@@ -66,7 +66,7 @@ function parseFrontmatter(text) {
     const body = fmMatch[2];
     const meta = {};
 
-    yamlText.split('\n').forEach(line => {
+    yamlText.split(/\r?\n/).forEach(line => {
         const m = line.match(/^(\w+):\s*(.*)$/);
         if (!m) return;
         const key = m[1];
@@ -182,6 +182,7 @@ function build() {
             subcategory: meta.subcategory || '未分类',
             subSubcategory: meta.subSubcategory || '',
             title: meta.title || meta.id || filename,
+            source: meta.source || '',
             content: body.trim(),
             timeComplexity: meta.timeComplexity || '未知',
             spaceComplexity: meta.spaceComplexity || '未知',
@@ -231,6 +232,7 @@ function build() {
             problemsData.push({
                 id: probId,
                 title: meta.title || probId,
+                source: meta.source || '',
                 oj: meta.oj || '',
                 problemId: meta.problemId || '',
                 difficulty: meta.difficulty || '未标注',

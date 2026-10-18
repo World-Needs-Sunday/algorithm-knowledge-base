@@ -33,7 +33,7 @@ int main()
 	ios::sync_with_stdio(false);
 	cin.tie(nullptr); cout.tie(nullptr);
 	int n,k,q;
-	//n: 初始数据量 , k: 初始维护第k大 , q: 测试数量
+	//n: 初始数据量 , k: 初始维护第k小 , q: 测试数量
 	cin >> n >> k >> q;
 	for (int i = 1; i <= n; i++)
 	{

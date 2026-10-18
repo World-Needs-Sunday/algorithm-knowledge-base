@@ -84,8 +84,10 @@ Splay的均摊 $O(\log n)$ 复杂度基于势能函数（potential function）�
 
 ## 逐行代码解析
 
+### 模块一 · 头文件与结构体定义
+
 ```cpp
-#include<bits/stdc++.h>
+#include<bits/stdc++.h> 
 using namespace std;
 struct sytree
 {
@@ -105,14 +107,22 @@ struct sytree
 };
 vector<sytree> tree;  // tree[0] 是哨兵空节点, 必须保证 sz=0, cnt=0
 int root = 0;         // 全局根节点下标, 0表示空树
+```
 
+- 结构体存 `fa / son[2] / val / sz / cnt` 五个字段：父节点、左右孩子、值、子树大小、同值计数；构造函数把单节点初始化为 `son=0, fa=0, cnt=1, sz=1`。
+- `tree` 是动态 vector，下标即节点编号；`tree[0]` 是空哨兵节点，其 `sz`、`cnt` 必须为 0，否则 `upsz` 访问空子树时会把空节点当成大小为 1 的节点而算错。
+- `root=0` 表示空树，真实节点从下标 1 开始，0 号位永远不存真实数据。
+
+### 模块二 · upsz 与 rot（维护大小 + 单旋）
+
+```cpp
 inline void upsz(int x)//修改大小 
 {
 	// 子树大小 = 左子树 + 右子树 + 自身重复次数
 	// tree[0].sz 必须为0, 否则空子树会贡献错误值
 	tree[x].sz = tree[tree[x].son[0]].sz + tree[tree[x].son[1]].sz + tree[x].cnt;
 }
-void rot(int x) //旋转: 将x上移一层, y下移
+void rot(int x) //旋转 
 {
 	int y = tree[x].fa;         // y 是 x 的父节点
 	int z = tree[y].fa;         // z 是 y 的父节点 (x 的祖父)
@@ -128,7 +138,17 @@ void rot(int x) //旋转: 将x上移一层, y下移
 	tree[x].fa = z;                        // x 的父 = z
 	upsz(y), upsz(x);                     // 先更新下层 y, 再更新上层 x
 }
-void splay(int x, int k)//将x移动到k下面 (k=0 表示移到根)
+```
+
+- `upsz` 用 `左子树sz + 右子树sz + cnt` 重算节点大小；`tree[0].sz` 必须是 0，空子树才贡献 0。
+- `k = (tree[y].son[1] == x)` 判定 x 是左还是右孩子（k=1 右孩子→左旋，k=0 左孩子→右旋），`k^1` 取反方向。
+- 旋转分三步：x 的内侧子树移交给 y、y 下移成为 x 的孩子、x 接替 y 在祖父 z 中的位置，每步都同步维护 `fa` 指针。
+- `upsz(y), upsz(x)` 顺序不能反：先更新下层的 y，再更新上层的 x。
+
+### 模块三 · splay（伸展核心）
+
+```cpp
+void splay(int x, int k)//将x移动到k下面 
 {
 	while (tree[x].fa != k)
 	{
@@ -138,21 +158,30 @@ void splay(int x, int k)//将x移动到k下面 (k=0 表示移到根)
 		{
 			// 异或为真: x和y方向不同 (zig-zag) -> 先旋 x
 			// 异或为假: x和y方向相同 (zig-zig) -> 先旋 y
-			(tree[y].son[0] == x) ^ (tree[z].son[0] == y) ? rot(x) : rot(y);
+			(tree[y].son[0] == x) ^ (tree[z].son[0] == y) ? rot(x) : rot(y);//同向旋转y,异向旋转x
 		}
 		rot(x); // 最后必定再旋一次 x
 	}
 	if (k == 0) root = x; // 若目标是根则更新全局根
 }
-void find(int v)//找到v (或最近节点), 并将其 splay 到根
+```
+
+- 循环条件 `tree[x].fa != k`：把 x 一路旋到 k 的正下方，k=0 表示旋到根。
+- 只有存在祖父 z 且 `z != k` 时才做双旋判定，用异或区分 zig-zig 与 zig-zag。
+- 异或为真（x 与 y 方向不同，zig-zag）先 `rot(x)`；为假（同向，zig-zig）先 `rot(y)`；最后都再补一次 `rot(x)`。
+- 循环结束后若 `k==0` 更新 `root=x`，保证全局根指针与结构一致。
+
+### 模块四 · find 与前驱/后继
+
+```cpp
+void find(int v)//找到v，并且将x移动到根节点 
 {
 	int x = root;
 	// v > tree[x].val 为真(1)走右, 为假(0)走左; 同时检查不等于v且子节点存在
-	while (tree[x].son[v > tree[x].val] && tree[x].val != v)
-		x = tree[x].son[v > tree[x].val];
+	while (tree[x].son[v > tree[x].val] && tree[x].val != v) x = tree[x].son[v > tree[x].val];
 	splay(x, 0);
 }
-int get_pre(int v) //找到v的前驱 (小于v的最大值)
+int get_pre(int v) //找到v的前驱 
 {
 	find(v);            // v 或最近节点旋到根
 	int x = root;
@@ -161,7 +190,7 @@ int get_pre(int v) //找到v的前驱 (小于v的最大值)
 	while (tree[x].son[1]) x = tree[x].son[1]; // 左子树中一直往右走到底
 	return x;
 }
-int get_suc(int v)//找到v的后继 (大于v的最小值)
+int get_suc(int v)//找到v的后继 
 {
 	find(v);
 	int x = root;
@@ -170,13 +199,22 @@ int get_suc(int v)//找到v的后继 (大于v的最小值)
 	while (tree[x].son[0]) x = tree[x].son[0]; // 右子树中一直往左走到底
 	return x;
 }
-void del(int v)//删除v
+```
+
+- `find` 用 `v > tree[x].val` 作方向下标（真=右 1、假=左 0）沿 BST 下行，命中 v 或走到空边即停，然后 `splay(x,0)` 旋到根。
+- find 后 root 要么是 v 本身，要么是离 v 最近的节点（前驱或后继），前驱/后继查询都复用这一点。
+- `get_pre`：root 值已 < v 时 root 即前驱；否则进左子树一路向右走到底，取左子树中的最大值。
+- `get_suc` 对称：root 值已 > v 时 root 即后继；否则进右子树一路向左走到底；-INF/+INF 哨兵保证永远有解。
+
+### 模块五 · del / getrk / getval（删除、排名、第 k 小）
+
+```cpp
+void del(int v)//删除v 
 {
 	int pre = get_pre(v);  // 前驱 (因哨兵存在必定有值)
 	int suc = get_suc(v);  // 后继
 	splay(pre, 0); splay(suc, pre);
-	// pre 为根, suc 为 pre 的右孩子
-	// 由于 pre < v < suc 且 v 唯一, v 一定是 suc 的左孩子
+	//将pre当根节点，suc作为pre的右孩子，目的是因为v是树中唯一满足pre < v < suc,所以v一定是suc的左孩子
 	int tmp = tree[suc].son[0];
 	if (tree[tmp].cnt > 1)  // 重复元素: 仅减少计数
 	{
@@ -189,14 +227,14 @@ void del(int v)//删除v
 		splay(suc, 0);
 	}
 }
-int getrk(int v)//找到v的排名 (小于v的元素个数+1)
+int getrk(int v)//找到v的排名 
 {
 	find(v);
 	// 若 root.val < v (v不在树中): 排名 = 左子树sz + root.cnt (所有<=root的个数)
 	// 若 root.val >= v (v在树中):  排名 = 左子树sz (严格<v的个数)
 	return tree[root].val < v ? tree[tree[root].son[0]].sz + tree[root].cnt : tree[tree[root].son[0]].sz;
 }
-int getval(int k)//找到第k小的数
+int getval(int k)//找到第k小的数 
 {
 	int x = root;
 	k += 1; // +1 跳过 -INF 哨兵 (哨兵占第1名)
@@ -217,7 +255,17 @@ int getval(int k)//找到第k小的数
 	splay(x, 0);
 	return tree[x].val;
 }
-void insert(int v)//添加元素
+```
+
+- `del` 先取 pre/suc 再 `splay(pre,0); splay(suc,pre)`，使 pre 为根、suc 为 pre 右孩子；因 pre<v<suc 且 v 唯一，v 必是 suc 的左孩子。
+- 若 `cnt>1` 只 `--cnt`，否则把 suc 左孩子置 0 摘除节点；两种分支最后都 splay 到根，维持局部性并顺带修正沿途 sz。
+- `getrk`：find 后若 `root.val < v`（v 不在树）返回 `左子树sz+cnt`（所有 ≤root 即 <v 的元素个数），否则返回 `左子树sz`（严格 <v 的个数）。
+- `getval`：`k+=1` 跳过 -INF 哨兵；`左子树sz+cnt < k` 时向右走并减掉，否则看左子树是否够 k，都不满足则当前节点就是答案。
+
+### 模块六 · insert 与 main（插入 + 主流程）
+
+```cpp
+void insert(int v)//添加元素 
 {
 	int x = root, p = 0;
 	while (x && tree[x].val != v) // 沿BST向下搜索v
@@ -263,6 +311,11 @@ int main()
 }
 ```
 
+- `insert` 沿 BST 向下找 v：找到就 `cnt++`，否则以 `tree.size()` 为新下标、`emplace_back` 构造并挂到父节点 p 的对应方向。
+- 每次 insert 都 `splay(x,0)` 把新插入或已存在节点旋到根，维持访问局部性。
+- `main` 先 `emplace_back(0)` 建立空哨兵并显式置 `sz=0, cnt=0`，再插入 -INF/+INF 两个哨兵，保证前驱/后继永不出界。
+- switch 按 op 分发 6 种操作；前驱/后继输出的是 `tree[get_pre(x)].val`（取节点值），排名与第 k 小直接输出函数返回值。
+
 ## 复杂度分析
 
 Splay树每次操作的均摊时间复杂度为 $O(\log n)$。这一结论基于Sleator-Tarjan的势能分析：定义势能函数 $\Phi(T) = \sum_u \log_2(\text{size}(u))$，其中size(u)是节点u的子树大小。Access Lemma证明，将节点x伸展到根的实际代价加上势能变化不超过 $3 \cdot \log_2(\text{size}(T)) + 1 = O(\log n)$。在一串m次操作中，初始势能为0、最终势能不超过 $n \cdot \log_2(n)$，因此总实际代价 $\leq$ 总均摊代价 + 初始势能 $= O((m+n) \cdot \log n)$，每次操作均摊 $O(\log n)$。
@@ -280,6 +333,7 @@ Splay树适用于需要动态维护有序序列并支持排名查询、前驱后
 - **rot后必须调用upsz**：旋转改变了子树结构，若忘记更新sz则后续的排名查询和第k小查询全部出错。代码中 `upsz(y), upsz(x)` 先更新下层y再更新上层x，顺序不能反。
 - **getval中的k+=1**：由于插入了-INF哨兵，最小的真实元素排名为2（第1名是-INF），因此查询第k小实际要找第k+1名。
 - **del中v必须是suc的左孩子**：这一前提依赖于"v在树中唯一存在且pre<v<suc"的BST性质。若树中不存在v，get_pre和get_suc仍会返回最近的节点，但del的逻辑前提不成立，可能导致误删。
+- **getval(k)越界会死循环与哨兵值域冲突**：`getval` 用 `while(true)` 无兜底退出，k 越界（过大或过小）时会在空节点上反复原地打转，应假设 k 合法或先判断 `1 <= k <= 元素总数`；另外哨兵取 `±0x3f3f3f3f`（约 $1.06\times10^9$），插入值若逼近该上界会与 +INF 冲突，值域应远离哨兵或改用更大的哨兵（如 `±0x7fffffff`）。
 
 ## 对比与扩展
 

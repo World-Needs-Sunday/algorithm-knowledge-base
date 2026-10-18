@@ -308,3 +308,21 @@ Eager Prim 维护 `key[v]` 数组（每个未访问节点到已选集合的最�
 ### 扩展：Boruvka 算法
 
 Boruvka 是第三种经典 MST 算法，结合了 Kruskal 和 Prim 的特点：每轮每个连通分量同时选取各自的最小出边，然后合并。时间复杂度 $O(m \log n)$，适合并行化。可用于求解最小生成森林和某些离线问题。
+
+### 扩展：d[] 入堆剪枝（Lazy 与 Eager 的折中）
+
+Lazy Prim 每次扩展都把**所有**未访问邻居推入堆，过期元素最多 $O(m)$；Eager Prim 需要 decrease-key，而 C++ STL 的 `priority_queue` 不支持。折中写法是额外维护 `d[v]`（节点 $v$ 到已选集合的当前最短边权，初始为 `INF`、起点为 `0`），入堆前先剪枝：**仅当 `t.second < d[t.first]` 才 push**——这里 `t` 是候选边 `(节点, 边权)`，即 `t.first` 为节点、`t.second` 为边权，等价于 $w < d[v]$，入堆时同步 `d[v] = w`。这样每个节点在堆里只保留"比已记录更优"的候选，明显减少过期元素；复杂度仍为 $O(m \log m)$（常数更小），且无需 decrease-key。注意堆仍须按**边权**升序排序，`(节点, 边权)` 只是为对照剪枝条件，实现时可沿用正文的 `(边权, 节点)` 反序 pair。
+
+```
+初始化 d[1..n] = INF，d[start] = 0
+push (start, 0)                    # pair 约定：(节点, 边权)
+while 堆非空:
+    (u, w) = 弹出堆顶              # 堆按边权 w 升序
+    if vis[u]: continue            # 惰性删除兜底
+    vis[u] = true; ans += w
+    for 边 (u -> v, w2):
+        if vis[v]: continue
+        if w2 < d[v]:              # t.second < d[t.first]
+            d[v] = w2
+            push (v, w2)
+```

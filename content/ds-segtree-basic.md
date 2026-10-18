@@ -17,7 +17,7 @@ codePath: '数据结构\普通线段树\基础模板\Untitled1.cpp'
 
 线段树的四个核心操作紧密配合：build（建树）自底向上初始化每个节点的区间和；pushdown（my_down）在访问子节点前把父节点的延迟标记下传，保证子节点 tree 值的正确性；update（my_add）在修改时先 pushdown，若完全覆盖则打标记返回，否则递归两个孩子并在返回时 pushup（用孩子值更新自身）；query（my_get）同样先 pushdown，再根据区间相交情况决定返回、合并或递归。pushdown 必须在 update 和 query 递归前都调用，否则子节点的 tree 值会因为没有应用父节点的历史修改而出错。
 
-本模板的建树部分有一个特殊处理：叶子节点的初始值被赋为它的下标 l（即 `tree[rt]=l`），而非从输入读取。这意味着初始时位置 i 的值为 i，对应一类"初始序列为 1,2,3,...,n"的题目变体。若要改成读入任意数组 a[]，只需把 `tree[rt]=l` 改为 `tree[rt]=a[l]` 即可。
+本模板在建树前先从输入读入原数组 `a[1..n]`，叶子节点的初始值取自 `tree[rt]=a[l]`。因此它支持任意初始序列（如洛谷 P3372 的读入要求），不再假定初始序列为 1,2,3,...,n。
 
 ## 数据结构图示
 
@@ -30,6 +30,8 @@ codePath: '数据结构\普通线段树\基础模板\Untitled1.cpp'
     /    \      /    \       /    \       /    \
  [1]rt=8 [2]rt=9 [3]rt=10 [4]rt=11 [5]rt=12 [6]rt=13 [7]rt=14 [8]rt=15
 ```
+
+> 上图为 n=8 时的结构示意，根节点 sum 的值为 $\sum_{i=1}^{8} a[i]$（图中以输入为 1..8 时 sum=36 为例）。
 
 Lazy 标记下传示例：对 [1,8] 全区间加 k 后，根节点 rt=1 被完全覆盖，直接执行 $\text{tree}[1] \leftarrow \text{tree}[1] + 8k$ 和 $\text{lazy}[1] \leftarrow \text{lazy}[1] + k$，子节点不变。下次查询 [1,4] 时调用 `my_down(1,1,8)`，把 lazy[1] 下传：
 
@@ -48,7 +50,7 @@ Lazy 标记下传示例：对 [1,8] 全区间加 k 后，根节点 rt=1 被完�
 
 - **作用**：建树 / 分配数组并启动建树。
 - **参数**：rt 当前节点编号，l,r 当前区间，n 总规模。
-- **算法步骤**：若 `l==r` 为叶子，赋初值（本模板赋下标 l）；否则取 `mid=(l+r)/2`，递归建左子 [l,mid] 和右子 [mid+1,r]，回溯时 `tree[rt]=tree[左]+tree[右]`。`init(n)` 负责 lazy 开 4n+1 初始化为 0，tree 开 4n+1，然后从 `init(1,1,n)` 开始。
+- **算法步骤**：若 `l==r` 为叶子，赋初值 `tree[rt]=a[l]`（原数组对应位置）；否则取 `mid=(l+r)/2`，递归建左子 [l,mid] 和右子 [mid+1,r]，回溯时 `tree[rt]=tree[左]+tree[右]`。`init(n)` 负责把 lazy 开 4n+1 并初始化为 0、tree 开 4n+1 并初始化为 0，然后从 `init(1,1,n)` 开始。
 - **关键细节**：数组必须开 4n 而非 2n。原因是当 n 不是 2 的幂时，线段树最后一层会有大量"空缺"，按 `rt<<1` 编号会导致最大节点编号接近 $4n$。开 $4n+1$ 才能保证不越界。
 
 ### my_down(i, l, r)
@@ -79,122 +81,147 @@ Lazy 标记下传示例：对 [1,8] 全区间加 k 后，根节点 rt=1 被完�
 
 ## 逐行代码解析
 
+### 全局变量
+
 ```cpp
 #include<bits/stdc++.h>
-/*洛谷3372*/ 
+/*洛谷3372*/
 using namespace std;
-vector<long long> tree;
-vector<long long> lazy;
+vector<long long> tree, lazy, a;
 ```
 
-使用全局 vector 存储线段树和 lazy 数组，元素类型 `long long` 防止区间和溢出。
+- `tree`、`lazy`、`a` 是三个全局 `vector<long long>`，分别存节点区间和、延迟标记、原数组；用 `long long` 防止区间和多次累加后溢出 int。
+- `#include<bits/stdc++.h>` 万能头 + `using namespace std`，让 `vector`、`cin/cout` 可直接使用。
+
+### init（建树）
 
 ```cpp
-void init(int rt,int l,int r)
+void init(int rt, int l, int r)
 {
-	if(l == r)
+	if (l == r)
 	{
-		tree[rt] = l;          // 叶子：初值=下标（题目变体）
+		tree[rt] = a[l];                       // 叶子：初值=原数组 a[l]
 		return;
 	}
 	int mid = (l + r) >> 1;
-	init(rt << 1 , l , mid);              // 建左子 [l,mid]
-	init((rt << 1) + 1, mid + 1,r);       // 建右子 [mid+1,r]
+	init(rt << 1, l, mid);                    // 建左子 [l,mid]
+	init((rt << 1) + 1, mid + 1, r);          // 建右子 [mid+1,r]
 	tree[rt] = tree[rt << 1] + tree[(rt << 1) + 1]; // pushup：区间和=左+右
 }
 void init(int n)
 {
-	lazy.resize(4 * n + 1 , 0);   // lazy 初始化为 0（加法单位元）
-	tree.resize(n * 4 + 1);       // tree 大小 4n+1
-	init(1,1,n);                  // 从根开始建树
+	lazy.assign(4 * n + 1, 0);   // lazy 初始化为 0（加法单位元）
+	tree.assign(n * 4 + 1, 0);   // tree 大小 4n+1，初始化为 0
+	init(1, 1, n);               // 从根开始建树
 }
 ```
 
-`tree[rt]=l` 是本模板的特点：叶子初值取下标。`resize(4*n+1,0)` 把 lazy 全置 0，避免垃圾值被当成下传标记。
+- 两个重载：`init(rt,l,r)` 递归建树，`init(n)` 负责分配数组并启动 `init(1,1,n)`。
+- `tree[rt]=a[l]` 是叶子赋初值：叶子初值取原数组 `a[l]`，因此支持任意初始序列（如 P3372 读入的数组）。
+- `assign(4*n+1,0)` / `assign(n*4+1,0)` 把 lazy、tree 全置 0，避免垃圾值被当成下传标记或干扰区间和；数组必须开 4n 而非 2n，因为 n 非 2 的幂时节点编号会接近 4n。
+- `mid=(l+r)>>1`，左子区间 [l,mid]、右子 [mid+1,r]；回溯 `tree[rt]=左+右` 完成 pushup。
+
+### my_down（下传 lazy）
 
 ```cpp
-void my_down(int i ,int l,int r)
+void my_down(int i, int l, int r)
 {
-	if(lazy[i] == 0 || l == r) return;   // 无标记或叶子，无需下传
+	if (lazy[i] == 0 || l == r) return;      // 无标记或叶子，无需下传
 	int mid = (l + r) >> 1;
 	lazy[i << 1] += lazy[i];                              // 左子标记累加
 	tree[i << 1] += (long long)(mid - l + 1) * lazy[i];   // 左子和 += lazy*左子长度
 	lazy[(i << 1) + 1] += lazy[i];                        // 右子标记累加
 	tree[(i << 1) + 1] += (long long)(r - mid) * lazy[i]; // 右子和 += lazy*右子长度
-	lazy[i] = 0;                       // 清空自身标记
+	lazy[i] = 0;                          // 清空自身标记
 }
 ```
 
-注意 `(long long)` 强转避免 int 溢出：`lazy[i]` 与长度相乘可能超过 int 范围。左子长度为 `mid-l+1`，右子长度为 `r-mid`，二者之和恰为 `r-l+1`。
+- 先判断 `lazy[i]==0 || l==r`：无标记或叶子节点无需下传，直接返回。
+- tree 增量是 `lazy × 区间长度`（不是 lazy 本身），因为 lazy 表示"每个元素都要加"，区间和增量 = lazy×len。
+- 左子长度 `mid-l+1`、右子长度 `r-mid`，二者之和恰为 `r-l+1`；`(long long)` 强转避免 `lazy×长度` 超过 int。
+- lazy 用 `+=` 累加而非覆盖，最后把自身 `lazy[i]=0` 清空。
+
+### my_get（区间查询）
 
 ```cpp
-long long my_get(int rt,int l,int r,const int& nl,const int& nr)
+long long my_get(int rt, int l, int r, const int& nl, const int& nr)
 {
-	my_down(rt,l,r);                       // 关键：先下传标记
-	if(l > nr || r < nl) return 0;        // 不相交
-	else if(nl <= l && nr >= r) return tree[rt];  // 完全包含
-	else 
+	my_down(rt, l, r);                        // 关键：先下传标记
+	if (l > nr || r < nl) return 0;           // 不相交
+	else if (nl <= l && nr >= r) return tree[rt];   // 完全包含
+	else
 	{
 		int mid = (l + r) >> 1;
-		return my_get(rt << 1 , l , mid , nl , nr)            // 左子
-		     + my_get((rt << 1) + 1, mid + 1,r,nl,nr);        // 右子
+		return my_get(rt << 1, l, mid, nl, nr) + my_get((rt << 1) + 1, mid + 1, r, nl, nr); // 左右子相加
 	}
 }
 ```
 
-三段式判断：不相交返回 0、完全包含返回 tree、部分相交递归两边求和。`const int&` 传参避免拷贝。
+- 进入第一行就 `my_down`：因为后面要读子节点的 tree，必须先下传父标记保证子节点正确。
+- 三段式判断：不相交返回 0、完全包含直接返回 tree、部分相交递归左右子并相加。
+- 不相交条件是 `l>nr || r<nl`，两个边界方向别写反；`const int&` 传参避免拷贝。
+
+### my_add（区间加法）
 
 ```cpp
-void my_add(int rt,int l,int r,const int& nl,const int& nr,const long long& k)
+void my_add(int rt, int l, int r, const int& nl, const int& nr, const long long& k)
 {
-	my_down(rt,l,r);                       // 先下传
-	if(l > nr || r < nl) return;          // 不相交
-	if(nl <= l && nr >= r)                 // 完全包含：打标记
+	my_down(rt, l, r);                        // 先下传
+	if (l > nr || r < nl) return;             // 不相交
+	if (nl <= l && nr >= r)                   // 完全包含：打标记
 	{
 		tree[rt] += (long long)(r - l + 1) * k;   // 区间和 += k*长度
 		lazy[rt] += k;                            // 标记累加
 		return;
 	}
 	int mid = (l + r) >> 1;
-	my_add(rt << 1,l,mid,nl,nr,k);                  // 递归左子
-	my_add((rt << 1) + 1,mid + 1,r,nl,nr,k);        // 递归右子
-	tree[rt] = tree[rt << 1] + tree[(rt << 1) + 1]; // pushup
+	my_add(rt << 1, l, mid, nl, nr, k);                // 递归左子
+	my_add((rt << 1) + 1, mid + 1, r, nl, nr, k);      // 递归右子
+	tree[rt] = tree[rt << 1] + tree[(rt << 1) + 1];    // pushup
 }
 ```
 
-完全包含分支里 `return` 前只更新 tree 和 lazy，不递归子节点，这正是 lazy 的体现；若误把子节点也更新会退化到 $O(n)$。
+- 完全包含分支只更新 `tree[rt] += k×长度` 和 `lazy[rt] += k` 后 return，不递归子节点——这正是 lazy 的核心，误递归会退化到 $O(n)$。
+- 部分相交时递归左右子，回溯 `tree[rt]=左+右` 做 pushup，保证父节点区间和正确。
+- k 用 `const long long&` 传引用，修改值可能较大，需用 long long 类型。
+
+### main
 
 ```cpp
 int main()
 {
 	ios::sync_with_stdio(false);
-	cin.tie(nullptr);cout.tie(nullptr);   // 快读
-	int n,m;
+	cin.tie(nullptr); cout.tie(nullptr);   // 快读
+	int n, m;
 	cin >> n >> m;
+	a.assign(n + 1, 0);                    // 原数组 a 大小 n+1，下标 1..n
+	for (int i = 1; i <= n; i++) cin >> a[i];   // 读入原数组
 	init(n);
-	for(int i = 0;i < m;i++)
+	for (int i = 0; i < m; i++)
 	{
 		int op;
 		cin >> op;
-		if(op == 1)                       // 区间加
+		if (op == 1)                       // 区间加
 		{
-			int x,y;
-			long long k; 
+			int x, y;
+			long long k;
 			cin >> x >> y >> k;
-			my_add(1,1,n,x,y,k);
+			my_add(1, 1, n, x, y, k);
 		}
 		else                              // 区间求和
 		{
-			int x,y;
+			int x, y;
 			cin >> x >> y;
-			cout << my_get(1,1,n,x,y) << '\n';
+			cout << my_get(1, 1, n, x, y) << '\n';
 		}
 	}
 	return 0;
-} 
+}
 ```
 
-主程序读入 n,m，建树后处理 m 次操作：op=1 调 my_add，否则调 my_get 输出。
+- 读入 n,m 后先 `a.assign(n+1,0)` 分配原数组，再循环读入 `a[1..n]`，然后 `init(n)` 建树，最后循环处理 m 次操作。
+- `op==1` 读 x,y,k 调 `my_add` 做区间加；否则读 x,y 调 `my_get` 输出区间和。
+- `ios::sync_with_stdio(false)` 关闭与 stdio 同步、`cin.tie(nullptr)` 解除 cin 与 cout 的绑定，加速 IO 避免大数据超时。
 
 ## 复杂度分析
 
