@@ -10,6 +10,7 @@ timeComplexity: '{{timeComplexity}}'
 spaceComplexity: '{{spaceComplexity}}'
 codePath: '{{codePath}}'
 level: {{level}}
+source: '{{source}}'   ← 作者/来源：站主自己的题可留空；其他人写 '焚风第三舰队指挥官 (QQ 3370864672)' 之类
 ---
 
 ## 题目描述

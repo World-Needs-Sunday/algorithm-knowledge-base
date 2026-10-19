@@ -221,6 +221,9 @@
         },
         "基础算法|实用工具": {
             "description": "竞赛中常用的辅助工具：时间测试、自用头文件、pb_ds 等，用于提升开发与调试效率。"
+        },
+        "基础算法|优化技巧": {
+            "description": "以机器字并行等常数手段压缩时间或空间的工程优化技巧，以 bitset 位运算加速为代表，如把 Floyd 传递闭包的 O(n^3) 常数除以字长。"
         }
     },
     "subSubcategories": {
@@ -878,7 +881,8 @@
                 "graph-johnson",
                 "graph-dijkstra-heap",
                 "dp-bitmask-hamilton",
-                "graph-dag-shortest-path"
+                "graph-dag-shortest-path",
+                "basic-bitset"
             ]
         },
         "graph-johnson": {
@@ -1266,6 +1270,14 @@
         "ds-odt": {
             "prerequisites": [],
             "related": []
+        },
+        "basic-bitset": {
+            "prerequisites": [
+                "graph-floyd"
+            ],
+            "related": [
+                "graph-floyd"
+            ]
         },
         "basic-doubling": {
             "prerequisites": [],

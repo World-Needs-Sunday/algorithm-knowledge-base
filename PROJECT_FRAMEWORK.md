@@ -11,7 +11,7 @@
 | 问题 | 答案 |
 |---|---|
 | 网站是什么 | 纯静态算法/知识点查询站（单文件 `index.html` + 三个构建产物），GitHub Pages 托管 |
-| 内容从哪来 | `content/*.md`（知识点 162 篇）、`problems/*.md`（题目 31 道）、各分类目录下的 `.cpp`（你本人写的代码） |
+| 内容从哪来 | `content/*.md`（知识点 163 篇）、`problems/*.md`（题目 31 道）、各分类目录下的 `.cpp`（你本人写的代码） |
 | 怎么生成网页数据 | `node build.js` → `data.js` + `problems_data.js` + `code_data.js` |
 | 改了内容怎么验证 | `node tools/lint.js`（**error 必须为 0**）→ `node build.js` → 浏览器 Ctrl+F5 |
 | 什么绝对不能做 | ① 代写 `.cpp` 实现 ② 手改三个产物 ③ 不过门禁就交付 |
@@ -41,7 +41,7 @@
 ├── README.md               # 项目说明（人/AI 入口）
 ├── AGENTS.md               # 三条铁律 + 入口指引
 ├── PROJECT_FRAMEWORK.md    # 本文件
-├── content/                # 知识点源文件（162 篇，平铺）；xxx--作者.md 是该知识点的「其他作者版本」
+├── content/                # 知识点源文件（163 篇，平铺）；xxx--作者.md 是该知识点的「其他作者版本」
 ├── problems/               # 题目源文件（31 道，平铺）
 ├── 动态规划/ 数据结构/ 图论/ 数学/ 字符串/ 基础算法/ 输入,输出/   # 知识点 .cpp
 ├── 题目专辑/                # 题目 .cpp
@@ -103,7 +103,7 @@ knowledge_graph.json ─┘       ├─► problems_data.js PROBLEMS_DATA
 | `title` | ✅ | 题名；**去掉 `D.`/`C1.` 这类场次编号前缀** |
 | `oj` | ✅ | 洛谷 / Codeforces / AtCoder / ICPC / CSP-S …；查不到就写 `来源未考证`，**不许编** |
 | `problemId` | ✅ | `P1050` / `CF2252D` …；查不到写 `-` |
-| `difficulty` | ✅ | 入门 / 简单 / 中等 / 困难 / 提高 |
+| `difficulty` | ✅ | 入门 / 简单 / 中等 / 困难 / 普及 / 其他 |
 | `category` | ✅ | 侧边栏分组用（按考点大类填） |
 | `tags` / 复杂度 / `codePath` / `level` | ❌ | 同知识点 |
 

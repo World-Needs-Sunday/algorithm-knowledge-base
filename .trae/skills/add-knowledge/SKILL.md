@@ -43,6 +43,7 @@ description: "添加知识点。当用户说「这是新知识点」「帮我入
 | `codePath` | `{大类}\{子分类}\{算法名}\Untitled1.cpp`（反斜杠） |
 
 > 拿不准的字段**必须问**，尤其 `category` / `subcategory` / `id`。
+> **作者（必确认）**：默认「站主」（你本人）→ 文件用 `content/<id>.md`。若是**其他作者**（如焚风），先确认作者名与 key，在 `build.js` 的 `AUTHOR_KEYS` 登记，文件用 `content/<id>--作者.md`，`id` 仍写 base id，`source` 填作者全名（详见下文「多版本」）。
 
 ### Step 2 · 建骨架（脚手架会自动建代码文件占位 + 图谱空条目）
 

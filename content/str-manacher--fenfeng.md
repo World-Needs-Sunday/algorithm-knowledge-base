@@ -8,7 +8,7 @@ tags: ["字符串", "Manacher", "最长回文子串", "回文串", "线性时间
 timeComplexity: 'O(n)'
 spaceComplexity: 'O(n)'
 level: A
-codePath: '字符串\Manacher\Untitled1.cpp'
+codePath: '字符串\Manacher\Untitled1--fenfeng.cpp'
 verified: 2026-10-19
 source: '焚风第三舰队指挥官 (QQ 3370864672)'
 ---

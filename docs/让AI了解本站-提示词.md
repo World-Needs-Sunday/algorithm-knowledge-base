@@ -69,7 +69,7 @@
 
 【是什么】
 纯静态站点：单文件 index.html（自写 CSS+JS）渲染，没有框架、没有 npm 依赖、没有后端。
-现在有 162 个知识点、31 道题目，分 8 个大类（基础算法/动态规划/数据结构/图论/数学/字符串/输入输出/初赛笔记）。
+现在有 163 个知识点、31 道题目，分 8 个大类（基础算法/动态规划/数据结构/图论/数学/字符串/输入输出/初赛笔记）。
 
 【内容怎么变成网页】
 - content/*.md      知识点（Markdown + frontmatter）
@@ -80,17 +80,24 @@
   页面只读这三个产物；产物永不手改，改了内容必须重新构建。
 
 【一篇知识点长什么样】
-frontmatter：id（=文件名）/ title（正式名）/ category / subcategory / tags（3–6 个）/
-timeComplexity / spaceComplexity（不许写"未知"）/ codePath / level(A/B/C)。
+frontmatter：id（=文件名）/ title（正式名）/ category / subcategory / subSubcategory（二级标签，可空）/
+tags（3–6 个）/ timeComplexity / spaceComplexity（不许写"未知"）/ codePath / level(A/B/C)。
 正文七章，标题逐字用：
   算法原理 → 核心公式 / 状态定义与转移方程 → 逐行代码解析 → 复杂度分析 →
   适用场景 → 常见陷阱与注意事项 → 对比与扩展
 （数据结构类在公式章后加「数据结构图示」「核心操作详解」。）
 
+【多版本（重要）】
+同一个知识点可有多个作者的版本：`content/<id>.md`=站主版，`content/<id>--作者.md`=其他作者版
+（作者 key 映射在 build.js 的 AUTHOR_KEYS，如 fenfeng→焚风）。详情页顶部 tab 切换，
+默认站主，无站主版则按时间优先；缺的版本 tab 置灰。
+
 【一道题目长什么样】
-frontmatter：id / title / oj / problemId / difficulty / category / tags / 复杂度 / codePath。
+frontmatter：id / title / oj / problemId / difficulty（入门/简单/中等/困难/普及/其他）/
+category / tags / 复杂度 / codePath / source（作者，站主自己的题可空）。
 正文：题目描述（含 输入格式 / 输出格式 / 数据范围）→ 样例 → 解题思路 →
       逐行代码解析 → 复杂度分析 → 常见陷阱与注意事项 → 对比与扩展。
+（题目目前单版本，作者只写 source 字段，无 tab 切换。）
 
 【三条铁律（最重要）】
 1. 不要替我写 .cpp 实现——我自己写。你可以讲思路、指 bug、列边界、给对拍框架、审查代码。
