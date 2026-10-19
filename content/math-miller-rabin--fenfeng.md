@@ -3,7 +3,7 @@ id: math-miller-rabin
 title: 'Miller–Rabin 素性测试'
 category: 数学
 subcategory: 数论基础
-subSubcategory: ''
+subSubcategory: '素数'
 tags: ['数论', '素数', '素性测试', '费马小定理', '概率算法']
 timeComplexity: 'O(k log³ n)'
 spaceComplexity: 'O(1)'

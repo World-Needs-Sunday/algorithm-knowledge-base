@@ -44,7 +44,7 @@ knowledge_graph.json ─┘            ├─► problems_data.js PROBLEMS_DATA
 | 路径 | 是什么 |
 |---|---|
 | `index.html` | 前端单文件（页面布局、KaTeX 三步法、标签筛选、搜索、hash 路由） |
-| `content/*.md` | **知识点源文件**（frontmatter + 7/8 章正文） |
+| `content/*.md` | **知识点源文件**（frontmatter + 7/8 章正文）；`content/<id>--作者.md` 是该知识点的**其他作者版本**，详情页顶部可切换 |
 | `problems/*.md` | **题目源文件**（frontmatter + 题面/思路/代码解析） |
 | `knowledge_graph.json` | 分类描述 + 前置/相关关系（`prerequisites` / `related`） |
 | `各分类目录/*.cpp` | **你本人写的代码**（知识点示例、题目正解、暴力、造数据） |

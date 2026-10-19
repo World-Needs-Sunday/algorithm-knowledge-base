@@ -3,6 +3,7 @@ id: math-crt
 title: '中国剩余定理（CRT）'
 category: '数学'
 subcategory: '数论基础'
+subSubcategory: '同余与模运算'
 difficulty: '提高'
 tags: ['数学', '数论', '中国剩余定理', 'CRT', '模逆元', '费马小定理', '同余方程组']
 prerequisites: ['math-modular-inverse', 'math-gcd-lcm', 'math-quick-pow-basic']

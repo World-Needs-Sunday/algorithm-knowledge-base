@@ -587,6 +587,36 @@
         .badge-space { background: var(--badge-space-bg); color: var(--badge-space-text); }
         .badge-source { background: #ede9fe; color: #5b21b6; }
 
+        .version-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-bottom: 0.9rem;
+        }
+        .version-tab {
+            padding: 0.32rem 0.85rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color, #e2e8f0);
+            background: transparent;
+            color: var(--text-secondary, #64748b);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .version-tab:hover { border-color: var(--accent, #6366f1); color: var(--accent, #6366f1); }
+        .version-tab.active {
+            background: var(--accent, #6366f1);
+            color: #fff;
+            border-color: var(--accent, #6366f1);
+        }
+        .version-tab.disabled {
+            cursor: not-allowed;
+            opacity: 0.38;
+            border-style: dashed;
+        }
+        .version-tab.disabled:hover { border-color: var(--border-color, #e2e8f0); color: var(--text-secondary, #64748b); }
+
         .badge-difficulty-easy { background: #dcfce7; color: #166534; }
         .badge-difficulty-medium { background: #fef9c3; color: #854d0e; }
         .badge-difficulty-hard { background: #fee2e2; color: #991b1b; }
@@ -1747,41 +1777,85 @@
         }
 
         // ===== Select Knowledge Point =====
+        var currentKp = null;
+        var currentVer = 0;
+
         function selectKP(id) {
             var kp = KNOWLEDGE_DATA.find(function(k) { return k.id === id; });
             if (!kp) return;
+            currentKp = kp;
+            currentVer = 0; // build.js 已把主版本（站主优先，否则时间优先）放在 versions[0]
             document.title = kp.title + ' · 算法知识点查询系统';
-
             currentId = id;
+
+            renderKpArticle(kp, currentVer);
+
+            // Update URL
+            location.hash = id;
+
+            // Update sidebar active (preserve expand/collapse state)
+            var savedState = saveSidebarState();
+            buildSidebar(searchInput.value);
+            restoreSidebarState(savedState);
+            revealActiveInSidebar();
+
+            // Scroll to top
+            contentEl.scrollTop = 0;
+
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('open');
+            }
+        }
+
+        function switchVersion(i) {
+            if (!currentKp || !currentKp.versions || i < 0 || i >= currentKp.versions.length) return;
+            currentVer = i;
+            renderKpArticle(currentKp, i);
+        }
+
+        function renderKpArticle(kp, verIdx) {
+            var versions = kp.versions || [{
+                author: '站主', content: kp.content, codePath: kp.codePath,
+                timeComplexity: kp.timeComplexity, spaceComplexity: kp.spaceComplexity, tags: kp.tags
+            }];
+            var ver = versions[verIdx];
+
+            // Version tabs（站主 + 所有已知作者；缺版本的置灰）
+            var tabsHtml = '<div class="version-tabs">';
+            (typeof AUTHORS !== 'undefined' ? AUTHORS : ['站主']).forEach(function(author) {
+                var vi = versions.findIndex(function(v) { return v.author === author; });
+                var cls = 'version-tab' + (vi === verIdx ? ' active' : '') + (vi < 0 ? ' disabled' : '');
+                var on = (vi >= 0) ? ' onclick="switchVersion(' + vi + ')"' : '';
+                tabsHtml += '<button class="' + cls + '"' + on + '>' + escHtml(author) + '</button>';
+            });
+            tabsHtml += '</div>';
 
             // Meta bar
             var metaHtml = '<div class="meta-bar">';
-            metaHtml += '<span class="badge badge-time">⏱ ' + escHtml(kp.timeComplexity) + '</span>';
-            metaHtml += '<span class="badge badge-space">💾 ' + escHtml(kp.spaceComplexity) + '</span>';
-            if (kp.tags && Array.isArray(kp.tags)) {
-                kp.tags.forEach(function(tag) {
+            metaHtml += '<span class="badge badge-time">⏱ ' + escHtml(ver.timeComplexity || '未知') + '</span>';
+            metaHtml += '<span class="badge badge-space">💾 ' + escHtml(ver.spaceComplexity || '未知') + '</span>';
+            if (ver.tags && Array.isArray(ver.tags)) {
+                ver.tags.forEach(function(tag) {
                     metaHtml += '<span class="tag">' + escHtml(tag) + '</span>';
                 });
-            }
-            if (kp.source) {
-                metaHtml += '<span class="badge badge-source">👤 ' + escHtml(kp.source) + '</span>';
             }
             metaHtml += '</div>';
 
             // Render content: 三步法保护 LaTeX（实现见 renderMarkdownWithMath）
             var contentHtml = '';
             try {
-                contentHtml = renderMarkdownWithMath(kp.content);
+                contentHtml = renderMarkdownWithMath(ver.content);
             } catch(e) {
                 contentHtml = '<p>内容渲染出错: ' + escHtml(e.message) + '</p>';
             }
 
             // Code section placeholder
             var codeHtml = '';
-            if (kp.codePath && typeof CODE_DATA !== 'undefined' && CODE_DATA[kp.codePath]) {
+            if (ver.codePath && typeof CODE_DATA !== 'undefined' && CODE_DATA[ver.codePath]) {
                 codeHtml = '<div class="code-section">' +
                     '<div class="code-header">' +
-                    '<span class="code-filename">📄 ' + escHtml(kp.codePath.split('\\').pop()) + '</span>' +
+                    '<span class="code-filename">📄 ' + escHtml(ver.codePath.split('\\').pop()) + '</span>' +
                     '<button class="copy-btn" onclick="copyCode(this)">📋 复制</button>' +
                     '</div>' +
                     '<pre><code class="language-cpp" id="code-block"></code></pre>' +
@@ -1789,7 +1863,7 @@
             }
 
             // Nav buttons
-            var idx = KNOWLEDGE_DATA.findIndex(function(k) { return k.id === id; });
+            var idx = KNOWLEDGE_DATA.findIndex(function(k) { return k.id === kp.id; });
             var navHtml = '<div class="nav-buttons">';
             if (idx > 0) {
                 navHtml += '<button class="nav-btn nav-prev" onclick="selectKP(\'' + KNOWLEDGE_DATA[idx-1].id + '\')" title="' + escAttr(KNOWLEDGE_DATA[idx-1].title) + '">← ' + escHtml(KNOWLEDGE_DATA[idx-1].title) + '</button>';
@@ -1839,6 +1913,7 @@
             contentEl.innerHTML =
                 '<article class="article">' +
                 '<h1>' + escHtml(kp.title) + '</h1>' +
+                tabsHtml +
                 metaHtml +
                 prereqHtml +
                 '<div class="markdown-body">' + contentHtml + '</div>' +
@@ -1849,8 +1924,8 @@
 
             // Set code content safely (avoids template literal injection)
             var codeBlock = document.getElementById('code-block');
-            if (codeBlock && kp.codePath && CODE_DATA[kp.codePath]) {
-                codeBlock.textContent = CODE_DATA[kp.codePath];
+            if (codeBlock && ver.codePath && CODE_DATA[ver.codePath]) {
+                codeBlock.textContent = CODE_DATA[ver.codePath];
                 hljs.highlightElement(codeBlock);
             }
 
@@ -1860,7 +1935,6 @@
             });
 
             // Render math (fallback for \(...\) and \[...\] delimiters only)
-            // $...$ and $$...$$ are already rendered via placeholder approach above
             try {
                 renderMathInElement(contentEl, {
                     delimiters: [
@@ -1873,23 +1947,6 @@
                 });
             } catch(e) {
                 console.warn('KaTeX render error:', e);
-            }
-
-            // Update URL
-            location.hash = id;
-
-            // Update sidebar active (preserve expand/collapse state)
-            var savedState = saveSidebarState();
-            buildSidebar(searchInput.value);
-            restoreSidebarState(savedState);
-            revealActiveInSidebar();
-
-            // Scroll to top
-            contentEl.scrollTop = 0;
-
-            // Close sidebar on mobile
-            if (window.innerWidth <= 768) {
-                document.getElementById('sidebar').classList.remove('open');
             }
         }
 

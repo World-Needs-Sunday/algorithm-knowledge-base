@@ -3,7 +3,7 @@ id: math-modular-arithmetic
 title: '模运算相关算法'
 category: 数学
 subcategory: 数论基础
-subSubcategory: ''
+subSubcategory: '同余与模运算'
 tags: ['数学', '数论', '模运算', '同余', '逆元']
 timeComplexity: '视具体实现'
 spaceComplexity: '视具体实现'

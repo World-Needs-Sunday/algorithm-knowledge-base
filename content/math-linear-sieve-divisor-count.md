@@ -3,6 +3,7 @@ id: math-linear-sieve-divisor-count
 title: '线性筛求约数个数（欧拉筛批量预处理）'
 category: '数学'
 subcategory: '数论基础'
+subSubcategory: '素数'
 difficulty: '进阶'
 tags: ['数学', '数论', '约数个数', '线性筛', '欧拉筛', '积性函数', '预处理']
 prerequisites: ['math-sieve-eratosthenes', 'math-linear-sieve-phi']

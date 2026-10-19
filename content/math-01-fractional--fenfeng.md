@@ -3,7 +3,7 @@ id: math-01-fractional
 title: '0/1 分数规划'
 category: 数学
 subcategory: 数论基础
-subSubcategory: ''
+subSubcategory: '同余与模运算'
 tags: ["数学", "数论", "分数规划", "二分答案"]
 timeComplexity: '视具体实现'
 spaceComplexity: '视具体实现'

@@ -3,6 +3,7 @@ id: math-modular-inverse
 title: '模逆元（费马小定理 + 扩展欧几里得）'
 category: '数学'
 subcategory: '数论基础'
+subSubcategory: '同余与模运算'
 difficulty: '普及+'
 tags: ['数学', '数论', '模逆元', '费马小定理', '欧拉定理', '快速幂', '扩展欧几里得']
 prerequisites: ['math-quick-pow-basic', 'math-euler-phi', 'math-gcd-lcm']

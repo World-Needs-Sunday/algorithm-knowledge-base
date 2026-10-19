@@ -2,7 +2,8 @@
 id: ds-persistent-segtree-3919
 title: '可持久化线段树（单点修改单点查询 P3919）'
 category: 数据结构
-subcategory: 可持久化线段树
+subcategory: '可持久化数据结构'
+subSubcategory: '可持久化线段树'
 tags: ["数据结构", "可持久化线段树", "历史版本", "单点修改", "P3919"]
 timeComplexity: '建树O(n)，单次修改O(log n)，单次查询O(log n)'
 spaceComplexity: 'O(n+m·log n)'

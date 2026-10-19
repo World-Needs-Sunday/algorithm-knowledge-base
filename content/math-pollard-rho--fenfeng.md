@@ -3,7 +3,7 @@ id: math-pollard-rho
 title: 'Pollard-Rho 质因数分解'
 category: 数学
 subcategory: 数论基础
-subSubcategory: ''
+subSubcategory: '素数'
 tags: ["数学", "数论", "质因数分解", "随机化算法", "生日悖论"]
 timeComplexity: 'O(n^{1/4})'
 spaceComplexity: 'O(1)'

@@ -3,6 +3,7 @@ id: math-euler-phi
 title: '欧拉函数（单次求值）'
 category: '数学'
 subcategory: '数论基础'
+subSubcategory: '数论函数'
 difficulty: '入门'
 tags: ['数学', '数论', '欧拉函数', '积性函数', '质因数分解']
 prerequisites: ['math-gcd-lcm', 'math-sieve-eratosthenes']

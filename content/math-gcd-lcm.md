@@ -3,6 +3,7 @@ id: math-gcd-lcm
 title: 'GCD 与 LCM（欧几里得算法）'
 category: '数学'
 subcategory: '数论基础'
+subSubcategory: '数论函数'
 difficulty: '入门'
 tags: ['数学', '数论', '最大公约数', '最小公倍数', '欧几里得算法', '递归']
 timeComplexity: 'O(log min(a,b))'

@@ -3,6 +3,7 @@ id: math-sieve-eratosthenes
 title: '埃拉托斯特尼筛法（埃氏筛）'
 category: '数学'
 subcategory: '数论基础'
+subSubcategory: '素数'
 difficulty: '入门'
 tags: ['数学', '数论', '素数', '筛法', '埃氏筛', '预处理']
 prerequisites: ['math-gcd-lcm']

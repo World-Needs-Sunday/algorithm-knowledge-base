@@ -3,7 +3,7 @@ id: math-block-division
 title: '整除分块（数论分块）'
 category: 数学
 subcategory: 数论基础
-subSubcategory: ''
+subSubcategory: '数论函数'
 tags: ["数学", "数论", "整除分块", "根号复杂度"]
 timeComplexity: 'O(√n)'
 spaceComplexity: 'O(1)'

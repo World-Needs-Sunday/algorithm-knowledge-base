@@ -2,7 +2,8 @@
 id: ds-persistent-segtree-template
 title: '可持久化线段树（单点修改区间求和 普通模板）'
 category: 数据结构
-subcategory: 可持久化线段树
+subcategory: '可持久化数据结构'
+subSubcategory: '可持久化线段树'
 tags: ["数据结构", "可持久化线段树", "历史版本", "区间求和"]
 timeComplexity: '建树O(n)，单次修改O(log n)，单次区间查询O(log n)'
 spaceComplexity: 'O(n+m·log n)'

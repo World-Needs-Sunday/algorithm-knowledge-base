@@ -170,6 +170,13 @@ if (fileArgs.length) {
   problemFiles = problemFiles.filter(f => wanted.has(f));
 }
 
+// 知识点数量按「base id」统计（多版本文件 xxx--作者.md 与 xxx.md 算同一个知识点）
+const distinctKpCount = new Set(contentFiles.map(f => {
+  const b = path.basename(f, '.md');
+  const i = b.indexOf('--');
+  return i >= 0 ? b.slice(0, i) : b;
+})).size;
+
 let graph = { categories: {}, subcategories: {}, knowledgePoints: {}, subSubcategories: {} };
 if (fs.existsSync(GRAPH_FILE)) {
   try { graph = Object.assign(graph, JSON.parse(readText(GRAPH_FILE))); }
@@ -187,7 +194,11 @@ const codeSync = { exact: 0, annotated: 0, drift: 0, fragment: 0 };
 // 预填充「已知 id」：即使本次只检查若干文件，跨文件引用校验（E011/W032）也要以全量为准，
 // 否则单文件检查会把所有 prerequisites/related 误报成"指向不存在"。
 try {
-  fs.readdirSync(CONTENT_DIR).filter(f => f.endsWith('.md')).forEach(f => knownIds.add(path.basename(f, '.md')));
+  fs.readdirSync(CONTENT_DIR).filter(f => f.endsWith('.md')).forEach(f => {
+    const b = path.basename(f, '.md');
+    const i = b.indexOf('--');
+    knownIds.add(i >= 0 ? b.slice(0, i) : b); // 多版本：按 base id 登记
+  });
 } catch (e) { /* 已在上方处理 */ }
 try {
   fs.readdirSync(PROBLEMS_DIR).filter(f => f.endsWith('.md')).forEach(f => knownIds.add(path.basename(f, '.md')));
@@ -210,19 +221,23 @@ function checkFile(kind, filename) {
     if (!meta[f]) err('E002', rel, 2, `frontmatter 缺少必填字段 "${f}"`);
   });
 
-  // --- id 规范 ---
-  const id = meta.id || path.basename(filename, '.md');
-  const expectId = path.basename(filename, '.md');
+  // --- id 规范（多版本：文件名 xxx--作者.md 视为 xxx 的一个版本）---
+  const fullBase = path.basename(filename, '.md');
+  const isVersionFile = kind === 'kp' && fullBase.includes('--');
+  const expectId = isVersionFile ? fullBase.slice(0, fullBase.indexOf('--')) : fullBase;
+  const id = meta.id || expectId;
   if (meta.id && meta.id !== expectId) {
-    err('E003', rel, 2, `id (${meta.id}) 与文件名 (${expectId}) 不一致`, 'id 必须等于文件名（不含 .md），否则锚点/互链会失效');
+    err('E003', rel, 2, `id (${meta.id}) 与文件名 (${expectId}) 不一致`, 'id 必须等于文件名（不含 .md 与 --作者 后缀），否则锚点/互链会失效');
   }
   if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) {
     warn('W001', rel, 2, `id "${id}" 不符合命名规范（小写字母/数字/连字符）`);
   }
-  if (seenIds.has(id)) {
-    err('E004', rel, 2, `id "${id}" 重复（已在 ${seenIds.get(id)} 出现）`);
-  } else {
-    seenIds.set(id, rel);
+  if (!isVersionFile) {
+    if (seenIds.has(id)) {
+      err('E004', rel, 2, `id "${id}" 重复（已在 ${seenIds.get(id)} 出现）`);
+    } else {
+      seenIds.set(id, rel);
+    }
   }
   knownIds.add(id);
 
@@ -494,16 +509,16 @@ if (fs.existsSync(INDEX_FILE) && !fileArgs.length) {
   const catalogCount = (htmlStatic.match(/class="catalog-kp-item"/g) || []).length;
   const sidebarCount = (htmlStatic.match(/class="kp-item[^"]*"/g) || []).length;
   const footerMatch = html.match(/<span id="kp-count">(\d+)<\/span>/);
-  if (catalogCount && catalogCount !== contentFiles.length) {
+  if (catalogCount && catalogCount !== distinctKpCount) {
     warn('W035', 'index.html', 1,
-      `index.html 内预渲染目录有 ${catalogCount} 条，content/ 有 ${contentFiles.length} 条`,
+      `index.html 内预渲染目录有 ${catalogCount} 条，content/ 有 ${distinctKpCount} 条`,
       '预渲染块由手工维护、容易过期；建议改为构建时生成或直接删除该块');
   }
-  if (footerMatch && Number(footerMatch[1]) !== contentFiles.length) {
-    warn('W036', 'index.html', 1, `index.html 侧栏写死 "${footerMatch[1]} 个知识点"，实际 ${contentFiles.length} 条`);
+  if (footerMatch && Number(footerMatch[1]) !== distinctKpCount) {
+    warn('W036', 'index.html', 1, `index.html 侧栏写死 "${footerMatch[1]} 个知识点"，实际 ${distinctKpCount} 条`);
   }
-  if (sidebarCount && sidebarCount !== contentFiles.length) {
-    warn('W037', 'index.html', 1, `index.html 内预渲染侧栏有 ${sidebarCount} 条，content/ 有 ${contentFiles.length} 条`);
+  if (sidebarCount && sidebarCount !== distinctKpCount) {
+    warn('W037', 'index.html', 1, `index.html 内预渲染侧栏有 ${sidebarCount} 条，content/ 有 ${distinctKpCount} 条`);
   }
   if (!/<meta\s+name="description"/i.test(html)) warn('W038', 'index.html', 1, '缺少 <meta name="description">');
   if (!/rel="icon"/i.test(html)) warn('W039', 'index.html', 1, '缺少 favicon（<link rel="icon">）');
@@ -539,7 +554,7 @@ if (JSON_OUT) {
   console.log(JSON.stringify({
     summary: {
       files: contentFiles.length + problemFiles.length,
-      knowledgePoints: contentFiles.length,
+      knowledgePoints: distinctKpCount,
       problems: problemFiles.length,
       errors: errors.length, warnings: warns.length,
     },
@@ -584,7 +599,7 @@ if (JSON_OUT) {
     }
   }
   console.log('\n' + '-'.repeat(72));
-  console.log(`📊 知识点 ${contentFiles.length} 篇 · 题目 ${problemFiles.length} 道 · 错误 ${errors.length} · 警告 ${warns.length}`);
+  console.log(`📊 知识点 ${distinctKpCount} 篇 · 题目 ${problemFiles.length} 道 · 错误 ${errors.length} · 警告 ${warns.length}`);
   console.log(`🔗 正文代码与 .cpp 同步情况：代码一致 ${codeSync.exact}（其中带注释讲解版 ${codeSync.annotated}）· 真漂移 ${codeSync.drift} · 片段式 ${codeSync.fragment}`);
   console.log(errors.length ? '❌ 存在错误，请修复后再构建/发布' : (warns.length ? '✅ 无阻塞错误（仍有警告待清理）' : '✅ 全部通过'));
   console.log('-'.repeat(72));
@@ -592,7 +607,7 @@ if (JSON_OUT) {
 
 if (WRITE_REPORT) {
   const out = ['# 内容质量检查报告', '', `生成时间：${new Date().toLocaleString('zh-CN')}`, '',
-    `- 知识点：${contentFiles.length} 篇`, `- 题目：${problemFiles.length} 道`,
+    `- 知识点：${distinctKpCount} 篇`, `- 题目：${problemFiles.length} 道`,
     `- 错误：${errors.length} 条`, `- 警告：${warns.length} 条`, '',
     '## 按规则统计', '', '| 规则 | 级别 | 数量 | 说明 |', '|---|---|---|---|'];
   Object.keys(byCode).sort().forEach(c => {

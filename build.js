@@ -150,50 +150,85 @@ function build() {
 
     const knowledgeData = [];
     const allCodePaths = [];
-    const codePathToKpIndex = {};
     let warnings = [];
 
-    // 解析所有 .md 文件
+    // 作者映射：文件名后缀 --key → 显示名（未来加新人在这里扩展）
+    const AUTHOR_KEYS = { fenfeng: '焚风' };
+
+    // 解析所有 .md 文件，按 base id 分组（同 id 多版本）
+    const versionGroups = new Map(); // baseId -> versions[]
     mdFiles.forEach(filename => {
         const filepath = path.join(CONTENT_DIR, filename);
         const raw = fs.readFileSync(filepath, 'utf8');
         const { meta, body } = parseFrontmatter(raw);
 
-        // 校验必填字段（codePath 对初赛笔记等无代码知识点为可选）
+        // 由文件名推断作者：xxx.md → 站主；xxx--fenfeng.md → 焚风
+        const baseName = path.basename(filename, '.md');
+        let author = '站主';
+        let baseId = baseName;
+        const dashIdx = baseName.indexOf('--');
+        if (dashIdx >= 0) {
+            const key = baseName.slice(dashIdx + 2);
+            baseId = baseName.slice(0, dashIdx);
+            author = AUTHOR_KEYS[key] || key;
+        }
+
         const required = ['id', 'title', 'category', 'subcategory'];
         for (const field of required) {
-            if (!meta[field]) {
-                warnings.push(`⚠️  ${filename}: 缺少字段 "${field}"`);
-            }
+            if (!meta[field]) warnings.push(`⚠️  ${filename}: 缺少字段 "${field}"`);
         }
 
-        const codePath = meta.codePath || '';
-        if (codePath) {
-            allCodePaths.push(codePath);
-            codePathToKpIndex[codePath] = knowledgeData.length;
-        }
-
-        // 存储完整 Markdown 正文（由前端 marked.js 渲染）
-        const kpId = meta.id || path.basename(filename, '.md');
-        const graphEntry = graph.knowledgePoints[kpId] || {};
-        knowledgeData.push({
-            id: kpId,
-            category: meta.category || '未分类',
-            subcategory: meta.subcategory || '未分类',
-            subSubcategory: meta.subSubcategory || '',
-            title: meta.title || meta.id || filename,
-            source: meta.source || '',
-            content: body.trim(),
+        if (!versionGroups.has(baseId)) versionGroups.set(baseId, []);
+        versionGroups.get(baseId).push({
+            meta, body, author,
+            codePath: meta.codePath || '',
             timeComplexity: meta.timeComplexity || '未知',
             spaceComplexity: meta.spaceComplexity || '未知',
             tags: Array.isArray(meta.tags) ? meta.tags : (meta.tags ? [meta.tags] : []),
-            codePath: codePath,
+            verified: meta.verified || '',
+            source: meta.source || ''
+        });
+    });
+
+    // 生成 KNOWLEDGE_DATA：每个 baseId 一条，含 versions[]
+    for (const [baseId, vers] of versionGroups) {
+        // 主版本：优先站主；无站主则按 verified 时间优先（取最新）
+        let primary = vers.find(v => v.author === '站主');
+        if (!primary) {
+            primary = vers.slice().sort((a, b) => (b.verified || '').localeCompare(a.verified || ''))[0] || vers[vers.length - 1];
+        }
+        vers.forEach(v => { if (v.codePath) allCodePaths.push(v.codePath); });
+        // 版本数组：主版本放第一位（前端默认显示它）
+        const orderedVers = [primary, ...vers.filter(v => v !== primary)];
+
+        const graphEntry = graph.knowledgePoints[baseId] || {};
+        knowledgeData.push({
+            id: baseId,
+            category: primary.meta.category || '未分类',
+            subcategory: primary.meta.subcategory || '未分类',
+            subSubcategory: primary.meta.subSubcategory || '',
+            title: primary.meta.title || baseId,
+            versions: orderedVers.map(v => ({
+                author: v.author,
+                content: v.body.trim(),
+                codePath: v.codePath,
+                timeComplexity: v.timeComplexity,
+                spaceComplexity: v.spaceComplexity,
+                tags: v.tags,
+                source: v.source
+            })),
+            // 兼容旧字段（取主版本），供目录/搜索/筛选使用
+            content: primary.body.trim(),
+            timeComplexity: primary.timeComplexity,
+            spaceComplexity: primary.spaceComplexity,
+            tags: primary.tags,
+            codePath: primary.codePath,
             prerequisites: graphEntry.prerequisites || [],
             related: graphEntry.related || []
         });
 
-        console.log(`  ✓ ${meta.id || filename} — ${meta.title || ''}`);
-    });
+        console.log(`  ✓ ${baseId}（${vers.length} 版本）— ${primary.meta.title || ''}`);
+    }
 
     // 读取所有代码文件（知识点 + 题目）
     console.log(`\n📖 读取 ${allCodePaths.length} 个代码文件...`);
@@ -276,6 +311,8 @@ function build() {
     const dataJs = `// 此文件由 build.js 自动生成，请勿手动编辑
 // 修改 content/ 下的 .md 文件后运行 node build.js 重新生成
 const KNOWLEDGE_DATA = ${JSON.stringify(knowledgeData, null, 4)};
+
+const AUTHORS = ${JSON.stringify(['站主', ...Object.values(AUTHOR_KEYS)])};
 
 const CATEGORY_META = ${JSON.stringify(graph.categories || {}, null, 4)};
 

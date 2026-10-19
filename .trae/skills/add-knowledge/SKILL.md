@@ -36,7 +36,7 @@ description: "添加知识点。当用户说「这是新知识点」「帮我入
 | `id` | `{前缀}-{子分类缩写}-{算法名}`，小写连字符；前缀见 `PROJECT_FRAMEWORK.md` §3.6 |
 | `title` | 正式算法名；**禁止**"自己写的""以前没学过" |
 | `category` | 8 个大类之一 |
-| `subcategory` / `subSubcategory` | 需在图谱里登记过（否则 lint W005/W006） |
+| `subcategory` / `subSubcategory` | 需在图谱里登记过（否则 lint W005/W006）；**同类知识点多时用 `subSubcategory` 做二级标签**（例：数学·数论基础 → 素数 / 同余与模运算 / 数论函数；数据结构·可持久化数据结构 → 可持久化线段树） |
 | `tags` | 3–6 个（>8 触发 W010） |
 | `timeComplexity` / `spaceComplexity` | 从思路或代码层数推出；**不许写"未知"** |
 | `level` | 默认 `A`；用户说要详解/深挖再给 B/C |
@@ -126,6 +126,15 @@ node build.js               # 产物：109 → 110 之类
 | 图谱 `related` 单向 | W033（113 处那种规模很难修） | 加一条反向边 |
 | 标题带"自己写的" | W002 | 改成正式名（版本差异用 `-self` 后缀放 id 里） |
 | 表格公式里的 `|` | W019，表格错位 | 写 `\lvert…\rvert` |
+
+## 多版本（给知识点加"其他作者的版本"）
+
+每个知识点可有多个作者各自的版本（正文 + 代码各一套），详情页顶部 tab 切换：
+
+- 站主版：`content/<id>.md`；其他作者版：`content/<id>--作者.md`（作者 key 见 `build.js` 顶部 `AUTHOR_KEYS`）。
+- 版本文件 `id` 与站主版相同（base id，不含 `--作者`），`category/subcategory` 一致，`source` 填作者全名，`codePath` 用**独立路径**（同目录文件名加 `--作者` 后缀，不覆盖站主 `.cpp`）。
+- 只给某作者加版本时：新建 `content/<id>--作者.md`，不碰站主版；新建作者时先在 `AUTHOR_KEYS` 登记 key → 显示名。
+- 版本文件同样走门禁（`node tools/lint.js` + `build.js`）。
 
 ## 汇报模板
 
