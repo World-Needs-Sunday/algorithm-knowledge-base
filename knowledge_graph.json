@@ -310,6 +310,9 @@
         },
         "基础算法|搜索|折半搜索": {
             "description": "Meet in the Middle（折半搜索）将搜索空间分成两半分别枚举，再合并结果，将指数级复杂度从O(2^n)降至O(n·2^(n/2))，是解决中等规模子集类问题的核心技巧。"
+        },
+        "基础算法|搜索|启发式搜索": {
+            "description": "以 f=g+h 评价函数引导搜索方向：g 是起点到当前状态的实际代价，h 是当前状态到目标的剩余代价下界（可采纳启发）。A* 是其代表算法，广泛用于网格寻路、拼图、第 K 短路等问题。"
         }
     },
     "knowledgePoints": {
@@ -850,7 +853,8 @@
                 "graph-dag-shortest-path",
                 "graph-spfa",
                 "graph-topo-sort",
-                "basic-bfs-bidirectional"
+                "basic-bfs-bidirectional",
+                "basic-astar"
             ]
         },
         "graph-bellman-ford": {
@@ -1298,6 +1302,14 @@
         "basic-bfs": {
             "prerequisites": [],
             "related": []
+        },
+        "basic-astar": {
+            "prerequisites": [
+                "graph-dijkstra-heap"
+            ],
+            "related": [
+                "graph-dijkstra-heap"
+            ]
         },
         "graph-basic": {
             "prerequisites": [],
