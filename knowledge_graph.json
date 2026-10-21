@@ -1251,7 +1251,9 @@
             ]
         },
         "math-block-division": {
-            "prerequisites": [],
+            "prerequisites": [
+                "math-number-theory-basic"
+            ],
             "related": []
         },
         "str-ac-automaton": {
