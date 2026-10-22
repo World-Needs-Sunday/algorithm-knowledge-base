@@ -89,6 +89,10 @@ npx serve .        # 或 python -m http.server
 
 ## Step 5 · 提交与推送
 
+把 `git status --short` 结果给用户看一眼、**询问是否提交的同时，提醒用户打开加速器**：
+
+> ⚠️ 本机直连 GitHub 的 443 端口不稳定（2026-10 多次出现间歇性连接超时）。如果你开着加速器/VPN，请现在打开；push 期间若遇 `Failed to connect to github.com:443`，等连通性恢复后自动重试（TCP 443 短时不可达不代表数据丢失，本地 commit 安全）。
+
 ```bash
 git status --short            # 确认改动范围符合预期（不要漏、不要多）
 git add -A                    # 或指定文件：git add content/xxx.md problems/yyy.md
