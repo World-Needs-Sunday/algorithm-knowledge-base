@@ -189,6 +189,9 @@
         "基础算法|倍增": {
             "description": "通过预处理 2^k 规模的信息，把线性逐位处理优化为按二进制位跳跃。是 ST 表、LCA 倍增、快速幂、后缀数组等算法的共同思想基础。"
         },
+        "基础算法|根号分治": {
+            "description": "按阈值 B≈√m 把对象按规模分成两类分别处理的方法论：小规模单次便宜可暴力，大规模数量少可集中处理，两边复杂度平衡。代表应用是无向图三元环计数（度数定向 + 时间戳标记，O(m√m)）。"
+        },
         "图论|图论基础": {
             "description": "图、有向/无向、度、路径、环、连通性、简单图等基本概念与性质，是后续所有图论算法（最短路、MST、SCC、网络流等）的基础。"
         },
@@ -783,7 +786,8 @@
                 "ds-mo-team",
                 "ds-segtree-basic",
                 "ds-monoqueue-2d",
-                "basic-quickselect-kth"
+                "basic-quickselect-kth",
+                "basic-sqrt-decomposition"
             ]
         },
         "ds-mo-team": {
@@ -1254,7 +1258,9 @@
             "prerequisites": [
                 "math-number-theory-basic"
             ],
-            "related": []
+            "related": [
+                "basic-sqrt-decomposition"
+            ]
         },
         "str-ac-automaton": {
             "prerequisites": [
@@ -1304,6 +1310,15 @@
         "basic-bfs": {
             "prerequisites": [],
             "related": []
+        },
+        "basic-sqrt-decomposition": {
+            "prerequisites": [
+                "graph-storage"
+            ],
+            "related": [
+                "math-block-division",
+                "ds-block-decomposition"
+            ]
         },
         "basic-astar": {
             "prerequisites": [
