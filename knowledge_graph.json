@@ -210,6 +210,9 @@
         "图论|虚树": {
             "description": "在多组询问、每组涉及少量关键点的情况下，把关键点及其 LCA 按原树祖先关系连成的一棵压缩树，从而把树上 DP/询问复杂度从 O(n) 降到 O(k log k)。"
         },
+        "图论|分层图": {
+            "description": "把有限取值的附加状态（剩余次数、方向、是否持有、状态机阶段）拆成「层」的最短路建模技巧：状态从 u 扩展为 (u, state)，跨层边即状态转移。可显式建 k+1 层图，也可隐式状态扩展 + 支配剪枝（如 P4568 的一维 vis 最大剩余次数剪枝）。"
+        },
         "数学|群论": {
             "description": "群、置换、Polya 计数等抽象代数概念，用于循环计数、等价类计数等问题。"
         },
@@ -329,7 +332,8 @@
         "basic-interval-scheduling": {
             "prerequisites": [],
             "related": [
-                "basic-interval-merge"
+                "basic-interval-merge",
+                "basic-regret-greedy"
             ]
         },
         "basic-interval-merge": {
@@ -570,7 +574,8 @@
                 "ds-diff-1d",
                 "ds-prefix-sum-2d",
                 "ds-bit-point-range",
-                "str-hash"
+                "str-hash",
+                "ds-bit-second-prefix"
             ]
         },
         "ds-diff-1d": {
@@ -618,6 +623,24 @@
                 "dp-linear-lis-bit-count",
                 "basic-divide-conquer-merge-inversion",
                 "exam-bit-operation"
+            ]
+        },
+        "ds-bit-second-prefix": {
+            "prerequisites": [
+                "ds-bit-point-range"
+            ],
+            "related": [
+                "ds-prefix-sum-1d",
+                "ds-bit-second-diff"
+            ]
+        },
+        "ds-bit-second-diff": {
+            "prerequisites": [
+                "ds-diff-1d",
+                "ds-bit-second-prefix"
+            ],
+            "related": [
+                "ds-bit-second-prefix"
             ]
         },
         "ds-bit-range-point": {
@@ -858,7 +881,8 @@
                 "graph-spfa",
                 "graph-topo-sort",
                 "basic-bfs-bidirectional",
-                "basic-astar"
+                "basic-astar",
+                "graph-layered"
             ]
         },
         "graph-bellman-ford": {
@@ -891,6 +915,14 @@
                 "dp-bitmask-hamilton",
                 "graph-dag-shortest-path",
                 "basic-bitset"
+            ]
+        },
+        "graph-layered": {
+            "prerequisites": [
+                "graph-dijkstra-heap"
+            ],
+            "related": [
+                "graph-dijkstra-heap"
             ]
         },
         "graph-johnson": {
@@ -1302,6 +1334,14 @@
         "basic-greedy": {
             "prerequisites": [],
             "related": []
+        },
+        "basic-regret-greedy": {
+            "prerequisites": [
+                "basic-greedy"
+            ],
+            "related": [
+                "basic-interval-scheduling"
+            ]
         },
         "basic-dfs": {
             "prerequisites": [],
