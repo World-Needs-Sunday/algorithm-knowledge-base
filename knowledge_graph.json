@@ -1066,7 +1066,16 @@
                 "graph-tarjan-cut-vertex",
                 "graph-tarjan-bridge",
                 "graph-bipartite-dfs-coloring",
-                "graph-scc-dag-dp"
+                "graph-scc-dag-dp",
+                "graph-2sat"
+            ]
+        },
+        "graph-2sat": {
+            "prerequisites": [
+                "graph-tarjan-scc"
+            ],
+            "related": [
+                "graph-tarjan-scc"
             ]
         },
         "graph-scc-condensation": {
