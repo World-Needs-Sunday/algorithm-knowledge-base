@@ -376,7 +376,16 @@
                 "dp-multi-bag-binary",
                 "dp-linear-triangle",
                 "dp-tree-dance",
-                "dp-tree-01bag"
+                "dp-tree-01bag",
+                "dp-knapsack-topk"
+            ]
+        },
+        "dp-knapsack-topk": {
+            "prerequisites": [
+                "dp-01bag-standard"
+            ],
+            "related": [
+                "dp-01bag-standard"
             ]
         },
         "dp-bitmask-hamilton": {
