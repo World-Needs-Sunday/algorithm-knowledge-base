@@ -11,7 +11,7 @@
 | 问题 | 答案 |
 |---|---|
 | 网站是什么 | 纯静态算法/知识点查询站（单文件 `index.html` + 三个构建产物），GitHub Pages 托管 |
-| 内容从哪来 | `content/*.md`（知识点 171 篇）、`problems/*.md`（题目 34 道）、各分类目录下的 `.cpp`（你本人写的代码） |
+| 内容从哪来 | `content/*.md`（知识点 174 篇）、`problems/*.md`（题目 34 道）、各分类目录下的 `.cpp`（你本人写的代码） |
 | 怎么生成网页数据 | `node build.js` → `data.js` + `problems_data.js` + `code_data.js` |
 | 改了内容怎么验证 | `node tools/lint.js`（**error 必须为 0**）→ `node build.js` → 浏览器 Ctrl+F5 |
 | 什么绝对不能做 | ① 代写 `.cpp` 实现 ② 手改三个产物 ③ 不过门禁就交付 |
@@ -41,9 +41,9 @@
 ├── README.md               # 项目说明（人/AI 入口）
 ├── AGENTS.md               # 三条铁律 + 入口指引
 ├── PROJECT_FRAMEWORK.md    # 本文件
-├── content/                # 知识点源文件（171 篇，平铺）；xxx--作者.md 是该知识点的「其他作者版本」
+├── content/                # 知识点源文件（174 篇，平铺）；xxx--作者.md 是该知识点的「其他作者版本」
 ├── problems/               # 题目源文件（34 道，平铺）
-├── 动态规划/ 数据结构/ 图论/ 数学/ 字符串/ 基础算法/ 输入,输出/   # 知识点 .cpp
+├── 动态规划/ 数据结构/ 图论/ 数学/ 字符串/ 基础算法/ 输入,输出/ 优化技巧/   # 知识点 .cpp
 ├── 题目专辑/                # 题目 .cpp
 ├── templates/              # kp-template.md / problem-template.md
 ├── tools/                  # lint.js（门禁）+ new-kp.js + new-problem.js + stress.*（对拍）
@@ -86,7 +86,7 @@ knowledge_graph.json ─┘       ├─► problems_data.js PROBLEMS_DATA
 |---|---|---|
 | `id` | ✅ | **必须等于文件名（去 .md）**，小写字母/数字/连字符 |
 | `title` | ✅ | 正式名称，单引号包裹；**禁止**"自己写的""以前没学过""D. xxx"这类字样 |
-| `category` | ✅ | 8 个之一：基础算法 / 动态规划 / 数据结构 / 图论 / 数学 / 字符串 / 输入输出 / 初赛笔记 |
+| `category` | ✅ | 9 个之一：基础算法 / 动态规划 / 数据结构 / 图论 / 数学 / 字符串 / 输入输出 / 初赛笔记 / 优化技巧 |
 | `subcategory` | ✅ | 子分类，需在 `knowledge_graph.json` 的 `subcategories` 里登记 |
 | `subSubcategory` | ❌ | 小分类（需在 `subSubcategories` 登记） |
 | `tags` | ❌ | 3–6 个最佳，**最多 8 个** |
@@ -205,6 +205,7 @@ knowledge_graph.json ─┘       ├─► problems_data.js PROBLEMS_DATA
 | 表格里公式含 `|` 会把表格拆成多余单元格 | 写成 `\lvert x \rvert`（不要写 `\|`，那是双竖线范数符号） |
 | `$` 不成对（如正文里的货币符号） | 成对使用；行内公式 `$` 两侧不要留空格 |
 | 反引号代码段里混进 LaTeX | 代码引用与公式分开：`` `fac[i]` ``（即 $2^i \bmod \text{mod}$） |
+| 行内公式里的 `&` 未转义（`&` 是 KaTeX 对齐符，会导致整段公式解析失败、原文泄漏） | 写成 `\&`，如 $nxt\ \&\ mask$；位运算「与」优先用 `\&\ ` 或改文字表述 |
 
 ---
 

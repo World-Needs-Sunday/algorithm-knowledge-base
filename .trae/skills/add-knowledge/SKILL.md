@@ -35,7 +35,7 @@ description: "添加知识点。当用户说「这是新知识点」「帮我入
 |---|---|
 | `id` | `{前缀}-{子分类缩写}-{算法名}`，小写连字符；前缀见 `PROJECT_FRAMEWORK.md` §3.6 |
 | `title` | 正式算法名；**禁止**"自己写的""以前没学过" |
-| `category` | 8 个大类之一 |
+| `category` | 9 个大类之一 |
 | `subcategory` / `subSubcategory` | 需在图谱里登记过（否则 lint W005/W006）；**同类知识点多时用 `subSubcategory` 做二级标签**（例：数学·数论基础 → 素数 / 同余与模运算 / 数论函数；数据结构·可持久化数据结构 → 可持久化线段树） |
 | `tags` | 3–6 个（>8 触发 W010） |
 | `timeComplexity` / `spaceComplexity` | 从思路或代码层数推出；**不许写"未知"** |

@@ -39,6 +39,11 @@
             "nature": "竞赛理论知识",
             "description": "CSP 初赛涉及的理论知识与考点总结，不包含代码实现，侧重概念理解、公式记忆和应试技巧。涵盖位运算、数据类型、运算符优先级、进制转换等初赛高频考点。",
             "problemDomain": "CSP 初赛的选择题、判断题、程序阅读题等理论考核场景"
+        },
+        "优化技巧": {
+            "nature": "工程优化与常数压缩",
+            "description": "以工程手段压缩时间或空间常数的优化技巧，聚焦「渐近复杂度不变的前提下更快、更省」。涵盖 bitset 机器字并行、卡常策略等。",
+            "problemDomain": "常数级优化、位运算加速、空间压缩等工程优化场景"
         }
     },
     "subcategories": {
@@ -228,8 +233,11 @@
         "基础算法|实用工具": {
             "description": "竞赛中常用的辅助工具：时间测试、自用头文件、pb_ds 等，用于提升开发与调试效率。"
         },
-        "基础算法|优化技巧": {
-            "description": "以机器字并行等常数手段压缩时间或空间的工程优化技巧，以 bitset 位运算加速为代表，如把 Floyd 传递闭包的 O(n^3) 常数除以字长。"
+        "优化技巧|常数优化": {
+            "description": "在渐近复杂度不变的前提下压缩常数或空间的工程优化手段，以 bitset 机器字并行（把逐位操作压成整字、常数除以字长）为代表，如把 Floyd 传递闭包的 O(n^3) 常数除以 64。"
+        },
+        "优化技巧|位运算技巧": {
+            "description": "用二进制掩码表示集合、以位运算实现枚举与判定的技巧：子集枚举（(i-1)&s 降序遍历）、位掩码 BFS 连通性判定等，是状压 DP 与集合类算法的实现基石。"
         }
     },
     "subSubcategories": {
@@ -923,7 +931,7 @@
                 "graph-dijkstra-heap",
                 "dp-bitmask-hamilton",
                 "graph-dag-shortest-path",
-                "basic-bitset"
+                "opt-bitset"
             ]
         },
         "graph-layered": {
@@ -1333,12 +1341,36 @@
             "prerequisites": [],
             "related": []
         },
-        "basic-bitset": {
+        "opt-bitset": {
             "prerequisites": [
                 "graph-floyd"
             ],
             "related": [
-                "graph-floyd"
+                "graph-floyd",
+                "opt-bitmask-connectivity"
+            ]
+        },
+        "opt-bitmask-connectivity": {
+            "prerequisites": [
+                "exam-bit-operation"
+            ],
+            "related": [
+                "opt-bitset",
+                "opt-subset-enumeration"
+            ]
+        },
+        "opt-subset-enumeration": {
+            "prerequisites": [
+                "exam-bit-operation"
+            ],
+            "related": [
+                "opt-bitmask-connectivity"
+            ]
+        },
+        "opt-timestamp": {
+            "prerequisites": [],
+            "related": [
+                "basic-sqrt-decomposition"
             ]
         },
         "basic-doubling": {
@@ -1375,7 +1407,8 @@
             ],
             "related": [
                 "math-block-division",
-                "ds-block-decomposition"
+                "ds-block-decomposition",
+                "opt-timestamp"
             ]
         },
         "basic-astar": {
